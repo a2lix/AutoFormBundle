@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <!-- Form Manipulators -->
+        <service id="a2lix_auto_form.default.manipulator" class="A2lix\AutoFormBundle\Form\Manipulator\DefaultManipulator">
+            <argument type="service" id="a2lix_auto_form.doctrine_info" />
+            <argument type="collection">
+                <argument>id</argument>
+                <argument>locale</argument>
+                <argument>translatable</argument>
+            </argument>
+        </service>
+
+        <!-- Form Listeners -->
+        <service id="a2lix_auto_form.default.listener.autoform" class="A2lix\AutoFormBundle\Form\EventListener\AutoFormListener">
+            <argument type="service" id="a2lix_auto_form.default.manipulator" />
+        </service>
+
+        <!-- Form Types -->
+        <service id="a2lix_auto_form.default.type.autoform" class="A2lix\AutoFormBundle\Form\Type\AutoFormType">
+            <argument type="service" id="a2lix_auto_form.default.listener.autoform" />
+
+            <tag name="form.type" />
+        </service>
+    </services>
+</container>
