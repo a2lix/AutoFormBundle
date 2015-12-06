@@ -12,15 +12,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AutoFormType extends AbstractType
 {
-    /** @var AutoFormListener */
-    private $AutoFormListener;
+    /** @var autoFormListener */
+    private $autoFormListener;
 
     /**
-     * @param AutoFormListener $AutoFormListener
+     * @param AutoFormListener $autoFormListener
      */
-    public function __construct(AutoFormListener $AutoFormListener)
+    public function __construct(AutoFormListener $autoFormListener)
     {
-        $this->AutoFormListener = $AutoFormListener;
+        $this->autoFormListener = $autoFormListener;
     }
 
     /**
@@ -29,7 +29,7 @@ class AutoFormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber($this->AutoFormListener);
+        $builder->addEventSubscriber($this->autoFormListener);
     }
 
     /**
@@ -39,6 +39,7 @@ class AutoFormType extends AbstractType
     {
         $resolver->setDefaults([
             'fields' => [],
+            'excluded_fields' => [],
         ]);
     }
 }
