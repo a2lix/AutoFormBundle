@@ -12,39 +12,38 @@ class DefaultManipulator implements FormManipulatorInterface
     /** @var ObjectInfoInterface */
     private $objectInfo;
     /** @var array */
-    private $excludedFields;
+    private $globalExcludedFields;
 
     /**
      * @param ObjectInfoInterface $objectInfo
-     * @param array               $excludedFields
+     * @param array               $globalExcludedFields
      */
-    public function __construct(ObjectInfoInterface $objectInfo, array $excludedFields = [])
+    public function __construct(ObjectInfoInterface $objectInfo, array $globalExcludedFields = [])
     {
         $this->objectInfo = $objectInfo;
-        $this->excludedFields = $excludedFields;
+        $this->globalExcludedFields = $globalExcludedFields;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFieldsConfig($class, array $formFieldsConfig)
+    public function getFieldsConfig($class, array $formConfig)
     {
-        $objectFieldsConfig = $this->objectInfo->getFieldsConfig($class);
-
         // Filtering to remove excludedFields
-        $usuableObjectFieldsConfig = $this->filteringUsuableFields($objectFieldsConfig);
+        $objectFieldsConfig = $this->objectInfo->getFieldsConfig($class);
+        $usuableObjectFieldsConfig = $this->filteringUsuableFields($objectFieldsConfig, $formConfig['excluded_fields']);
 
-        if (empty($formFieldsConfig)) {
+        if (empty($formConfig['fields'])) {
             return $usuableObjectFieldsConfig;
         }
 
         // Check unknows fields
-        $unknowsFields = array_diff(array_keys($formFieldsConfig), array_keys($usuableObjectFieldsConfig));
+        $unknowsFields = array_diff(array_keys($formConfig['fields']), array_keys($usuableObjectFieldsConfig));
         if (count($unknowsFields)) {
-            throw new \RuntimeException(sptrinf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
+            throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
         }
 
-        foreach ($formFieldsConfig as $formFieldName => $formFieldConfig) {
+        foreach ($formConfig['fields'] as $formFieldName => $formFieldConfig) {
             if (null === $formFieldConfig) {
                 continue;
             }
@@ -52,6 +51,7 @@ class DefaultManipulator implements FormManipulatorInterface
             // If display undesired, remove
             if (isset($formFieldConfig['display']) && (false === $formFieldConfig['display'])) {
                 unset($usuableObjectFieldsConfig[$formFieldName]);
+                continue;
             }
 
             // Override with formFieldsConfig priority
@@ -63,15 +63,17 @@ class DefaultManipulator implements FormManipulatorInterface
 
     /**
      * @param array $objectFieldsConfig
+     * @param array $formExcludedFields
      *
      * @return array
      */
-    private function filteringUsuableFields(array $objectFieldsConfig)
+    private function filteringUsuableFields(array $objectFieldsConfig, array $formExcludedFields)
     {
-        $usualableFields = [];
+        $excludedFields = array_merge($this->globalExcludedFields, $formExcludedFields);
 
+        $usualableFields = [];
         foreach ($objectFieldsConfig as $fieldName => $fieldConfig) {
-            if (!in_array($fieldName, $this->excludedFields, true)) {
+            if (!in_array($fieldName, $excludedFields, true)) {
                 $usualableFields[$fieldName] = $fieldConfig;
             }
         }

@@ -44,7 +44,7 @@ class AutoFormListener implements EventSubscriberInterface
 
         $fieldsClass = ClassUtils::getRealClass($formConfig->getDataClass());
 
-        $fieldsOptions = $this->formManipulator->getFieldsConfig($fieldsClass, $formConfig->getOptions()['fields']);
+        $fieldsOptions = $this->formManipulator->getFieldsConfig($fieldsClass, $formConfig->getOptions());
         foreach ($fieldsOptions as $fieldName => $fieldConfig) {
             $fieldType = isset($fieldConfig['field_type']) ? $fieldConfig['field_type'] : null;
             unset($fieldConfig['field_type']);

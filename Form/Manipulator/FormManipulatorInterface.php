@@ -9,11 +9,11 @@ interface FormManipulatorInterface
 {
     /**
      * @param string $class
-     * @param array  $formFieldsConfig
+     * @param array  $formConfig
      *
      * @throws \RuntimeException
      *
      * @return array
      */
-    public function getFieldsConfig($class, array $formFieldsConfig);
+    public function getFieldsConfig($class, array $formConfig);
 }
