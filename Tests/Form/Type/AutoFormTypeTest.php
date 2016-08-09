@@ -21,9 +21,8 @@ class AutoFormTypeTest extends TypeTestCase
         ], [])];
     }
 
-    public function testSubmitValidDefaultConfigurationData()
+    public function testCreationValidDefaultConfigurationData()
     {
-        // Creation
         $media1 = new Media();
         $media1->setUrl('http://example.org/media1')
                ->setDescription('media1 desc');
@@ -58,7 +57,14 @@ class AutoFormTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals($product, $form->getData());
 
-        // Edition
+        return $product;
+    }
+
+    /**
+     * @depends testCreationValidDefaultConfigurationData
+     */
+    public function testEditionValidDefaultConfigurationData($product)
+    {
         $product->getMedias()[0]->setUrl('http://example.org/media1-edit');
         $product->getMedias()[1]->setDescription('media2 desc edit');
 

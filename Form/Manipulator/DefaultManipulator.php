@@ -3,6 +3,8 @@
 namespace A2lix\AutoFormBundle\Form\Manipulator;
 
 use A2lix\AutoFormBundle\ObjectInfo\ObjectInfoInterface;
+use Doctrine\Common\Util\ClassUtils;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @author David ALLIX
@@ -27,23 +29,26 @@ class DefaultManipulator implements FormManipulatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getFieldsConfig($class, array $formConfig)
+    public function getFieldsConfig(FormInterface $form)
     {
+        $class = $this->getDataClass($form);
+        $formOptions = $form->getConfig()->getOptions();
+
         // Filtering to remove excludedFields
         $objectFieldsConfig = $this->objectInfo->getFieldsConfig($class);
-        $usuableObjectFieldsConfig = $this->filteringUsuableFields($objectFieldsConfig, $formConfig['excluded_fields']);
+        $usuableObjectFieldsConfig = $this->filteringUsuableFields($objectFieldsConfig, $formOptions['excluded_fields']);
 
-        if (empty($formConfig['fields'])) {
+        if (empty($formOptions['fields'])) {
             return $usuableObjectFieldsConfig;
         }
 
         // Check unknows fields
-        $unknowsFields = array_diff(array_keys($formConfig['fields']), array_keys($usuableObjectFieldsConfig));
+        $unknowsFields = array_diff(array_keys($formOptions['fields']), array_keys($usuableObjectFieldsConfig));
         if (count($unknowsFields)) {
             throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
         }
 
-        foreach ($formConfig['fields'] as $formFieldName => $formFieldConfig) {
+        foreach ($formOptions['fields'] as $formFieldName => $formFieldConfig) {
             if (null === $formFieldConfig) {
                 continue;
             }
@@ -62,6 +67,29 @@ class DefaultManipulator implements FormManipulatorInterface
     }
 
     /**
+     * @param FormInterface $form
+     *
+     * @return string
+     */
+    private function getDataClass(FormInterface $form)
+    {
+        // Simple case, data_class from current form
+        if ($dataClass = $form->getConfig()->getDataClass()) {
+            return ClassUtils::getRealClass($dataClass);
+        }
+
+        // Advanced case, loop parent form to get closest fill data_class
+        while ($formParent = $form->getParent()) {
+            if (!$dataClass = $formParent->getConfig()->getDataClass()) {
+                $form = $formParent;
+                continue;
+            }
+
+            return $this->objectInfo->getAssociationTargetClass($dataClass, $form->getName());
+        }
+    }
+
+    /**
      * @param array $objectFieldsConfig
      * @param array $formExcludedFields
      *
@@ -73,9 +101,11 @@ class DefaultManipulator implements FormManipulatorInterface
 
         $usualableFields = [];
         foreach ($objectFieldsConfig as $fieldName => $fieldConfig) {
-            if (!in_array($fieldName, $excludedFields, true)) {
-                $usualableFields[$fieldName] = $fieldConfig;
+            if (in_array($fieldName, $excludedFields, true)) {
+                continue;
             }
+
+            $usualableFields[$fieldName] = $fieldConfig;
         }
 
         return $usualableFields;

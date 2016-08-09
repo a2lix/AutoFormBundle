@@ -12,17 +12,18 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": "^5.4 || ^7.0",
         "symfony/form": "~2.8|~3.0",
         "symfony/doctrine-bridge": "~2.8|~3.0"
     },
     "require-dev": {
         "symfony/validator": "~2.8|~3.0",
         "phpunit/phpunit": "~4.1",
-        "fabpot/php-cs-fixer": "~1.10",
+        "friendsofphp/php-cs-fixer": "~1.10",
         "doctrine/orm": "~2.4"
     },
     "suggest": {
+        "a2lix/translation-form-bundle": "For translation form"
     },
     "autoload": {
         "psr-4": { "A2lix\\AutoFormBundle\\": "" },
@@ -30,7 +31,6 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "beta",
     "extra": {
         "branch-alias": {
             "dev-master": "0.x-dev"

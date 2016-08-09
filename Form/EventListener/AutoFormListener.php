@@ -3,7 +3,6 @@
 namespace A2lix\AutoFormBundle\Form\EventListener;
 
 use A2lix\AutoFormBundle\Form\Manipulator\FormManipulatorInterface;
-use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -40,11 +39,8 @@ class AutoFormListener implements EventSubscriberInterface
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();
-        $formConfig = $form->getConfig();
 
-        $fieldsClass = ClassUtils::getRealClass($formConfig->getDataClass());
-
-        $fieldsOptions = $this->formManipulator->getFieldsConfig($fieldsClass, $formConfig->getOptions());
+        $fieldsOptions = $this->formManipulator->getFieldsConfig($form);
         foreach ($fieldsOptions as $fieldName => $fieldConfig) {
             $fieldType = isset($fieldConfig['field_type']) ? $fieldConfig['field_type'] : null;
             unset($fieldConfig['field_type']);

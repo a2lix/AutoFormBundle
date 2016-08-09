@@ -56,8 +56,8 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     protected function getConfiguredAutoFormType()
     {
-        $AutoFormListener = new \A2lix\AutoFormBundle\Form\EventListener\AutoFormListener($this->getDefaultFormManipulator());
+        $autoFormListener = new \A2lix\AutoFormBundle\Form\EventListener\AutoFormListener($this->getDefaultFormManipulator());
 
-        return new \A2lix\AutoFormBundle\Form\Type\AutoFormType($AutoFormListener);
+        return new \A2lix\AutoFormBundle\Form\Type\AutoFormType($autoFormListener);
     }
 }

@@ -5,6 +5,7 @@ namespace A2lix\AutoFormBundle\Form\Type;
 use A2lix\AutoFormBundle\Form\EventListener\AutoFormListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -41,5 +42,13 @@ class AutoFormType extends AbstractType
             'fields' => [],
             'excluded_fields' => [],
         ]);
+
+        $resolver->setNormalizer('data_class', function (Options $options, $value) {
+            if (empty($value)) {
+                throw new \RuntimeException(sprintf('Missing "data_class" option of "AutoFormType".'));
+            }
+
+            return $value;
+        });
     }
 }

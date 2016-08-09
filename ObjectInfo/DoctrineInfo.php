@@ -67,7 +67,7 @@ class DoctrineInfo implements ObjectInfoInterface
                 $assocsConfigs[$assocName] = [
                     'field_type' => 'A2lix\AutoFormBundle\Form\Type\AutoFormType',
                     'data_class' => $class,
-//                    'required' => !$nullable,
+                    'required' => !$nullable,
                 ];
 
                 continue;
@@ -85,5 +85,24 @@ class DoctrineInfo implements ObjectInfoInterface
         }
 
         return $assocsConfigs;
+    }
+
+    /**
+     * @param string $class
+     * @param string $fieldName
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function getAssociationTargetClass($class, $fieldName)
+    {
+        $metadata = $this->classMetadataFactory->getMetadataFor($class);
+
+        if ($metadata->hasAssociation($fieldName)) {
+            return $metadata->getAssociationTargetClass($fieldName);
+        }
+
+        throw new \Exception(sprintf('Unable to find the association target class of "%s" in %s.', $fieldName, $class));
     }
 }

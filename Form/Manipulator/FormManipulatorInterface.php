@@ -2,18 +2,19 @@
 
 namespace A2lix\AutoFormBundle\Form\Manipulator;
 
+use Symfony\Component\Form\FormInterface;
+
 /**
  * @author David ALLIX
  */
 interface FormManipulatorInterface
 {
     /**
-     * @param string $class
-     * @param array  $formConfig
+     * @param FormInterface $form
      *
      * @throws \RuntimeException
      *
      * @return array
      */
-    public function getFieldsConfig($class, array $formConfig);
+    public function getFieldsConfig(FormInterface $form);
 }
