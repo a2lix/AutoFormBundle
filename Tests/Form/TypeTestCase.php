@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of A2lix projects.
+ *
+ * (c) David ALLIX
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace A2lix\AutoFormBundle\Tests\Form;
 
 use Doctrine\ORM\EntityManager;
@@ -10,9 +19,6 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-/**
- * @author David ALLIX
- */
 abstract class TypeTestCase extends BaseTypeTestCase
 {
     /** @var DefaultManipulator */
