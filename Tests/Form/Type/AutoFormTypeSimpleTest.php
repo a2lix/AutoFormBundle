@@ -16,7 +16,7 @@ use A2lix\AutoFormBundle\Tests\Fixtures\Entity\Product;
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
-class AutoFormTypeTest extends TypeTestCase
+class AutoFormTypeSimpleTest extends TypeTestCase
 {
     protected function getExtensions()
     {
@@ -27,8 +27,25 @@ class AutoFormTypeTest extends TypeTestCase
         ], [])];
     }
 
-    public function testCreationValidDefaultConfigurationData()
+    public function testEmptyForm()
     {
+        $form = $this->factory->createBuilder('A2lix\AutoFormBundle\Form\Type\AutoFormType', new Product())
+            ->add('create', 'Symfony\Component\Form\Extension\Core\Type\SubmitType')
+            ->getForm();
+
+        $this->assertEquals(['create', 'title', 'description', 'url', 'medias'], array_keys($form->all()), 'Fields should matches Product fields');
+
+        $mediasFormOptions = $form->get('medias')->getConfig()->getOptions();
+        $this->assertEquals('A2lix\AutoFormBundle\Form\Type\AutoFormType', $mediasFormOptions['entry_type'], 'Media type should be an AutoType');
+        $this->assertEquals('A2lix\AutoFormBundle\Tests\Fixtures\Entity\Media', $mediasFormOptions['entry_options']['data_class'], 'Media should have its right data_class');
+    }
+
+    public function testCreationForm()
+    {
+        $form = $this->factory->createBuilder('A2lix\AutoFormBundle\Form\Type\AutoFormType', new Product())
+            ->add('create', 'Symfony\Component\Form\Extension\Core\Type\SubmitType')
+            ->getForm();
+
         $media1 = new Media();
         $media1->setUrl('http://example.org/media1')
                ->setDescription('media1 desc');
@@ -55,10 +72,6 @@ class AutoFormTypeTest extends TypeTestCase
             ],
         ];
 
-        $form = $this->factory->createBuilder('A2lix\AutoFormBundle\Form\Type\AutoFormType', new Product())
-            ->add('create', 'Symfony\Component\Form\Extension\Core\Type\SubmitType')
-            ->getForm();
-
         $form->submit($formData);
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals($product, $form->getData());
@@ -67,9 +80,9 @@ class AutoFormTypeTest extends TypeTestCase
     }
 
     /**
-     * @depends testCreationValidDefaultConfigurationData
+     * @depends testCreationForm
      */
-    public function testEditionValidDefaultConfigurationData($product)
+    public function testEditionForm($product)
     {
         $product->getMedias()[0]->setUrl('http://example.org/media1-edit');
         $product->getMedias()[1]->setDescription('media2 desc edit');

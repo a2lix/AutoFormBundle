@@ -26,19 +26,8 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('locale_provider')->defaultValue('default')->end()
-                ->scalarNode('default_locale')->defaultNull()->end()
-                ->arrayNode('locales')
-                    ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) {
-                            return preg_split('/\s*,\s*/', $v);
-                        })
-                    ->end()
-                    ->requiresAtLeastOneElement()
-                    ->prototype('scalar')->end()
-                ->end()
-                ->arrayNode('required_locales')
+                ->arrayNode('excluded_fields')
+                    ->defaultValue(['id', 'locale', 'translatable'])
                     ->beforeNormalization()
                         ->ifString()
                         ->then(function ($v) {
@@ -47,7 +36,6 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->prototype('scalar')->end()
                 ->end()
-                ->scalarNode('templating')->defaultValue('A2lixAutoFormBundle::default.html.twig')->end()
             ->end()
         ;
 

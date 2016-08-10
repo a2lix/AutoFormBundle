@@ -6,13 +6,9 @@
 
     <services>
         <!-- Form Manipulators -->
-        <service id="a2lix_auto_form.default.manipulator" class="A2lix\AutoFormBundle\Form\Manipulator\DefaultManipulator">
+        <service id="a2lix_auto_form.default.manipulator" class="A2lix\AutoFormBundle\Form\Manipulator\DefaultManipulator" public="false">
             <argument type="service" id="a2lix_auto_form.doctrine_info" />
-            <argument type="collection">
-                <argument>id</argument>
-                <argument>locale</argument>
-                <argument>translatable</argument>
-            </argument>
+            <argument type="collection"></argument>
         </service>
 
         <!-- Form Listeners -->

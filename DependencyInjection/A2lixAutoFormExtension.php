@@ -32,6 +32,7 @@ class A2lixAutoFormExtension extends Extension
         $loader->load('a2lix_form.xml');
         $loader->load('object_info.xml');
 
-        $container->setParameter('a2lix_auto_form.templating', $config['templating']);
+        $defaultManipulator = $container->getDefinition('a2lix_auto_form.default.manipulator');
+        $defaultManipulator->replaceArgument(1, $config['excluded_fields']);
     }
 }
