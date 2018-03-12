@@ -13,13 +13,13 @@
     ],
     "require": {
         "php": "^5.4 || ^7.0",
-        "symfony/form": "~2.8|~3.0",
-        "symfony/doctrine-bridge": "~2.8|~3.0"
+        "symfony/form": "~2.8|~3.0|~4.0",
+        "symfony/doctrine-bridge": "~2.8|~3.0|~4.0"
     },
     "require-dev": {
-        "symfony/validator": "~2.8|~3.0",
-        "phpunit/phpunit": "~4.1",
-        "friendsofphp/php-cs-fixer": "~1.10",
+        "symfony/validator": "~2.8|~3.0|~4.0",
+        "symfony/phpunit-bridge": "^4.0",
+        "friendsofphp/php-cs-fixer": "~1.10|~2.10",
         "doctrine/orm": "~2.4"
     },
     "suggest": {
