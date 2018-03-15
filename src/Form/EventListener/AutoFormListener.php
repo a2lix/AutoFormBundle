@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of A2lix projects.
+ * This file is part of the AutoFormBundle package.
  *
- * (c) David ALLIX
+ * (c) David ALLIX <http://a2lix.fr>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,37 +20,27 @@ use Symfony\Component\Form\FormEvents;
 
 class AutoFormListener implements EventSubscriberInterface
 {
-    /** @var FormManipulatorInterface */
     private $formManipulator;
 
-    /**
-     * @param FormManipulatorInterface $formManipulator
-     */
     public function __construct(FormManipulatorInterface $formManipulator)
     {
         $this->formManipulator = $formManipulator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
 
         $fieldsOptions = $this->formManipulator->getFieldsConfig($form);
         foreach ($fieldsOptions as $fieldName => $fieldConfig) {
-            $fieldType = isset($fieldConfig['field_type']) ? $fieldConfig['field_type'] : null;
+            $fieldType = $fieldConfig['field_type'] ?? null;
             unset($fieldConfig['field_type']);
 
             $form->add($fieldName, $fieldType, $fieldConfig);

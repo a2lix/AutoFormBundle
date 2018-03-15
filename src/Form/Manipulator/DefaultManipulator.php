@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of A2lix projects.
+ * This file is part of the AutoFormBundle package.
  *
- * (c) David ALLIX
+ * (c) David ALLIX <http://a2lix.fr>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,25 +19,16 @@ use Symfony\Component\Form\FormInterface;
 
 class DefaultManipulator implements FormManipulatorInterface
 {
-    /** @var ObjectInfoInterface */
     private $objectInfo;
-    /** @var array */
     private $globalExcludedFields;
 
-    /**
-     * @param ObjectInfoInterface $objectInfo
-     * @param array               $globalExcludedFields
-     */
     public function __construct(ObjectInfoInterface $objectInfo, array $globalExcludedFields = [])
     {
         $this->objectInfo = $objectInfo;
         $this->globalExcludedFields = $globalExcludedFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldsConfig(FormInterface $form)
+    public function getFieldsConfig(FormInterface $form): array
     {
         $class = $this->getDataClass($form);
         $formOptions = $form->getConfig()->getOptions();
@@ -72,12 +65,7 @@ class DefaultManipulator implements FormManipulatorInterface
         return $usuableObjectFieldsConfig;
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return string
-     */
-    private function getDataClass(FormInterface $form)
+    private function getDataClass(FormInterface $form): string
     {
         // Simple case, data_class from current form
         if ($dataClass = $form->getConfig()->getDataClass()) {
@@ -95,13 +83,7 @@ class DefaultManipulator implements FormManipulatorInterface
         }
     }
 
-    /**
-     * @param array $objectFieldsConfig
-     * @param array $formExcludedFields
-     *
-     * @return array
-     */
-    private function filteringUsuableFields(array $objectFieldsConfig, array $formExcludedFields)
+    private function filteringUsuableFields(array $objectFieldsConfig, array $formExcludedFields): array
     {
         $excludedFields = array_merge($this->globalExcludedFields, $formExcludedFields);
 

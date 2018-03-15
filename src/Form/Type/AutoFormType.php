@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of A2lix projects.
+ * This file is part of the AutoFormBundle package.
  *
- * (c) David ALLIX
+ * (c) David ALLIX <http://a2lix.fr>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,30 +21,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AutoFormType extends AbstractType
 {
-    /** @var autoFormListener */
     private $autoFormListener;
 
-    /**
-     * @param AutoFormListener $autoFormListener
-     */
     public function __construct(AutoFormListener $autoFormListener)
     {
         $this->autoFormListener = $autoFormListener;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber($this->autoFormListener);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'fields' => [],

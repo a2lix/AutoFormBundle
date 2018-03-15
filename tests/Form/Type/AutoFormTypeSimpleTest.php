@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of A2lix projects.
+ * This file is part of the AutoFormBundle package.
  *
- * (c) David ALLIX
+ * (c) David ALLIX <http://a2lix.fr>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,39 +13,32 @@
 
 namespace A2lix\AutoFormBundle\Tests\Form\Type;
 
+use A2lix\AutoFormBundle\Form\Type\AutoFormType;
 use A2lix\AutoFormBundle\Tests\Fixtures\Entity\Media;
 use A2lix\AutoFormBundle\Tests\Fixtures\Entity\Product;
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\PreloadedExtension;
 
 class AutoFormTypeSimpleTest extends TypeTestCase
 {
-    protected function getExtensions()
+    public function testEmptyForm(): void
     {
-        $autoFormType = $this->getConfiguredAutoFormType();
-
-        return [new PreloadedExtension([
-            $autoFormType,
-        ], [])];
-    }
-
-    public function testEmptyForm()
-    {
-        $form = $this->factory->createBuilder('A2lix\AutoFormBundle\Form\Type\AutoFormType', new Product())
-            ->add('create', 'Symfony\Component\Form\Extension\Core\Type\SubmitType')
+        $form = $this->factory->createBuilder(AutoFormType::class, new Product())
+            ->add('create', SubmitType::class)
             ->getForm();
 
         $this->assertEquals(['create', 'title', 'description', 'url', 'medias'], array_keys($form->all()), 'Fields should matches Product fields');
 
         $mediasFormOptions = $form->get('medias')->getConfig()->getOptions();
-        $this->assertEquals('A2lix\AutoFormBundle\Form\Type\AutoFormType', $mediasFormOptions['entry_type'], 'Media type should be an AutoType');
-        $this->assertEquals('A2lix\AutoFormBundle\Tests\Fixtures\Entity\Media', $mediasFormOptions['entry_options']['data_class'], 'Media should have its right data_class');
+        $this->assertEquals(AutoFormType::class, $mediasFormOptions['entry_type'], 'Media type should be an AutoType');
+        $this->assertEquals(Media::class, $mediasFormOptions['entry_options']['data_class'], 'Media should have its right data_class');
     }
 
-    public function testCreationForm()
+    public function testCreationForm(): Product
     {
-        $form = $this->factory->createBuilder('A2lix\AutoFormBundle\Form\Type\AutoFormType', new Product())
-            ->add('create', 'Symfony\Component\Form\Extension\Core\Type\SubmitType')
+        $form = $this->factory->createBuilder(AutoFormType::class, new Product())
+            ->add('create', SubmitType::class)
             ->getForm();
 
         $media1 = new Media();
@@ -82,7 +77,7 @@ class AutoFormTypeSimpleTest extends TypeTestCase
     /**
      * @depends testCreationForm
      */
-    public function testEditionForm($product)
+    public function testEditionForm(Product $product): void
     {
         $product->getMedias()[0]->setUrl('http://example.org/media1-edit');
         $product->getMedias()[1]->setDescription('media2 desc edit');
@@ -101,8 +96,8 @@ class AutoFormTypeSimpleTest extends TypeTestCase
             ],
         ];
 
-        $form = $this->factory->createBuilder('A2lix\AutoFormBundle\Form\Type\AutoFormType', new Product())
-            ->add('create', 'Symfony\Component\Form\Extension\Core\Type\SubmitType')
+        $form = $this->factory->createBuilder(AutoFormType::class, new Product())
+            ->add('create', SubmitType::class)
             ->getForm();
 
         $form->submit($formData);
@@ -115,5 +110,14 @@ class AutoFormTypeSimpleTest extends TypeTestCase
         foreach (array_keys($formData) as $key) {
             $this->assertArrayHasKey($key, $children);
         }
+    }
+
+    protected function getExtensions(): array
+    {
+        $autoFormType = $this->getConfiguredAutoFormType();
+
+        return [new PreloadedExtension([
+            $autoFormType,
+        ], [])];
     }
 }

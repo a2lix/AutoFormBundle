@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of A2lix projects.
+ * This file is part of the AutoFormBundle package.
  *
- * (c) David ALLIX
+ * (c) David ALLIX <http://a2lix.fr>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,23 +19,14 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 class DoctrineInfo implements ObjectInfoInterface
 {
-    /** @var ClassMetadataFactory */
     private $classMetadataFactory;
 
-    /**
-     * @param ClassMetadataFactory $classMetadataFactory
-     */
     public function __construct(ClassMetadataFactory $classMetadataFactory)
     {
         $this->classMetadataFactory = $classMetadataFactory;
     }
 
-    /**
-     * @param string $class
-     *
-     * @return array
-     */
-    public function getFieldsConfig($class)
+    public function getFieldsConfig(string $class): array
     {
         $fieldsConfig = [];
 
@@ -50,13 +43,18 @@ class DoctrineInfo implements ObjectInfoInterface
         return $fieldsConfig;
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param array         $assocNames
-     *
-     * @return array
-     */
-    private function getAssocsConfig(ClassMetadata $metadata, $assocNames)
+    public function getAssociationTargetClass(string $class, string $fieldName): string
+    {
+        $metadata = $this->classMetadataFactory->getMetadataFor($class);
+
+        if (!$metadata->hasAssociation($fieldName)) {
+            throw new \Exception(sprintf('Unable to find the association target class of "%s" in %s.', $fieldName, $class));
+        }
+
+        return $metadata->getAssociationTargetClass($fieldName);
+    }
+
+    private function getAssocsConfig(ClassMetadata $metadata, array $assocNames): array
     {
         $assocsConfigs = [];
 
@@ -91,24 +89,5 @@ class DoctrineInfo implements ObjectInfoInterface
         }
 
         return $assocsConfigs;
-    }
-
-    /**
-     * @param string $class
-     * @param string $fieldName
-     *
-     * @throws \Exception
-     *
-     * @return string
-     */
-    public function getAssociationTargetClass($class, $fieldName)
-    {
-        $metadata = $this->classMetadataFactory->getMetadataFor($class);
-
-        if (!$metadata->hasAssociation($fieldName)) {
-            throw new \Exception(sprintf('Unable to find the association target class of "%s" in %s.', $fieldName, $class));
-        }
-
-        return $metadata->getAssociationTargetClass($fieldName);
     }
 }
