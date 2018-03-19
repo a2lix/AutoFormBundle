@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of A2lix projects.
+ * This file is part of the AutoFormBundle package.
  *
- * (c) David ALLIX
+ * (c) David ALLIX <http://a2lix.fr>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,39 +42,41 @@ class Media
      */
     protected $description;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProduct()
+    public function getProduct(): Product
     {
         return $this->product;
     }
 
-    public function setProduct(Product $product)
+    public function setProduct(Product $product): self
     {
         $this->product = $product;
+
+        return $this;
     }
 
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
 
-    public function setUrl($url)
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
 
         return $this;
     }
 
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 

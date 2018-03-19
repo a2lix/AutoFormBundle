@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of A2lix projects.
+ * This file is part of the AutoFormBundle package.
  *
- * (c) David ALLIX
+ * (c) David ALLIX <http://a2lix.fr>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +13,8 @@
 
 namespace A2lix\AutoFormBundle\Tests\Fixtures\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -47,56 +51,56 @@ class Product
 
     public function __construct()
     {
-        $this->medias = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->medias = new ArrayCollection();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle($title)
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
 
-    public function setUrl($url)
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
 
         return $this;
     }
 
-    public function getMedias()
+    public function getMedias(): Collection
     {
         return $this->medias;
     }
 
-    public function addMedia(Media $media)
+    public function addMedia(Media $media): self
     {
         if (!$this->medias->contains($media)) {
             $media->setProduct($this);
@@ -106,11 +110,9 @@ class Product
         return $this;
     }
 
-    public function removeMedia(Media $media)
+    public function removeMedia(Media $media): self
     {
-        if ($this->medias->contains($media)) {
-            $this->medias->removeElement($media);
-        }
+        $this->medias->removeElement($media);
 
         return $this;
     }
