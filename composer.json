@@ -1,8 +1,8 @@
 {
     "name": "a2lix/auto-form-bundle",
     "type": "symfony-bundle",
-    "description": "Automatize form creation",
-    "keywords": ["symfony", "form", "field", "automatize", "automatization", "magic"],
+    "description": "Automate form building",
+    "keywords": ["symfony", "form", "field", "automate", "automation", "magic", "building"],
     "homepage": "https://github.com/a2lix/AutoFormBundle",
     "license": "MIT",
     "authors": [
