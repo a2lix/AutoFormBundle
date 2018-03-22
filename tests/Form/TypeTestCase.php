@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace A2lix\AutoFormBundle\Tests\Form;
 
 use A2lix\AutoFormBundle\Form\EventListener\AutoFormListener;
-use A2lix\AutoFormBundle\Form\Manipulator\DefaultManipulator;
+use A2lix\AutoFormBundle\Form\Manipulator\DoctrineORMManipulator;
 use A2lix\AutoFormBundle\Form\Type\AutoFormType;
-use A2lix\AutoFormBundle\ObjectInfo\DoctrineInfo;
+use A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class TypeTestCase extends BaseTypeTestCase
 {
-    protected $defaultFormManipulator;
+    protected $doctrineORMManipulator;
 
     protected function setUp(): void
     {
@@ -55,22 +55,22 @@ abstract class TypeTestCase extends BaseTypeTestCase
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
-    protected function getDefaultFormManipulator(): DefaultManipulator
+    protected function getDoctrineORMManipulator(): DoctrineORMManipulator
     {
-        if (null !== $this->defaultFormManipulator) {
-            return $this->defaultFormManipulator;
+        if (null !== $this->doctrineORMManipulator) {
+            return $this->doctrineORMManipulator;
         }
 
         $config = Setup::createAnnotationMetadataConfiguration([__DIR__.'/../Fixtures/Entity'], true, null, null, false);
         $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);
-        $doctrineInfo = new DoctrineInfo($entityManager->getMetadataFactory());
+        $doctrineORMInfo = new DoctrineORMInfo($entityManager->getMetadataFactory());
 
-        return $this->defaultFormManipulator = new DefaultManipulator($doctrineInfo, ['id', 'locale', 'translatable']);
+        return $this->doctrineORMManipulator = new DoctrineORMManipulator($doctrineORMInfo, ['id', 'locale', 'translatable']);
     }
 
     protected function getConfiguredAutoFormType(): AutoFormType
     {
-        $autoFormListener = new AutoFormListener($this->getDefaultFormManipulator());
+        $autoFormListener = new AutoFormListener($this->getDoctrineORMManipulator());
 
         return new AutoFormType($autoFormListener);
     }
