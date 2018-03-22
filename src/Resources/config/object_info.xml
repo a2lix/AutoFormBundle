@@ -5,11 +5,11 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="a2lix_auto_form.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
+        <service id="a2lix_auto_form.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory">
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
-        <service id="a2lix_auto_form.doctrine_orm_info" class="A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo" public="false">
+        <service id="A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo">
             <argument type="service" id="a2lix_auto_form.doctrine.metadata_factory" />
         </service>
     </services>

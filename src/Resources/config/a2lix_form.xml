@@ -6,21 +6,19 @@
 
     <services>
         <!-- Form Manipulators -->
-        <service id="a2lix_auto_form.doctrine_orm.manipulator" class="A2lix\AutoFormBundle\Form\Manipulator\DoctrineORMManipulator" public="false">
-            <argument type="service" id="a2lix_auto_form.doctrine_orm_info" />
+        <service id="A2lix\AutoFormBundle\Form\Manipulator\DoctrineORMManipulator">
+            <argument type="service" id="A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo" />
             <argument type="collection"></argument>
         </service>
 
-        <service id="a2lix_auto_form.default.manipulator" alias="a2lix_auto_form.doctrine_orm.manipulator" />
-
         <!-- Form Listeners -->
-        <service id="a2lix_auto_form.default.listener.autoform" class="A2lix\AutoFormBundle\Form\EventListener\AutoFormListener">
-            <argument type="service" id="a2lix_auto_form.doctrine_orm.manipulator" />
+        <service id="A2lix\AutoFormBundle\Form\EventListener\AutoFormListener">
+            <argument type="service" id="a2lix_auto_form.manipulator.default" />
         </service>
 
         <!-- Form Types -->
-        <service id="a2lix_auto_form.default.type.autoform" class="A2lix\AutoFormBundle\Form\Type\AutoFormType">
-            <argument type="service" id="a2lix_auto_form.default.listener.autoform" />
+        <service id="A2lix\AutoFormBundle\Form\Type\AutoFormType">
+            <argument type="service" id="A2lix\AutoFormBundle\Form\EventListener\AutoFormListener" />
 
             <tag name="form.type" />
         </service>
