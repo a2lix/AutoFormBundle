@@ -26,9 +26,8 @@ matrix:
 
     # Test the latest stable release
     - php: 7.1
-      env: CHECK_PHP_SYNTAX="true"
     - php: 7.2
-      env: COVERAGE="true" PHPUNIT_FLAGS="-v --coverage-text --coverage-clover=build/coverage.xml"
+      env: CHECK_PHP_SYNTAX="true"
 
     # Latest commit to master
     - php: 7.2
@@ -55,7 +54,3 @@ script:
   # Force most recent version of PHPUnit
   - SYMFONY_PHPUNIT_VERSION=6.5 ./vendor/bin/simple-phpunit $PHPUNIT_FLAGS
   - if [[ "$CHECK_PHP_SYNTAX" == "true" ]]; then php ./vendor/bin/php-cs-fixer fix --no-interaction --dry-run --diff -v; fi;
-
-after_success:
-  - if [[ $COVERAGE = true ]]; then wget https://scrutinizer-ci.com/ocular.phar; fi
-  - if [[ $COVERAGE = true ]]; then php ocular.phar code-coverage:upload --format=php-clover build/coverage.xml; fi
