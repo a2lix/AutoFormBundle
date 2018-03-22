@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormEvents;
 
 class AutoFormListener implements EventSubscriberInterface
 {
+    /** @var FormManipulatorInterface */
     private $formManipulator;
 
     public function __construct(FormManipulatorInterface $formManipulator)

@@ -30,7 +30,7 @@ class A2lixAutoFormExtension extends Extension
         $loader->load('a2lix_form.xml');
         $loader->load('object_info.xml');
 
-        $defaultManipulator = $container->getDefinition('a2lix_auto_form.default.manipulator');
-        $defaultManipulator->replaceArgument(1, $config['excluded_fields']);
+        $doctrineORMManipulator = $container->getDefinition('a2lix_auto_form.doctrine_orm.manipulator');
+        $doctrineORMManipulator->replaceArgument(1, $config['excluded_fields']);
     }
 }

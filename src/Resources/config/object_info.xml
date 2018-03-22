@@ -9,7 +9,7 @@
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
-        <service id="a2lix_auto_form.doctrine_info" class="A2lix\AutoFormBundle\ObjectInfo\DoctrineInfo" public="false">
+        <service id="a2lix_auto_form.doctrine_orm_info" class="A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo" public="false">
             <argument type="service" id="a2lix_auto_form.doctrine.metadata_factory" />
         </service>
     </services>

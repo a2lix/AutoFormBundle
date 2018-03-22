@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace A2lix\AutoFormBundle\ObjectInfo;
 
+use A2lix\AutoFormBundle\Form\Type\AutoFormType;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
-class DoctrineInfo implements ObjectInfoInterface
+class DoctrineORMInfo
 {
+    /** @var ClassMetadataFactory */
     private $classMetadataFactory;
 
     public function __construct(ClassMetadataFactory $classMetadataFactory)
@@ -48,7 +51,7 @@ class DoctrineInfo implements ObjectInfoInterface
         $metadata = $this->classMetadataFactory->getMetadataFor($class);
 
         if (!$metadata->hasAssociation($fieldName)) {
-            throw new \Exception(sprintf('Unable to find the association target class of "%s" in %s.', $fieldName, $class));
+            throw new \RuntimeException(sprintf('Unable to find the association target class of "%s" in %s.', $fieldName, $class));
         }
 
         return $metadata->getAssociationTargetClass($fieldName);
@@ -69,7 +72,7 @@ class DoctrineInfo implements ObjectInfoInterface
                 $nullable = ($metadata instanceof ClassMetadataInfo) && isset($metadata->discriminatorColumn['nullable']) && $metadata->discriminatorColumn['nullable'];
 
                 $assocsConfigs[$assocName] = [
-                    'field_type' => 'A2lix\AutoFormBundle\Form\Type\AutoFormType',
+                    'field_type' => AutoFormType::class,
                     'data_class' => $class,
                     'required' => !$nullable,
                 ];
@@ -78,8 +81,8 @@ class DoctrineInfo implements ObjectInfoInterface
             }
 
             $assocsConfigs[$assocName] = [
-                'field_type' => 'Symfony\Component\Form\Extension\Core\Type\CollectionType',
-                'entry_type' => 'A2lix\AutoFormBundle\Form\Type\AutoFormType',
+                'field_type' => CollectionType::class,
+                'entry_type' => AutoFormType::class,
                 'entry_options' => [
                     'data_class' => $class,
                 ],

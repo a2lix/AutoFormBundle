@@ -13,18 +13,20 @@ declare(strict_types=1);
 
 namespace A2lix\AutoFormBundle\Form\Manipulator;
 
-use A2lix\AutoFormBundle\ObjectInfo\ObjectInfoInterface;
+use A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo;
 use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Form\FormInterface;
 
-class DefaultManipulator implements FormManipulatorInterface
+class DoctrineORMManipulator implements FormManipulatorInterface
 {
-    private $objectInfo;
+    /** @var DoctrineORMInfo */
+    private $doctrineORMInfo;
+    /** @var array */
     private $globalExcludedFields;
 
-    public function __construct(ObjectInfoInterface $objectInfo, array $globalExcludedFields = [])
+    public function __construct(DoctrineORMInfo $doctrineORMInfo, array $globalExcludedFields = [])
     {
-        $this->objectInfo = $objectInfo;
+        $this->doctrineORMInfo = $doctrineORMInfo;
         $this->globalExcludedFields = $globalExcludedFields;
     }
 
@@ -34,7 +36,7 @@ class DefaultManipulator implements FormManipulatorInterface
         $formOptions = $form->getConfig()->getOptions();
 
         // Filtering to remove excludedFields
-        $objectFieldsConfig = $this->objectInfo->getFieldsConfig($class);
+        $objectFieldsConfig = $this->doctrineORMInfo->getFieldsConfig($class);
         $usuableObjectFieldsConfig = $this->filteringUsuableFields($objectFieldsConfig, $formOptions['excluded_fields']);
 
         if (empty($formOptions['fields'])) {
@@ -79,8 +81,10 @@ class DefaultManipulator implements FormManipulatorInterface
                 continue;
             }
 
-            return $this->objectInfo->getAssociationTargetClass($dataClass, $form->getName());
+            return $this->doctrineORMInfo->getAssociationTargetClass($dataClass, $form->getName());
         }
+
+        throw new \RuntimeException('Unable to get dataClass');
     }
 
     private function filteringUsuableFields(array $objectFieldsConfig, array $formExcludedFields): array

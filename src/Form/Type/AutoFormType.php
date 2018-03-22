@@ -21,6 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AutoFormType extends AbstractType
 {
+    /** @var AutoFormListener */
     private $autoFormListener;
 
     public function __construct(AutoFormListener $autoFormListener)
