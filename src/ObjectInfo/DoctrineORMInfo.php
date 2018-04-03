@@ -35,11 +35,11 @@ class DoctrineORMInfo
 
         $metadata = $this->classMetadataFactory->getMetadataFor($class);
 
-        if ($fields = $metadata->getFieldNames()) {
+        if (!empty($fields = $metadata->getFieldNames())) {
             $fieldsConfig = array_fill_keys($fields, []);
         }
 
-        if ($assocNames = $metadata->getAssociationNames()) {
+        if (!empty($assocNames = $metadata->getAssociationNames())) {
             $fieldsConfig += $this->getAssocsConfig($metadata, $assocNames);
         }
 

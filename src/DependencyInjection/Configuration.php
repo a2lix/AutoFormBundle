@@ -33,7 +33,8 @@ class Configuration implements ConfigurationInterface
                             return preg_split('/\s*,\s*/', $v);
                         })
                     ->end()
-                    ->prototype('scalar')->end()
+                    ->prototype('scalar')
+                    ->info('Global list of fields to exclude from form generation. (Default: id, locale, translatable)')->end()
                 ->end()
             ->end()
         ;

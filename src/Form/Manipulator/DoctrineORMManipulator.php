@@ -37,15 +37,15 @@ class DoctrineORMManipulator implements FormManipulatorInterface
 
         // Filtering to remove excludedFields
         $objectFieldsConfig = $this->doctrineORMInfo->getFieldsConfig($class);
-        $usuableObjectFieldsConfig = $this->filteringUsuableFields($objectFieldsConfig, $formOptions['excluded_fields']);
+        $validObjectFieldsConfig = $this->filteringValidFields($objectFieldsConfig, $formOptions['excluded_fields']);
 
         if (empty($formOptions['fields'])) {
-            return $usuableObjectFieldsConfig;
+            return $validObjectFieldsConfig;
         }
 
         // Check unknows fields
-        $unknowsFields = array_diff(array_keys($formOptions['fields']), array_keys($usuableObjectFieldsConfig));
-        if (count($unknowsFields)) {
+        $unknowsFields = array_diff(array_keys($formOptions['fields']), array_keys($validObjectFieldsConfig));
+        if (count($unknowsFields) > 0) {
             throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
         }
 
@@ -56,27 +56,27 @@ class DoctrineORMManipulator implements FormManipulatorInterface
 
             // If display undesired, remove
             if (isset($formFieldConfig['display']) && (false === $formFieldConfig['display'])) {
-                unset($usuableObjectFieldsConfig[$formFieldName]);
+                unset($validObjectFieldsConfig[$formFieldName]);
                 continue;
             }
 
             // Override with formFieldsConfig priority
-            $usuableObjectFieldsConfig[$formFieldName] = $formFieldConfig + $usuableObjectFieldsConfig[$formFieldName];
+            $validObjectFieldsConfig[$formFieldName] = $formFieldConfig + $validObjectFieldsConfig[$formFieldName];
         }
 
-        return $usuableObjectFieldsConfig;
+        return $validObjectFieldsConfig;
     }
 
     private function getDataClass(FormInterface $form): string
     {
         // Simple case, data_class from current form
-        if ($dataClass = $form->getConfig()->getDataClass()) {
+        if (null !== $dataClass = $form->getConfig()->getDataClass()) {
             return ClassUtils::getRealClass($dataClass);
         }
 
         // Advanced case, loop parent form to get closest fill data_class
-        while ($formParent = $form->getParent()) {
-            if (!$dataClass = $formParent->getConfig()->getDataClass()) {
+        while (null !== $formParent = $form->getParent()) {
+            if (null === $dataClass = $formParent->getConfig()->getDataClass()) {
                 $form = $formParent;
                 continue;
             }
@@ -87,19 +87,19 @@ class DoctrineORMManipulator implements FormManipulatorInterface
         throw new \RuntimeException('Unable to get dataClass');
     }
 
-    private function filteringUsuableFields(array $objectFieldsConfig, array $formExcludedFields): array
+    private function filteringValidFields(array $objectFieldsConfig, array $formExcludedFields): array
     {
         $excludedFields = array_merge($this->globalExcludedFields, $formExcludedFields);
 
-        $usualableFields = [];
+        $validFields = [];
         foreach ($objectFieldsConfig as $fieldName => $fieldConfig) {
             if (in_array($fieldName, $excludedFields, true)) {
                 continue;
             }
 
-            $usualableFields[$fieldName] = $fieldConfig;
+            $validFields[$fieldName] = $fieldConfig;
         }
 
-        return $usualableFields;
+        return $validFields;
     }
 }
