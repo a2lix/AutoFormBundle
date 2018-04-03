@@ -41,7 +41,7 @@ class AutoFormType extends AbstractType
             'excluded_fields' => [],
         ]);
 
-        $resolver->setNormalizer('data_class', function (Options $options, $value) {
+        $resolver->setNormalizer('data_class', function (Options $options, $value): string {
             if (empty($value)) {
                 throw new \RuntimeException(sprintf('Missing "data_class" option of "AutoFormType".'));
             }

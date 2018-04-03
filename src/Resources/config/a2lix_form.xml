@@ -5,20 +5,22 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults public="false" />
+
         <!-- Form Manipulators -->
-        <service id="A2lix\AutoFormBundle\Form\Manipulator\DoctrineORMManipulator">
-            <argument type="service" id="A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo" />
+        <service id="a2lix_auto_form.form.manipulator.doctrine_orm_manipulator" class="A2lix\AutoFormBundle\Form\Manipulator\DoctrineORMManipulator">
+            <argument type="service" id="a2lix_auto_form.object_info.doctrine_orm_info" />
             <argument type="collection"></argument>
         </service>
 
         <!-- Form Listeners -->
-        <service id="A2lix\AutoFormBundle\Form\EventListener\AutoFormListener">
+        <service id="a2lix_auto_form.form.event_listener.auto_form_listener" class="A2lix\AutoFormBundle\Form\EventListener\AutoFormListener">
             <argument type="service" id="a2lix_auto_form.manipulator.default" />
         </service>
 
         <!-- Form Types -->
-        <service id="A2lix\AutoFormBundle\Form\Type\AutoFormType">
-            <argument type="service" id="A2lix\AutoFormBundle\Form\EventListener\AutoFormListener" />
+        <service id="a2lix_auto_form.form.type.auto_form_type" class="A2lix\AutoFormBundle\Form\Type\AutoFormType">
+            <argument type="service" id="a2lix_auto_form.form.event_listener.auto_form_listener" />
 
             <tag name="form.type" />
         </service>
