@@ -59,6 +59,10 @@ class DoctrineORMManipulator implements FormManipulatorInterface
                 unset($formOptions['fields'][$formFieldName]);
                 continue;
             }
+
+            if ([] === $formFieldConfig) {
+                $formOptions['fields'][$formFieldName] = $validObjectFieldsConfig[$formFieldName];
+            }
         }
         $formOptions['fields'] += $validObjectFieldsConfig;
 
