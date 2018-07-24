@@ -62,7 +62,7 @@ class DoctrineORMInfo
         $assocsConfigs = [];
 
         foreach ($assocNames as $assocName) {
-            if (!$metadata->isAssociationInverseSide($assocName)) {
+            if ($metadata->isAssociationInverseSide($assocName)) {
                 continue;
             }
 
