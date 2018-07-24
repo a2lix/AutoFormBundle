@@ -56,15 +56,13 @@ class DoctrineORMManipulator implements FormManipulatorInterface
 
             // If display undesired, remove
             if (isset($formFieldConfig['display']) && (false === $formFieldConfig['display'])) {
-                unset($validObjectFieldsConfig[$formFieldName]);
+                unset($formOptions['fields'][$formFieldName]);
                 continue;
             }
-
-            // Override with formFieldsConfig priority
-            $validObjectFieldsConfig[$formFieldName] = $formFieldConfig + $validObjectFieldsConfig[$formFieldName];
         }
+        $formOptions['fields'] += $validObjectFieldsConfig;
 
-        return $validObjectFieldsConfig;
+        return $formOptions['fields'];
     }
 
     private function getDataClass(FormInterface $form): string
