@@ -45,7 +45,7 @@ class DoctrineORMManipulator implements FormManipulatorInterface
 
         // Check unknows fields
         $unknowsFields = array_diff(array_keys($formOptions['fields']), array_keys($validObjectFieldsConfig));
-        if (count($unknowsFields) > 0) {
+        if (\count($unknowsFields) > 0) {
             throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
         }
 
@@ -93,7 +93,7 @@ class DoctrineORMManipulator implements FormManipulatorInterface
 
         $validFields = [];
         foreach ($objectFieldsConfig as $fieldName => $fieldConfig) {
-            if (in_array($fieldName, $excludedFields, true)) {
+            if (\in_array($fieldName, $excludedFields, true)) {
                 continue;
             }
 
