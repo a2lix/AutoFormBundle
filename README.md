@@ -20,9 +20,11 @@ Check out the documentation on the [official website](http://a2lix.fr/bundles/au
 
 ## Contribution help
 
+```
 docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) composer install --ignore-platform-reqs
 docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) composer run-script phpunit
 docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) composer run-script cs-fixer
+```
 
 ## License
 
