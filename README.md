@@ -12,12 +12,25 @@ Automate form building.
 
 | Branch | Tools |
 | --- | --- |
-| master | [![Build Status](https://travis-ci.org/a2lix/AutoFormBundle.svg?branch=master)](https://travis-ci.org/a2lix/AutoFormBundle) [![Code Coverage](https://scrutinizer-ci.com/g/a2lix/AutoFormBundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/a2lix/AutoFormBundle/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/a2lix/AutoFormBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/a2lix/AutoFormBundle/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/c6e68536-570e-409b-99c0-528c3484ada7/mini.png)](https://insight.sensiolabs.com/projects/c6e68536-570e-409b-99c0-528c3484ada7) |
+| master | [![Build Status][ci_badge]][ci_link] [![Coverage Status][coverage_badge]][coverage_link] [![SensioLabsInsight][sensioinsight_badge]][sensioinsight_link] |
 
 ## Documentation
 
 Check out the documentation on the [official website](http://a2lix.fr/bundles/auto-form).
 
+## Contribution help
+
+docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) composer install --ignore-platform-reqs
+docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) composer run-script phpunit
+docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) composer run-script cs-fixer
+
 ## License
 
 This package is available under the [MIT license](LICENSE).
+
+[ci_badge]: https://github.com/a2lix/AutoFormBundle/workflows/CI/badge.svg
+[ci_link]: https://github.com/a2lix/AutoFormBundle/actions?query=workflow%3ACI
+[coverage_badge]: https://codecov.io/gh/a2lix/AutoFormBundle/branch/master/graph/badge.svg
+[coverage_link]: https://codecov.io/gh/a2lix/AutoFormBundle/branch/master
+[sensioinsight_badge]: https://insight.sensiolabs.com/projects/c6e68536-570e-409b-99c0-528c3484ada7/mini.png
+[sensioinsight_link]: https://insight.sensiolabs.com/projects/c6e68536-570e-409b-99c0-528c3484ada7

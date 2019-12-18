@@ -20,38 +20,46 @@ use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\PreloadedExtension;
 
-class AutoFormTypeSimpleTest extends TypeTestCase
+/**
+ * @internal
+ */
+final class AutoFormTypeSimpleTest extends TypeTestCase
 {
     public function testEmptyForm(): void
     {
         $form = $this->factory->createBuilder(AutoFormType::class, new Product())
             ->add('create', SubmitType::class)
-            ->getForm();
+            ->getForm()
+        ;
 
-        $this->assertEquals(['create', 'title', 'description', 'url', 'medias'], array_keys($form->all()), 'Fields should matches Product fields');
+        static::assertEquals(['create', 'title', 'description', 'url', 'medias'], array_keys($form->all()), 'Fields should matches Product fields');
 
         $mediasFormOptions = $form->get('medias')->getConfig()->getOptions();
-        $this->assertEquals(AutoFormType::class, $mediasFormOptions['entry_type'], 'Media type should be an AutoType');
-        $this->assertEquals(Media::class, $mediasFormOptions['entry_options']['data_class'], 'Media should have its right data_class');
+        static::assertEquals(AutoFormType::class, $mediasFormOptions['entry_type'], 'Media type should be an AutoType');
+        static::assertEquals(Media::class, $mediasFormOptions['entry_options']['data_class'], 'Media should have its right data_class');
     }
 
     public function testCreationForm(): Product
     {
         $form = $this->factory->createBuilder(AutoFormType::class, new Product())
             ->add('create', SubmitType::class)
-            ->getForm();
+            ->getForm()
+        ;
 
         $media1 = new Media();
         $media1->setUrl('http://example.org/media1')
-               ->setDescription('media1 desc');
+            ->setDescription('media1 desc')
+        ;
         $media2 = new Media();
         $media2->setUrl('http://example.org/media2')
-               ->setDescription('media2 desc');
+            ->setDescription('media2 desc')
+        ;
 
         $product = new Product();
         $product->setUrl('a2lix.fr')
-                ->addMedia($media1)
-                ->addMedia($media2);
+            ->addMedia($media1)
+            ->addMedia($media2)
+        ;
 
         $formData = [
             'url' => 'a2lix.fr',
@@ -68,8 +76,8 @@ class AutoFormTypeSimpleTest extends TypeTestCase
         ];
 
         $form->submit($formData);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($product, $form->getData());
+        static::assertTrue($form->isSynchronized());
+        static::assertEquals($product, $form->getData());
 
         return $product;
     }
@@ -98,17 +106,18 @@ class AutoFormTypeSimpleTest extends TypeTestCase
 
         $form = $this->factory->createBuilder(AutoFormType::class, new Product())
             ->add('create', SubmitType::class)
-            ->getForm();
+            ->getForm()
+        ;
 
         $form->submit($formData);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($product, $form->getData());
+        static::assertTrue($form->isSynchronized());
+        static::assertEquals($product, $form->getData());
 
         $view = $form->createView();
         $children = $view->children;
 
         foreach (array_keys($formData) as $key) {
-            $this->assertArrayHasKey($key, $children);
+            static::assertArrayHasKey($key, $children);
         }
     }
 

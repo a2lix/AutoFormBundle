@@ -46,10 +46,11 @@ abstract class TypeTestCase extends BaseTypeTestCase
             )
             ->addTypeGuesser(
                 $this->getMockBuilder(ValidatorTypeGuesser::class)
-                     ->disableOriginalConstructor()
-                     ->getMock()
+                    ->disableOriginalConstructor()
+                    ->getMock()
             )
-            ->getFormFactory();
+            ->getFormFactory()
+        ;
 
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);

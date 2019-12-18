@@ -25,17 +25,17 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('excluded_fields')
-                    ->defaultValue(['id', 'locale', 'translatable'])
-                    ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) {
-                            return preg_split('/\s*,\s*/', $v);
-                        })
-                    ->end()
-                    ->prototype('scalar')
-                    ->info('Global list of fields to exclude from form generation. (Default: id, locale, translatable)')->end()
-                ->end()
+            ->arrayNode('excluded_fields')
+            ->defaultValue(['id', 'locale', 'translatable'])
+            ->beforeNormalization()
+            ->ifString()
+            ->then(function ($v) {
+                return preg_split('/\s*,\s*/', $v);
+            })
+            ->end()
+            ->prototype('scalar')
+            ->info('Global list of fields to exclude from form generation. (Default: id, locale, translatable)')->end()
+            ->end()
             ->end()
         ;
 
