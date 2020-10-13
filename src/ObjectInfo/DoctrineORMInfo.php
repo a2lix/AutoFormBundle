@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace A2lix\AutoFormBundle\ObjectInfo;
 
 use A2lix\AutoFormBundle\Form\Type\AutoFormType;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class DoctrineORMInfo
