@@ -22,14 +22,18 @@ jobs:
               uses: actions/checkout@v2
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Cache Composer dependencies
-              uses: actions/cache@v1
+            - name: Update Composer v2
+              run: composer self-update --preview
+            - name: Get Composer Cache Directory
+              id: composer-cache
+              run: |
+                echo "::set-output name=dir::$(composer config cache-files-dir)"
+            - uses: actions/cache@v2
               with:
-                path: ~/.composer/cache
-                key: composer-php${{ matrix.php }}-highest-
+                path: ${{ steps.composer-cache.outputs.dir }}
+                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
                 restore-keys: |
-                   composer-php${{ matrix.php }}-highest-
-                   composer-
+                  ${{ runner.os }}-composer-
             - name: Validate Composer
               run: composer validate
             - name: Install xsl PHP extension
@@ -57,23 +61,30 @@ jobs:
                     - '7.2'
                     - '7.3'
                     - '7.4'
+                    - '8.0'
                 dependencies:
-                    - lowest
-                    - highest
+                    - 'highest'
+                include:
+                    -   php: '7.2'
+                        dependencies: 'lowest'
             fail-fast: false
         steps:
             - name: Checkout
               uses: actions/checkout@v2
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Cache Composer dependencies
-              uses: actions/cache@v1
+            - name: Update Composer v2
+              run: composer self-update --preview
+            - name: Get Composer Cache Directory
+              id: composer-cache
+              run: |
+                echo "::set-output name=dir::$(composer config cache-files-dir)"
+            - uses: actions/cache@v2
               with:
-                path: ~/.composer/cache
-                key: composer-php${{ matrix.php }}-${{ matrix.dependencies }}-
+                path: ${{ steps.composer-cache.outputs.dir }}
+                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
                 restore-keys: |
-                    composer-php${{ matrix.php }}-${{ matrix.dependencies }}-
-                    composer-
+                  ${{ runner.os }}-composer-
             - name: Install xsl PHP extension
               run: |
                 apk add $PHPIZE_DEPS libxslt-dev
@@ -109,14 +120,18 @@ jobs:
                 docker-php-ext-enable pcov
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Cache Composer dependencies
-              uses: actions/cache@v1
+            - name: Update Composer v2
+              run: composer self-update --preview
+            - name: Get Composer Cache Directory
+              id: composer-cache
+              run: |
+                echo "::set-output name=dir::$(composer config cache-files-dir)"
+            - uses: actions/cache@v2
               with:
-                path: ~/.composer/cache
-                key: composer-php${{ matrix.php }}-highest-
+                path: ${{ steps.composer-cache.outputs.dir }}
+                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
                 restore-keys: |
-                    composer-php${{ matrix.php }}-highest-
-                    composer-
+                  ${{ runner.os }}-composer-
             - name: Install xsl PHP extension
               run: |
                 apk add $PHPIZE_DEPS libxslt-dev
