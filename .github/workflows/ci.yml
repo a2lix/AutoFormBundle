@@ -5,7 +5,6 @@ on: ["push", "pull_request"]
 env:
     COMPOSER_ALLOW_SUPERUSER: '1'
     SYMFONY_PHPUNIT_VERSION: 9
-    SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT: 1
     SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
 jobs:
@@ -22,8 +21,8 @@ jobs:
               uses: actions/checkout@v2
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-#            - name: Update Composer v2
-#              run: composer self-update --preview
+            - name: Update Composer v2
+              run: composer self-update --preview
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
