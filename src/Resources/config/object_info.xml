@@ -7,7 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="a2lix_auto_form.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory">
+        <service id="a2lix_auto_form.doctrine.metadata_factory" class="Doctrine\Persistence\Mapping\ClassMetadataFactory">
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
