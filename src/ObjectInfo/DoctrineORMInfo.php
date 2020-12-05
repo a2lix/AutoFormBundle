@@ -62,33 +62,32 @@ class DoctrineORMInfo
         $assocsConfigs = [];
 
         foreach ($assocNames as $assocName) {
-            if (!$metadata->isAssociationInverseSide($assocName)) {
-                continue;
-            }
-
             $class = $metadata->getAssociationTargetClass($assocName);
+            $isAssociationInverseSide = $metadata->isAssociationInverseSide($assocName);
 
-            if ($metadata->isSingleValuedAssociation($assocName)) {
-                $nullable = ($metadata instanceof ClassMetadataInfo) && isset($metadata->discriminatorColumn['nullable']) && $metadata->discriminatorColumn['nullable'];
+            switch (true) {
+                case $metadata->isSingleValuedAssociation($assocName):
+                    $nullable = ($metadata instanceof ClassMetadataInfo) && isset($metadata->discriminatorColumn['nullable']) && $metadata->discriminatorColumn['nullable'];
 
-                $assocsConfigs[$assocName] = [
-                    'field_type' => AutoFormType::class,
-                    'data_class' => $class,
-                    'required' => !$nullable,
-                ];
+                    $assocsConfigs[$assocName] = [
+                        'field_type' => AutoFormType::class,
+                        'data_class' => $class,
+                        'required' => !$nullable,
+                    ];
+                    break;
 
-                continue;
+                case $isAssociationInverseSide && !$metadata->isSingleValuedAssociation($assocName):
+                    $assocsConfigs[$assocName] = [
+                        'field_type' => CollectionType::class,
+                        'entry_type' => AutoFormType::class,
+                        'entry_options' => [
+                            'data_class' => $class,
+                        ],
+                        'allow_add' => true,
+                        'by_reference' => false,
+                    ];
+                break;
             }
-
-            $assocsConfigs[$assocName] = [
-                'field_type' => CollectionType::class,
-                'entry_type' => AutoFormType::class,
-                'entry_options' => [
-                    'data_class' => $class,
-                ],
-                'allow_add' => true,
-                'by_reference' => false,
-            ];
         }
 
         return $assocsConfigs;
