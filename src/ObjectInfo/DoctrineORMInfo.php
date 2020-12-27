@@ -63,6 +63,7 @@ class DoctrineORMInfo
 
         foreach ($assocNames as $assocName) {
             if (!$metadata->isAssociationInverseSide($assocName)) {
+                $assocsConfigs[$assocName] = [];
                 continue;
             }
 
