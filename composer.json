@@ -1,5 +1,5 @@
 {
-    "name": "a2lix/auto-form-bundle",
+    "name": "jul6art/auto-form-bundle",
     "type": "symfony-bundle",
     "description": "Automate form building",
     "keywords": ["symfony", "form", "field", "automate", "automation", "magic", "building"],
@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=7.2.5 || ^8.0",
         "symfony/config": "^3.4.30|^4.3|^5.0",
         "symfony/dependency-injection": "^3.4.30|^4.3|^5.0",
         "symfony/doctrine-bridge": "^3.4.30|^4.3|^5.0",
