@@ -1,5 +1,5 @@
 {
-    "name": "a2lix/auto-form-bundle",
+    "name": "jul6art/auto-form-bundle",
     "type": "symfony-bundle",
     "description": "Automate form building",
     "keywords": ["symfony", "form", "field", "automate", "automation", "magic", "building"],
