@@ -4,7 +4,7 @@ on: ["push", "pull_request"]
 
 env:
     COMPOSER_ALLOW_SUPERUSER: '1'
-    SYMFONY_PHPUNIT_VERSION: 9
+    SYMFONY_PHPUNIT_VERSION: 9.5
     SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
 jobs:
@@ -62,8 +62,17 @@ jobs:
                 dependencies:
                     - 'highest'
                 include:
-                    -   php: '7.2'
-                        dependencies: 'lowest'
+                    - php: '7.2'
+                      dependencies: 'lowest'
+                      phpunit-version: 8.5
+                    - php: '7.3'
+                      phpunit-version: 9.5
+                    - php: '7.4'
+                      phpunit-version: 9.5
+                    - php: '8.0'
+                      phpunit-version: 9.5
+                    - php: '8.1'
+                      phpunit-version: 9.5
             fail-fast: false
         steps:
             - name: Checkout
@@ -91,6 +100,8 @@ jobs:
               if: matrix.dependencies == 'highest'
               run: composer update --no-progress --no-suggest --ansi
             - name: Run tests with PHPUnit
+              env:
+                SYMFONY_PHPUNIT_VERSION: ${{ matrix.phpunit-version }}
               run: vendor/bin/simple-phpunit --colors=always
 
     coverage:
