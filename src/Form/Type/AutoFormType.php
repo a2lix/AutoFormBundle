@@ -43,7 +43,7 @@ class AutoFormType extends AbstractType
 
         $resolver->setNormalizer('data_class', function (Options $options, $value): string {
             if (empty($value)) {
-                throw new \RuntimeException(sprintf('Missing "data_class" option of "AutoFormType".'));
+                throw new \RuntimeException('Missing "data_class" option of "AutoFormType".');
             }
 
             return $value;
