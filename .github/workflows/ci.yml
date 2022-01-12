@@ -21,8 +21,6 @@ jobs:
               uses: actions/checkout@v2
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Update Composer v2
-              run: composer self-update --preview
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
@@ -59,7 +57,8 @@ jobs:
                 php:
                     - '7.3'
                     - '7.4'
-                    - '8.0-rc'
+                    - '8.0'
+                    - '8.1'
                 dependencies:
                     - 'highest'
                 include:
@@ -71,8 +70,6 @@ jobs:
               uses: actions/checkout@v2
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
- #           - name: Update Composer v2
- #             run: composer self-update --preview
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
@@ -114,8 +111,6 @@ jobs:
                 docker-php-ext-enable pcov
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Update Composer v2
-              run: composer self-update --preview
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
