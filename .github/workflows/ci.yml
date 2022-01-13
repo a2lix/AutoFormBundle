@@ -4,7 +4,7 @@ on: ["push", "pull_request"]
 
 env:
     COMPOSER_ALLOW_SUPERUSER: '1'
-    SYMFONY_PHPUNIT_VERSION: 9
+    SYMFONY_PHPUNIT_VERSION: 9.5
     SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
 jobs:
@@ -21,8 +21,6 @@ jobs:
               uses: actions/checkout@v2
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Update Composer v2
-              run: composer self-update --preview
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
@@ -59,20 +57,28 @@ jobs:
                 php:
                     - '7.3'
                     - '7.4'
-                    - '8.0-rc'
+                    - '8.0'
+                    - '8.1'
                 dependencies:
                     - 'highest'
                 include:
-                    -   php: '7.2'
-                        dependencies: 'lowest'
+                    - php: '7.2'
+                      dependencies: 'lowest'
+                      phpunit-version: 8.5
+                    - php: '7.3'
+                      phpunit-version: 9.5
+                    - php: '7.4'
+                      phpunit-version: 9.5
+                    - php: '8.0'
+                      phpunit-version: 9.5
+                    - php: '8.1'
+                      phpunit-version: 9.5
             fail-fast: false
         steps:
             - name: Checkout
               uses: actions/checkout@v2
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
- #           - name: Update Composer v2
- #             run: composer self-update --preview
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
@@ -94,6 +100,8 @@ jobs:
               if: matrix.dependencies == 'highest'
               run: composer update --no-progress --no-suggest --ansi
             - name: Run tests with PHPUnit
+              env:
+                SYMFONY_PHPUNIT_VERSION: ${{ matrix.phpunit-version }}
               run: vendor/bin/simple-phpunit --colors=always
 
     coverage:
@@ -114,8 +122,6 @@ jobs:
                 docker-php-ext-enable pcov
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Update Composer v2
-              run: composer self-update --preview
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
