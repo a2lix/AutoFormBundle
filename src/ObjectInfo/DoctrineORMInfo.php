@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace A2lix\AutoFormBundle\ObjectInfo;
 
 use A2lix\AutoFormBundle\Form\Type\AutoFormType;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -62,19 +61,19 @@ class DoctrineORMInfo
         $assocsConfigs = [];
 
         foreach ($assocNames as $assocName) {
-            if (!$metadata->isAssociationInverseSide($assocName)) {
+            $associationMapping = $metadata->getAssociationMapping($assocName);
+
+            if (isset($associationMapping['inversedBy'])) {
                 continue;
             }
 
             $class = $metadata->getAssociationTargetClass($assocName);
 
             if ($metadata->isSingleValuedAssociation($assocName)) {
-                $nullable = ($metadata instanceof ClassMetadataInfo) && isset($metadata->discriminatorColumn['nullable']) && $metadata->discriminatorColumn['nullable'];
-
                 $assocsConfigs[$assocName] = [
                     'field_type' => AutoFormType::class,
                     'data_class' => $class,
-                    'required' => !$nullable,
+                    'required' => false,
                 ];
 
                 continue;
