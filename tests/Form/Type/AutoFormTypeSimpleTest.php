@@ -32,7 +32,7 @@ final class AutoFormTypeSimpleTest extends TypeTestCase
             ->getForm()
         ;
 
-        static::assertEquals(['create', 'title', 'description', 'url', 'medias'], array_keys($form->all()), 'Fields should matches Product fields');
+        static::assertEquals(['create', 'title', 'description', 'url', 'mainMedia', 'medias'], array_keys($form->all()), 'Fields should matches Product fields');
 
         $mediasFormOptions = $form->get('medias')->getConfig()->getOptions();
         static::assertEquals(AutoFormType::class, $mediasFormOptions['entry_type'], 'Media type should be an AutoType');

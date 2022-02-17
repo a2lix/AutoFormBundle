@@ -29,6 +29,9 @@ final class AutoFormTypeAdvancedTest extends TypeTestCase
     {
         $form = $this->factory->createBuilder(AutoFormType::class, new Product(), [
             'fields' => [
+                'mainMedia' => [
+                    'label' => 'Main Media',
+                ],
                 'url' => [
                     'label' => 'URL/URI',
                 ],
@@ -46,15 +49,25 @@ final class AutoFormTypeAdvancedTest extends TypeTestCase
         $media2->setUrl('http://example.org/media2')
             ->setDescription('media2 desc')
         ;
+        $media3 = new Media();
+        $media3->setUrl('http://example.org/media3')
+            ->setDescription('media3 desc')
+        ;
 
         $product = new Product();
-        $product->setUrl('a2lix.fr')
+        $product
+            ->setUrl('a2lix.fr')
+            ->setMainMedia($media3)
             ->addMedia($media1)
             ->addMedia($media2)
         ;
 
         $formData = [
             'url' => 'a2lix.fr',
+            'mainMedia' => [
+                'url' => 'http://example.org/media3',
+                'description' => 'media3 desc',
+            ],
             'medias' => [
                 [
                     'url' => 'http://example.org/media1',

@@ -45,6 +45,11 @@ class Product
     protected $url;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Media")
+     */
+    protected $mainMedia;
+
+    /**
      * @ORM\OneToMany(targetEntity="Media", mappedBy="product", cascade={"all"}, orphanRemoval=true)
      */
     protected $medias;
@@ -91,6 +96,18 @@ class Product
     public function setUrl(?string $url): self
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    public function getMainMedia(): ?Media
+    {
+        return $this->mainMedia;
+    }
+
+    public function setMainMedia(?Media $mainMedia): self
+    {
+        $this->mainMedia = $mainMedia;
 
         return $this;
     }
