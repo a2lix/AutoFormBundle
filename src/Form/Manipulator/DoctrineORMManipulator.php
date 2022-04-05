@@ -42,13 +42,10 @@ class DoctrineORMManipulator implements FormManipulatorInterface
             return $validObjectFieldsConfig;
         }
 
-        // Check correctness of remaining fields
-        $unmappedFieldsConfig = $this->filteringValidRemainingFields($validObjectFieldsConfig, $formOptions['fields'], $class);
+        $fields = [];
 
         foreach ($formOptions['fields'] as $formFieldName => $formFieldConfig) {
-            if (isset($unmappedFieldsConfig[$formFieldName])) {
-                continue;
-            }
+            $this->checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig);
 
             if (null === $formFieldConfig) {
                 continue;
@@ -56,15 +53,18 @@ class DoctrineORMManipulator implements FormManipulatorInterface
 
             // If display undesired, remove
             if (false === ($formFieldConfig['display'] ?? true)) {
-                unset($validObjectFieldsConfig[$formFieldName]);
                 continue;
             }
 
             // Override with formFieldsConfig priority
-            $validObjectFieldsConfig[$formFieldName] = $formFieldConfig + $validObjectFieldsConfig[$formFieldName];
+            $fields[$formFieldName] = $formFieldConfig;
+
+            if (isset($validObjectFieldsConfig[$formFieldName])) {
+                $fields[$formFieldName] += $validObjectFieldsConfig[$formFieldName];
+            }
         }
 
-        return $validObjectFieldsConfig + $unmappedFieldsConfig;
+        return $fields + $validObjectFieldsConfig;
     }
 
     private function getDataClass(FormInterface $form): string
@@ -107,30 +107,16 @@ class DoctrineORMManipulator implements FormManipulatorInterface
         return $validFields;
     }
 
-    private function filteringValidRemainingFields(array $validObjectFieldsConfig, array $formFields, string $class): array
+    private function checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig): void
     {
-        $unmappedFieldsConfig = [];
-
-        $validObjectFieldsKeys = array_keys($validObjectFieldsConfig);
-        $unknowsFields = [];
-
-        foreach ($formFields as $fieldName => $fieldConfig) {
-            if (\in_array($fieldName, $validObjectFieldsKeys, true)) {
-                continue;
-            }
-
-            if (false === ($fieldConfig['mapped'] ?? true)) {
-                $unmappedFieldsConfig[$fieldName] = $fieldConfig;
-                continue;
-            }
-
-            $unknowsFields[] = $fieldName;
+        if (isset($validObjectFieldsConfig[$formFieldName])) {
+            return;
         }
 
-        if (\count($unknowsFields) > 0) {
-            throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
+        if (false === ($formFieldConfig['mapped'] ?? true)) {
+            return;
         }
 
-        return $unmappedFieldsConfig;
+        throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
     }
 }
