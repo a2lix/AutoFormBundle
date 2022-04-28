@@ -12,7 +12,7 @@ Automate form building.
 
 | Branch | Tools |
 | --- | --- |
-| master | [![Build Status][ci_badge]][ci_link] [![Coverage Status][coverage_badge]][coverage_link] [![SensioLabsInsight][sensioinsight_badge]][sensioinsight_link] |
+| master | [![Build Status][ci_badge]][ci_link] [![Coverage Status][coverage_badge]][coverage_link] |
 
 ## Documentation
 
@@ -34,5 +34,3 @@ This package is available under the [MIT license](LICENSE).
 [ci_link]: https://github.com/a2lix/AutoFormBundle/actions?query=workflow%3ACI
 [coverage_badge]: https://codecov.io/gh/a2lix/AutoFormBundle/branch/master/graph/badge.svg
 [coverage_link]: https://codecov.io/gh/a2lix/AutoFormBundle/branch/master
-[sensioinsight_badge]: https://insight.sensiolabs.com/projects/c6e68536-570e-409b-99c0-528c3484ada7/mini.png
-[sensioinsight_link]: https://insight.sensiolabs.com/projects/c6e68536-570e-409b-99c0-528c3484ada7

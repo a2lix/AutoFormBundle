@@ -46,9 +46,7 @@ class DoctrineORMManipulator implements FormManipulatorInterface
         $unmappedFieldsConfig = $this->filteringValidRemainingFields($validObjectFieldsConfig, $formOptions['fields'], $class);
 
         foreach ($formOptions['fields'] as $formFieldName => $formFieldConfig) {
-            if (isset($unmappedFieldsConfig[$formFieldName])) {
-                continue;
-            }
+            $this->checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig);
 
             if (null === $formFieldConfig) {
                 continue;
@@ -109,30 +107,16 @@ class DoctrineORMManipulator implements FormManipulatorInterface
         return $validFields;
     }
 
-    private function filteringValidRemainingFields(array $validObjectFieldsConfig, array $formFields, string $class): array
+    private function checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig): void
     {
-        $unmappedFieldsConfig = [];
-
-        $validObjectFieldsKeys = array_keys($validObjectFieldsConfig);
-        $unknowsFields = [];
-
-        foreach ($formFields as $fieldName => $fieldConfig) {
-            if (\in_array($fieldName, $validObjectFieldsKeys, true)) {
-                continue;
-            }
-
-            if (false === ($fieldConfig['mapped'] ?? true)) {
-                $unmappedFieldsConfig[$fieldName] = $fieldConfig;
-                continue;
-            }
-
-            $unknowsFields[] = $fieldName;
+        if (isset($validObjectFieldsConfig[$formFieldName])) {
+            return;
         }
 
-        if (\count($unknowsFields) > 0) {
-            throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
+        if (false === ($formFieldConfig['mapped'] ?? true)) {
+            return;
         }
 
-        return $unmappedFieldsConfig;
+        throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
     }
 }
