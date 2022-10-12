@@ -45,7 +45,7 @@ class DoctrineORMManipulator implements FormManipulatorInterface
         $fields = [];
 
         foreach ($formOptions['fields'] as $formFieldName => $formFieldConfig) {
-            $this->checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig);
+            $this->checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig, $class);
 
             if (null === $formFieldConfig) {
                 continue;
@@ -107,7 +107,7 @@ class DoctrineORMManipulator implements FormManipulatorInterface
         return $validFields;
     }
 
-    private function checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig): void
+    private function checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig, $class): void
     {
         if (isset($validObjectFieldsConfig[$formFieldName])) {
             return;
@@ -117,6 +117,6 @@ class DoctrineORMManipulator implements FormManipulatorInterface
             return;
         }
 
-        throw new \RuntimeException(sprintf("Field(s) '%s' doesn't exist in %s", implode(', ', $unknowsFields), $class));
+        throw new \RuntimeException(sprintf("Field '%s' doesn't exist in %s", $formFieldName, $class));
     }
 }
