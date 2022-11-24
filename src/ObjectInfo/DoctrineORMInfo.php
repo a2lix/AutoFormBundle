@@ -64,6 +64,7 @@ class DoctrineORMInfo
             $associationMapping = $metadata->getAssociationMapping($assocName);
 
             if (isset($associationMapping['inversedBy'])) {
+                $assocsConfigs[$assocName] = [];
                 continue;
             }
 
