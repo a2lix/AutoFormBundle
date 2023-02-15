@@ -31,21 +31,27 @@ class DoctrineORMManipulator implements FormManipulatorInterface
 
     public function getFieldsConfig(FormInterface $form): array
     {
-        $class = $this->getDataClass($form);
         $formOptions = $form->getConfig()->getOptions();
+        if (array_key_exists('mapped', $formOptions) && false !== $formOptions) {
+            $class = null;
+            $validObjectFieldsConfig = [];
+        } else {
+            $class = $this->getDataClass($form);
 
-        // Filtering to remove excludedFields
-        $objectFieldsConfig = $this->doctrineORMInfo->getFieldsConfig($class);
-        $validObjectFieldsConfig = $this->filteringValidObjectFields($objectFieldsConfig, $formOptions['excluded_fields']);
+            // Filtering to remove excludedFields
+            $objectFieldsConfig = $this->doctrineORMInfo->getFieldsConfig($class);
+            $validObjectFieldsConfig = $this->filteringValidObjectFields($objectFieldsConfig, $formOptions['excluded_fields']);
 
-        if (empty($formOptions['fields'])) {
-            return $validObjectFieldsConfig;
+            if (empty($formOptions['fields'])) {
+                return $validObjectFieldsConfig;
+            }
         }
 
         $fields = [];
-
         foreach ($formOptions['fields'] as $formFieldName => $formFieldConfig) {
-            $this->checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig, $class);
+            if ($class) {
+                $this->checkFieldIsValid($formFieldName, $formFieldConfig, $validObjectFieldsConfig, $class);
+            }
 
             if (null === $formFieldConfig) {
                 continue;
