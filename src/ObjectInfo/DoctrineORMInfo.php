@@ -14,25 +14,25 @@ declare(strict_types=1);
 namespace A2lix\AutoFormBundle\ObjectInfo;
 
 use A2lix\AutoFormBundle\Form\Type\AutoFormType;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class DoctrineORMInfo
 {
-    /** @var ClassMetadataFactory */
-    private $classMetadataFactory;
+    /** @var ManagerRegistry */
+    private $managerRegistry;
 
-    public function __construct(ClassMetadataFactory $classMetadataFactory)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        $this->classMetadataFactory = $classMetadataFactory;
+        $this->managerRegistry = $managerRegistry;
     }
 
     public function getFieldsConfig(string $class): array
     {
         $fieldsConfig = [];
 
-        $metadata = $this->classMetadataFactory->getMetadataFor($class);
+        $metadata = $this->getMetadata($class);
 
         if (!empty($fields = $metadata->getFieldNames())) {
             $fieldsConfig = array_fill_keys($fields, []);
@@ -47,7 +47,7 @@ class DoctrineORMInfo
 
     public function getAssociationTargetClass(string $class, string $fieldName): string
     {
-        $metadata = $this->classMetadataFactory->getMetadataFor($class);
+        $metadata = $this->getMetadata($class);
 
         if (!$metadata->hasAssociation($fieldName)) {
             throw new \RuntimeException(sprintf('Unable to find the association target class of "%s" in %s.', $fieldName, $class));
@@ -92,5 +92,13 @@ class DoctrineORMInfo
         }
 
         return $assocsConfigs;
+    }
+
+    private function getMetadata(string $class): ClassMetadata
+    {
+        $em = $this->managerRegistry->getManagerForClass($class);
+        $classMetadataFactory = $em->getMetadataFactory();
+        return $classMetadataFactory->getMetadataFor($class);
+
     }
 }
