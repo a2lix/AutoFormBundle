@@ -19,6 +19,7 @@ use A2lix\AutoFormBundle\Form\Type\AutoFormType;
 use A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
@@ -64,7 +65,10 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
         $config = Setup::createAnnotationMetadataConfiguration([__DIR__.'/../Fixtures/Entity'], true, null, null, false);
         $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);
-        $doctrineORMInfo = new DoctrineORMInfo($entityManager->getMetadataFactory());
+
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($entityManager);
+        $doctrineORMInfo = new DoctrineORMInfo($managerRegistry);
 
         return $this->doctrineORMManipulator = new DoctrineORMManipulator($doctrineORMInfo, ['id', 'locale', 'translatable']);
     }
