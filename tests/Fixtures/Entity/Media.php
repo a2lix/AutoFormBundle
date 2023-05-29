@@ -47,7 +47,7 @@ class Media
         return $this->id;
     }
 
-    public function getProduct(): Product
+    public function getProduct(): ?Product
     {
         return $this->product;
     }

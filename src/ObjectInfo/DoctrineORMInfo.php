@@ -98,7 +98,7 @@ class DoctrineORMInfo
     {
         $em = $this->managerRegistry->getManagerForClass($class);
         $classMetadataFactory = $em->getMetadataFactory();
-        return $classMetadataFactory->getMetadataFor($class);
 
+        return $classMetadataFactory->getMetadataFor($class);
     }
 }

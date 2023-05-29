@@ -32,11 +32,11 @@ final class AutoFormTypeSimpleTest extends TypeTestCase
             ->getForm()
         ;
 
-        static::assertEquals(['create', 'title', 'description', 'url', 'mainMedia', 'medias'], array_keys($form->all()), 'Fields should matches Product fields');
+        self::assertEquals(['create', 'title', 'description', 'url', 'mainMedia', 'medias'], array_keys($form->all()), 'Fields should matches Product fields');
 
         $mediasFormOptions = $form->get('medias')->getConfig()->getOptions();
-        static::assertEquals(AutoFormType::class, $mediasFormOptions['entry_type'], 'Media type should be an AutoType');
-        static::assertEquals(Media::class, $mediasFormOptions['entry_options']['data_class'], 'Media should have its right data_class');
+        self::assertEquals(AutoFormType::class, $mediasFormOptions['entry_type'], 'Media type should be an AutoType');
+        self::assertEquals(Media::class, $mediasFormOptions['entry_options']['data_class'], 'Media should have its right data_class');
     }
 
     public function testCreationForm(): Product
@@ -76,8 +76,8 @@ final class AutoFormTypeSimpleTest extends TypeTestCase
         ];
 
         $form->submit($formData);
-        static::assertTrue($form->isSynchronized());
-        static::assertEquals($product, $form->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($product, $form->getData());
 
         return $product;
     }
@@ -110,14 +110,14 @@ final class AutoFormTypeSimpleTest extends TypeTestCase
         ;
 
         $form->submit($formData);
-        static::assertTrue($form->isSynchronized());
-        static::assertEquals($product, $form->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($product, $form->getData());
 
         $view = $form->createView();
         $children = $view->children;
 
         foreach (array_keys($formData) as $key) {
-            static::assertArrayHasKey($key, $children);
+            self::assertArrayHasKey($key, $children);
         }
     }
 

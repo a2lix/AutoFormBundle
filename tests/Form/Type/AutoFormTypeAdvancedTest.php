@@ -81,9 +81,9 @@ final class AutoFormTypeAdvancedTest extends TypeTestCase
         ];
 
         $form->submit($formData);
-        static::assertTrue($form->isSynchronized());
-        static::assertEquals($product, $form->getData());
-        static::assertEquals('URL/URI', $form->get('url')->getConfig()->getOptions()['label']);
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($product, $form->getData());
+        self::assertEquals('URL/URI', $form->get('url')->getConfig()->getOptions()['label']);
 
         return $product;
     }
@@ -132,9 +132,9 @@ final class AutoFormTypeAdvancedTest extends TypeTestCase
         ];
 
         $form->submit($formData);
-        static::assertTrue($form->isSynchronized());
-        static::assertEquals($product, $form->getData());
-        static::assertEquals('blue', $form->get('color')->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($product, $form->getData());
+        self::assertEquals('blue', $form->get('color')->getData());
 
         return $product;
     }
