@@ -16,7 +16,7 @@ namespace A2lix\AutoFormBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class A2lixAutoFormExtension extends Extension
@@ -26,7 +26,7 @@ class A2lixAutoFormExtension extends Extension
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(), $configs);
 
-        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('a2lix_form.xml');
         $loader->load('object_info.xml');
 

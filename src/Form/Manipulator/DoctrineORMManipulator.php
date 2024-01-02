@@ -18,16 +18,10 @@ use Symfony\Component\Form\FormInterface;
 
 class DoctrineORMManipulator implements FormManipulatorInterface
 {
-    /** @var DoctrineORMInfo */
-    private $doctrineORMInfo;
-    /** @var array */
-    private $globalExcludedFields;
-
-    public function __construct(DoctrineORMInfo $doctrineORMInfo, array $globalExcludedFields = [])
-    {
-        $this->doctrineORMInfo = $doctrineORMInfo;
-        $this->globalExcludedFields = $globalExcludedFields;
-    }
+    public function __construct(
+        private readonly DoctrineORMInfo $doctrineORMInfo,
+        private readonly array $globalExcludedFields = [],
+    ) {}
 
     public function getFieldsConfig(FormInterface $form): array
     {
@@ -71,17 +65,18 @@ class DoctrineORMManipulator implements FormManipulatorInterface
     {
         // Simple case, data_class from current form (with ORM Proxy management)
         if (null !== $dataClass = $form->getConfig()->getDataClass()) {
-            if (false === $pos = strrpos($dataClass, '\\__CG__\\')) {
+            if (false === $pos = strrpos((string) $dataClass, '\\__CG__\\')) {
                 return $dataClass;
             }
 
-            return substr($dataClass, $pos + 8);
+            return substr((string) $dataClass, $pos + 8);
         }
 
         // Advanced case, loop parent form to get closest fill data_class
         while (null !== $formParent = $form->getParent()) {
             if (null === $dataClass = $formParent->getConfig()->getDataClass()) {
                 $form = $formParent;
+
                 continue;
             }
 

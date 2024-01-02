@@ -20,13 +20,9 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class DoctrineORMInfo
 {
-    /** @var ClassMetadataFactory */
-    private $classMetadataFactory;
-
-    public function __construct(ClassMetadataFactory $classMetadataFactory)
-    {
-        $this->classMetadataFactory = $classMetadataFactory;
-    }
+    public function __construct(
+        private readonly ClassMetadataFactory $classMetadataFactory,
+    ) {}
 
     public function getFieldsConfig(string $class): array
     {
@@ -65,6 +61,7 @@ class DoctrineORMInfo
 
             if (isset($associationMapping['inversedBy'])) {
                 $assocsConfigs[$assocName] = [];
+
                 continue;
             }
 

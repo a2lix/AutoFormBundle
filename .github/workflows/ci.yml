@@ -4,7 +4,7 @@ on: ["push", "pull_request"]
 
 env:
     COMPOSER_ALLOW_SUPERUSER: '1'
-    SYMFONY_PHPUNIT_VERSION: 9.5
+    SYMFONY_PHPUNIT_VERSION: 9.6
     SYMFONY_DEPRECATIONS_HELPER: max[self]=0
 
 jobs:
@@ -12,25 +12,25 @@ jobs:
         name: Analyze
         runs-on: ubuntu-latest
         container:
-            image: php:7.4-alpine
+            image: php:8.3-alpine
             options: >-
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
-                echo "::set-output name=dir::$(composer config cache-files-dir)"
-            - uses: actions/cache@v2
+                echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+            - uses: actions/cache@v3
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
-                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                key: ${{ runner.os }}-composer-8.3-highest-${{ hashFiles('**/composer.lock') }}
                 restore-keys: |
-                  ${{ runner.os }}-composer-
+                  ${{ runner.os }}-composer-8.3-highest
             - name: Validate Composer
               run: composer validate
             - name: Install xsl PHP extension
@@ -55,40 +55,35 @@ jobs:
         strategy:
             matrix:
                 php:
-                    - '7.3'
-                    - '7.4'
-                    - '8.0'
                     - '8.1'
+                    - '8.2'
+                    - '8.3'
                 dependencies:
-                    - 'highest'
+                    - lowest
+                    - highest
                 include:
-                    - php: '7.2'
-                      dependencies: 'lowest'
-                      phpunit-version: 8.5
-                    - php: '7.3'
-                      phpunit-version: 9.5
-                    - php: '7.4'
-                      phpunit-version: 9.5
-                    - php: '8.0'
-                      phpunit-version: 9.5
                     - php: '8.1'
-                      phpunit-version: 9.5
+                      phpunit-version: 9.6
+                    - php: '8.2'
+                      phpunit-version: 9.6
+                    - php: '8.3'
+                      phpunit-version: 9.6
             fail-fast: false
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
             - name: Install Composer
               run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
-                echo "::set-output name=dir::$(composer config cache-files-dir)"
-            - uses: actions/cache@v2
+                echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+            - uses: actions/cache@v3
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
-                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ matrix.dependencies }}-${{ hashFiles('**/composer.lock') }}
                 restore-keys: |
-                  ${{ runner.os }}-composer-
+                  ${{ runner.os }}-composer-${{ matrix.php }}-${{ matrix.dependencies }}
             - name: Install xsl PHP extension
               run: |
                 apk add $PHPIZE_DEPS libxslt-dev
@@ -105,16 +100,16 @@ jobs:
               run: vendor/bin/simple-phpunit --colors=always
 
     coverage:
-        name: Coverage (PHP ${{ matrix.php }})
+        name: Coverage (PHP 8.3)
         runs-on: ubuntu-latest
         container:
-            image: php:7.4-alpine
+            image: php:8.3-alpine
             options: >-
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
             - name: Install pcov PHP extension
               run: |
                 apk add $PHPIZE_DEPS
@@ -125,13 +120,13 @@ jobs:
             - name: Get Composer Cache Directory
               id: composer-cache
               run: |
-                echo "::set-output name=dir::$(composer config cache-files-dir)"
-            - uses: actions/cache@v2
+                echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+            - uses: actions/cache@v3
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
-                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                key: ${{ runner.os }}-composer-8.3-highest-${{ hashFiles('**/composer.lock') }}
                 restore-keys: |
-                  ${{ runner.os }}-composer-
+                  ${{ runner.os }}-composer-8.3-highest
             - name: Install xsl PHP extension
               run: |
                 apk add $PHPIZE_DEPS libxslt-dev
@@ -141,6 +136,6 @@ jobs:
             - name: Run coverage with PHPUnit
               run: vendor/bin/simple-phpunit --coverage-clover ./coverage.xml --colors=always
             - name: Send code coverage report to Codecov.io
-              uses: codecov/codecov-action@v1.0.3      # 1.0.4+ uncompatible alpine :/
+              uses: codecov/codecov-action@v3
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
