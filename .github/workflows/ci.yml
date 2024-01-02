@@ -33,16 +33,12 @@ jobs:
                   ${{ runner.os }}-composer-8.3-highest
             - name: Validate Composer
               run: composer validate
-            - name: Install xsl PHP extension
-              run: |
-                apk add $PHPIZE_DEPS libxslt-dev
-                docker-php-ext-install xsl
             - name: Install highest dependencies with Composer
               run: composer update --no-progress --no-suggest --ansi
             - name: Disable PHP memory limit
               run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
-            - name: Analyze
-              run: vendor/bin/phpqa --execution no-parallel --progress-delay=-1 --ansi
+            - name: Run CS-Fixer
+              run: vendor/bin/php-cs-fixer fix --dry-run --diff --format=checkstyle
 
     phpunit:
         name: PHPUnit (PHP ${{ matrix.php }} Deps ${{ matrix.dependencies }})
@@ -127,10 +123,6 @@ jobs:
                 key: ${{ runner.os }}-composer-8.3-highest-${{ hashFiles('**/composer.lock') }}
                 restore-keys: |
                   ${{ runner.os }}-composer-8.3-highest
-            - name: Install xsl PHP extension
-              run: |
-                apk add $PHPIZE_DEPS libxslt-dev
-                docker-php-ext-install xsl
             - name: Install highest dependencies with Composer
               run: composer update --no-progress --no-suggest --ansi
             - name: Run coverage with PHPUnit
