@@ -21,13 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AutoFormType extends AbstractType
 {
-    /** @var AutoFormListener */
-    private $autoFormListener;
-
-    public function __construct(AutoFormListener $autoFormListener)
-    {
-        $this->autoFormListener = $autoFormListener;
-    }
+    public function __construct(
+        private readonly AutoFormListener $autoFormListener,
+    ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -41,7 +37,7 @@ class AutoFormType extends AbstractType
             'excluded_fields' => [],
         ]);
 
-        $resolver->setNormalizer('data_class', function (Options $options, $value): string {
+        $resolver->setNormalizer('data_class', static function (Options $options, $value): string {
             if (empty($value)) {
                 throw new \RuntimeException('Missing "data_class" option of "AutoFormType".');
             }

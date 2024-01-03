@@ -17,8 +17,9 @@ use A2lix\AutoFormBundle\Form\EventListener\AutoFormListener;
 use A2lix\AutoFormBundle\Form\Manipulator\DoctrineORMManipulator;
 use A2lix\AutoFormBundle\Form\Type\AutoFormType;
 use A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\ORMSetup;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
@@ -30,7 +31,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class TypeTestCase extends BaseTypeTestCase
 {
-    protected $doctrineORMManipulator;
+    protected ?DoctrineORMManipulator $doctrineORMManipulator = null;
 
     protected function setUp(): void
     {
@@ -45,9 +46,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
                 new FormTypeValidatorExtension($validator)
             )
             ->addTypeGuesser(
-                $this->getMockBuilder(ValidatorTypeGuesser::class)
-                    ->disableOriginalConstructor()
-                    ->getMock()
+                $this->createMock(ValidatorTypeGuesser::class)
             )
             ->getFormFactory()
         ;
@@ -62,8 +61,9 @@ abstract class TypeTestCase extends BaseTypeTestCase
             return $this->doctrineORMManipulator;
         }
 
-        $config = Setup::createAnnotationMetadataConfiguration([__DIR__.'/../Fixtures/Entity'], true, null, null, false);
-        $entityManager = EntityManager::create(['driver' => 'pdo_sqlite'], $config);
+        $config = ORMSetup::createAttributeMetadataConfiguration([__DIR__.'/../Fixtures/Entity'], true);
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
+        $entityManager = new EntityManager($connection, $config);
         $doctrineORMInfo = new DoctrineORMInfo($entityManager->getMetadataFactory());
 
         return $this->doctrineORMManipulator = new DoctrineORMManipulator($doctrineORMInfo, ['id', 'locale', 'translatable']);

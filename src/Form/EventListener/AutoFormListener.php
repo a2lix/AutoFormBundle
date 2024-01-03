@@ -20,13 +20,9 @@ use Symfony\Component\Form\FormEvents;
 
 class AutoFormListener implements EventSubscriberInterface
 {
-    /** @var FormManipulatorInterface */
-    private $formManipulator;
-
-    public function __construct(FormManipulatorInterface $formManipulator)
-    {
-        $this->formManipulator = $formManipulator;
-    }
+    public function __construct(
+        private readonly FormManipulatorInterface $formManipulator,
+    ) {}
 
     public static function getSubscribedEvents(): array
     {

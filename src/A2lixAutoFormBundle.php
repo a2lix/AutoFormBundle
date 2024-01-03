@@ -15,6 +15,4 @@ namespace A2lix\AutoFormBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class A2lixAutoFormBundle extends Bundle
-{
-}
+class A2lixAutoFormBundle extends Bundle {}

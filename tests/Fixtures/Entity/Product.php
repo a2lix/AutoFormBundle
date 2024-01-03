@@ -17,42 +17,28 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Product
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     */
-    protected $title;
+    #[ORM\Column(nullable: true)]
+    private ?string $title = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    protected $description;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     */
-    protected $url;
+    #[ORM\Column(nullable: true)]
+    private ?string $url = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Media")
-     */
-    protected $mainMedia;
+    #[ORM\ManyToOne(targetEntity: Media::class)]
+    private Media $mainMedia;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Media", mappedBy="product", cascade={"all"}, orphanRemoval=true)
-     */
-    protected $medias;
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'product', cascade: ['all'], orphanRemoval: true)]
+    private ArrayCollection $medias;
 
     public function __construct()
     {
