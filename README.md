@@ -30,7 +30,7 @@ docker run --rm --interactive --tty --volume $PWD:/app --user $(id -u):$(id -g) 
 
 This package is available under the [MIT license](LICENSE).
 
-[ci_badge]: https://github.com/a2lix/AutoFormBundle/workflows/CI/badge.svg
-[ci_link]: https://github.com/a2lix/AutoFormBundle/actions?query=workflow%3ACI
+[ci_badge]: https://github.com/a2lix/AutoFormBundle/actions/workflows/ci.yml/badge.svg
+[ci_link]: https://github.com/a2lix/AutoFormBundle/actions/workflows/ci.yml
 [coverage_badge]: https://codecov.io/gh/a2lix/AutoFormBundle/branch/master/graph/badge.svg
 [coverage_link]: https://codecov.io/gh/a2lix/AutoFormBundle/branch/master
