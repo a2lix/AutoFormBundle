@@ -17,12 +17,12 @@
     ],
     "require": {
         "php": "^8.1",
-        "doctrine/persistence": "^1.3|^2.0|^3.0",
-        "symfony/config": "^5.4.30|^6.3.10|^7.0",
-        "symfony/dependency-injection": "^5.4.30|^6.3.10|^7.0",
-        "symfony/doctrine-bridge": "^5.4.30|^6.3.10|^7.0",
-        "symfony/form": "^5.4.30|^6.3.10|^7.0",
-        "symfony/http-kernel": "^5.4.30|^6.3.10|^7.0"
+        "doctrine/persistence": "^2.0|^3.0",
+        "symfony/config": "^5.4.30|^6.3|^7.0",
+        "symfony/dependency-injection": "^5.4.30|^6.3|^7.0",
+        "symfony/doctrine-bridge": "^5.4.30|^6.3|^7.0",
+        "symfony/form": "^5.4.30|^6.3|^7.0",
+        "symfony/http-kernel": "^5.4.30|^6.3|^7.0"
     },
     "require-dev": {
         "doctrine/orm": "^2.15",
@@ -30,9 +30,9 @@
         "kubawerlos/php-cs-fixer-custom-fixers": "^3.18",
         "phpstan/phpstan": "^1.10",
         "rector/rector": "^0.18",
-        "symfony/cache": "^5.4.30|^6.3.10|^7.0",
-        "symfony/phpunit-bridge": "^5.4.30|^6.3.10|^7.0",
-        "symfony/validator": "^5.4.30|^6.3.10|^7.0",
+        "symfony/cache": "^5.4.30|^6.3|^7.0",
+        "symfony/phpunit-bridge": "^5.4.30|^6.3|^7.0",
+        "symfony/validator": "^5.4.30|^6.3|^7.0",
         "vimeo/psalm": "^5.18"
     },
     "suggest": {
