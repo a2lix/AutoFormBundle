@@ -18,6 +18,7 @@
 
   <php>
     <ini name="error_reporting" value="-1"/>
+    <server name="SYMFONY_MAX_PHPUNIT_VERSION" value="9.6" />
   </php>
 
   <listeners>
