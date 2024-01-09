@@ -2,33 +2,33 @@
 
 <!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/9.6/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
          backupGlobals="false"
          colors="true"
          bootstrap="vendor/autoload.php"
 >
-    <php>
-        <ini name="error_reporting" value="-1" />
-    </php>
+  <coverage>
+    <include>
+      <directory>src/</directory>
+    </include>
+    <exclude>
+      <directory>src/Resources</directory>
+    </exclude>
+  </coverage>
 
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
-    </listeners>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+  </php>
 
-    <filter>
-        <whitelist>
-            <directory>src/</directory>
-            <exclude>
-                <directory>src/Resources</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+  <listeners>
+    <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+  </listeners>
 
-    <testsuites>
-        <testsuite name="Bundle Test Suite">
-            <directory>tests/</directory>
-            <exclude>tests/Fixtures</exclude>
-            <exclude>tests/tmp</exclude>
-        </testsuite>
-    </testsuites>
+  <testsuites>
+    <testsuite name="Bundle Test Suite">
+      <directory>tests/</directory>
+      <exclude>tests/Fixtures</exclude>
+      <exclude>tests/tmp</exclude>
+    </testsuite>
+  </testsuites>
 </phpunit>
