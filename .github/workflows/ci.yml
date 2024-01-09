@@ -5,7 +5,6 @@ on: ["push", "pull_request"]
 env:
     COMPOSER_ALLOW_SUPERUSER: '1'
     SYMFONY_DEPRECATIONS_HELPER: max[self]=0
-    SYMFONY_PHPUNIT_REMOVE_RETURN_TYPEHINT: 1
 
 jobs:
     analyze:
@@ -91,39 +90,39 @@ jobs:
                 SYMFONY_MAX_PHPUNIT_VERSION: ${{ matrix.phpunit-version }}
               run: vendor/bin/simple-phpunit --colors=always
 
-    coverage:
-        name: Coverage (PHP 8.3)
-        runs-on: ubuntu-latest
-        container:
-            image: php:8.3-alpine
-            options: >-
-              --tmpfs /tmp:exec
-              --tmpfs /var/tmp:exec
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Install pcov PHP extension
-              run: |
-                apk add $PHPIZE_DEPS
-                pecl install pcov
-                docker-php-ext-enable pcov
-            - name: Install Composer
-              run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
-            - name: Get Composer Cache Directory
-              id: composer-cache
-              run: |
-                echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v3
-              with:
-                path: ${{ steps.composer-cache.outputs.dir }}
-                key: ${{ runner.os }}-composer-8.3-highest-${{ hashFiles('**/composer.json') }}
-                restore-keys: |
-                  ${{ runner.os }}-composer-8.3-highest
-            - name: Install highest dependencies with Composer
-              run: composer update --no-progress --no-suggest --ansi
-            - name: Run coverage with PHPUnit
-              run: vendor/bin/simple-phpunit --coverage-clover ./coverage.xml --colors=always
-            - name: Send code coverage report to Codecov.io
-              uses: codecov/codecov-action@v3
-              with:
-                token: ${{ secrets.CODECOV_TOKEN }}
+    # coverage:
+    #     name: Coverage (PHP 8.3)
+    #     runs-on: ubuntu-latest
+    #     container:
+    #         image: php:8.3-alpine
+    #         options: >-
+    #           --tmpfs /tmp:exec
+    #           --tmpfs /var/tmp:exec
+    #     steps:
+    #         - name: Checkout
+    #           uses: actions/checkout@v4
+    #         - name: Install pcov PHP extension
+    #           run: |
+    #             apk add $PHPIZE_DEPS
+    #             pecl install pcov
+    #             docker-php-ext-enable pcov
+    #         - name: Install Composer
+    #           run: wget -qO - https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+    #         - name: Get Composer Cache Directory
+    #           id: composer-cache
+    #           run: |
+    #             echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+    #         - uses: actions/cache@v3
+    #           with:
+    #             path: ${{ steps.composer-cache.outputs.dir }}
+    #             key: ${{ runner.os }}-composer-8.3-highest-${{ hashFiles('**/composer.json') }}
+    #             restore-keys: |
+    #               ${{ runner.os }}-composer-8.3-highest
+    #         - name: Install highest dependencies with Composer
+    #           run: composer update --no-progress --no-suggest --ansi
+    #         - name: Run coverage with PHPUnit
+    #           run: vendor/bin/simple-phpunit --coverage-clover ./coverage.xml --colors=always
+    #         - name: Send code coverage report to Codecov.io
+    #           uses: codecov/codecov-action@v3
+    #           with:
+    #             token: ${{ secrets.CODECOV_TOKEN }}
