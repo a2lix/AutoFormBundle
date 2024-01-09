@@ -80,7 +80,7 @@ class DoctrineORMManipulator implements FormManipulatorInterface
                 continue;
             }
 
-            return $this->doctrineORMInfo->getAssociationTargetClass($dataClass, $form->getName());
+            return $this->doctrineORMInfo->getAssociationTargetClass($dataClass, (string) $form->getPropertyPath());
         }
 
         throw new \RuntimeException('Unable to get dataClass');
