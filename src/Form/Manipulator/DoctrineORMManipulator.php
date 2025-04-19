@@ -30,7 +30,7 @@ class DoctrineORMManipulator implements FormManipulatorInterface
 
         // Filtering to remove excludedFields
         $objectFieldsConfig = $this->doctrineORMInfo->getFieldsConfig($class);
-        $validObjectFieldsConfig = $this->filteringValidObjectFields($objectFieldsConfig, $formOptions['excluded_fields']);
+        $validObjectFieldsConfig = $this->filteringValidObjectFields($objectFieldsConfig, $formOptions['excluded_fields'], $formOptions['included_fields']);
 
         if (empty($formOptions['fields'])) {
             return $validObjectFieldsConfig;
@@ -86,12 +86,15 @@ class DoctrineORMManipulator implements FormManipulatorInterface
         throw new \RuntimeException('Unable to get dataClass');
     }
 
-    private function filteringValidObjectFields(array $objectFieldsConfig, array $formExcludedFields): array
+    private function filteringValidObjectFields(array $objectFieldsConfig, array $formExcludedFields, array $formIncludedFields): array
     {
         $excludedFields = array_merge($this->globalExcludedFields, $formExcludedFields);
 
         $validFields = [];
         foreach ($objectFieldsConfig as $fieldName => $fieldConfig) {
+            if (!empty($formIncludedFields) && !\in_array($fieldName, $formIncludedFields, true)) {
+                continue;
+            }
             if (\in_array($fieldName, $excludedFields, true)) {
                 continue;
             }
