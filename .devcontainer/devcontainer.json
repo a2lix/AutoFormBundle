@@ -1,0 +1,12 @@
+{
+  "name": "PHP CLI",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [ "bmewburn.vscode-intelephense-client", "xdebug.php-debug", "getpsalm.psalm-vscode-plugin" ]
+    }
+  },
+  "remoteUser": "vscode"
+}

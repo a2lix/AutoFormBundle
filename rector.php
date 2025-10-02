@@ -3,35 +3,44 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Core\ValueObject\PhpVersion;
 use Rector\Doctrine\Set\DoctrineSetList;
-use Rector\PHPUnit\Set\PHPUnitLevelSetList;
+use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
-use Rector\Set\ValueObject\LevelSetList;
-use Rector\Symfony\Set\SymfonyLevelSetList;
 use Rector\Symfony\Set\SymfonySetList;
-use Rector\Symfony\Set\TwigSetList;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->parallel();
-    $rectorConfig->paths([
-        __DIR__.'/src',
-        __DIR__.'/tests',
-    ]);
-    $rectorConfig->importNames();
-    $rectorConfig->importShortClasses(false);
-
-    $rectorConfig->phpVersion(PhpVersion::PHP_82);
-    $rectorConfig->sets([
+return RectorConfig::configure()
+    ->withParallel()
+    ->withPaths([
+        __DIR__ . '/config',
+        __DIR__ . '/src',
+        __DIR__ . '/tests',
+    ])
+    ->withRootFiles()
+    ->withImportNames(importShortClasses: false)
+    ->withTypeCoverageLevel(0)
+    ->withDeadCodeLevel(0)
+    ->withCodeQualityLevel(0)
+    ->withRules([
+        AddVoidReturnTypeWhereNoReturnRector::class,
+    ])
+    ->withPhpSets()
+    ->withSets([
         LevelSetList::UP_TO_PHP_82,
-
         DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
-        // DoctrineSetList::DOCTRINE_CODE_QUALITY,
-        DoctrineSetList::DOCTRINE_ORM_214,
-        DoctrineSetList::DOCTRINE_DBAL_30,
+        SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
+        DoctrineSetList::GEDMO_ANNOTATIONS_TO_ATTRIBUTES,
+        PHPUnitSetList::PHPUNIT_110,
 
         PHPUnitLevelSetList::UP_TO_PHPUNIT_91,
-        // PHPUnitSetList::PHPUNIT_CODE_QUALITY,
-        // PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
+    ])
+    ->withAttributesSets(all: true)
+    ->withComposerBased(doctrine: true, phpunit: true, symfony: true)
+    ->withConfiguredRule(ClassPropertyAssignToConstructorPromotionRector::class, [
+        'inline_public' => true,
+    ])
+    ->withSkip([
+        ClassPropertyAssignToConstructorPromotionRector::class => [
+            __DIR__ . '/src/Entity/*',
+        ],
     ]);
-};

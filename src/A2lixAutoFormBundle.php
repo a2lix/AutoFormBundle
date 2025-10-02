@@ -13,6 +13,35 @@ declare(strict_types=1);
 
 namespace A2lix\AutoFormBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-class A2lixAutoFormBundle extends Bundle {}
+final class A2lixAutoFormBundle extends AbstractBundle
+{
+    #[\Override]
+    public function configure(DefinitionConfigurator $definition): void
+    {
+        $definition->rootNode()
+            ->children()
+                ->arrayNode('children_excluded')
+                ->scalarPrototype()->end()
+                ->defaultValue(['id'])
+                ->info('Class properties to exclude from autoType children. (Default: id)')
+                ->end()
+            ->end()
+        ;
+    }
+
+    #[\Override]
+    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+    {
+        $container->import('../config/services.php');
+
+        $container->services()
+            ->get('a2lix_auto_form.form.type.auto_type')
+            ->arg(1, $config['children_excluded'])
+        ;
+    }
+}

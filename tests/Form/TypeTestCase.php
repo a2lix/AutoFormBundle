@@ -13,66 +13,79 @@ declare(strict_types=1);
 
 namespace A2lix\AutoFormBundle\Tests\Form;
 
-use A2lix\AutoFormBundle\Form\EventListener\AutoFormListener;
-use A2lix\AutoFormBundle\Form\Manipulator\DoctrineORMManipulator;
-use A2lix\AutoFormBundle\Form\Type\AutoFormType;
-use A2lix\AutoFormBundle\ObjectInfo\DoctrineORMInfo;
+use A2lix\AutoFormBundle\Form\Builder\AutoTypeBuilder;
+use A2lix\AutoFormBundle\Form\Type\AutoType;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
-use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Forms;
+use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 abstract class TypeTestCase extends BaseTypeTestCase
 {
-    protected ?DoctrineORMManipulator $doctrineORMManipulator = null;
+    use ValidatorExtensionTrait;
 
-    protected function setUp(): void
+    protected ?AutoTypeBuilder $autoTypeBuilder = null;
+
+    protected function getConfiguredAutoType(array $childrenExcluded = []): AutoType
     {
-        parent::setUp();
-
-        $validator = $this->createMock(ValidatorInterface::class);
-        $validator->method('validate')->willReturn(new ConstraintViolationList());
-
-        $this->factory = Forms::createFormFactoryBuilder()
-            ->addExtensions($this->getExtensions())
-            ->addTypeExtension(
-                new FormTypeValidatorExtension($validator)
-            )
-            ->addTypeGuesser(
-                $this->createMock(ValidatorTypeGuesser::class)
-            )
-            ->getFormFactory()
-        ;
-
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
+        return new AutoType($this->getAutoTypeBuilder(), $childrenExcluded);
     }
 
-    protected function getDoctrineORMManipulator(): DoctrineORMManipulator
+    private function getAutoTypeBuilder(): AutoTypeBuilder
     {
-        if (null !== $this->doctrineORMManipulator) {
-            return $this->doctrineORMManipulator;
+        if (null !== $this->autoTypeBuilder) {
+            return $this->autoTypeBuilder;
         }
 
-        $config = ORMSetup::createAttributeMetadataConfiguration([__DIR__.'/../Fixtures/Entity'], true);
-        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
-        $entityManager = new EntityManager($connection, $config);
-        $doctrineORMInfo = new DoctrineORMInfo($entityManager->getMetadataFactory());
-
-        return $this->doctrineORMManipulator = new DoctrineORMManipulator($doctrineORMInfo, ['id', 'locale', 'translatable']);
+        return $this->autoTypeBuilder = new AutoTypeBuilder(
+            $this->getPropertyInfoExtractor(),
+        );
     }
 
-    protected function getConfiguredAutoFormType(): AutoFormType
+    private function getPropertyInfoExtractor(): PropertyInfoExtractor
     {
-        $autoFormListener = new AutoFormListener($this->getDoctrineORMManipulator());
+        $config = ORMSetup::createAttributeMetadataConfig([__DIR__ . '/../Fixtures/Entity'], true);
+        $config->setProxyDir(__DIR__ . '/../proxies');
+        $config->setProxyNamespace('EntityProxy');
 
-        return new AutoFormType($autoFormListener);
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
+        $entityManager = new EntityManager($connection, $config);
+
+        $doctrineExtractor = new DoctrineExtractor($entityManager);
+        $reflectionExtractor = new ReflectionExtractor();
+
+        return new PropertyInfoExtractor(
+            listExtractors: [
+                $reflectionExtractor,
+                $doctrineExtractor
+            ],
+            typeExtractors:[
+                $doctrineExtractor,
+                new PhpStanExtractor(),
+                new PhpDocExtractor(),
+                $reflectionExtractor
+            ],
+            accessExtractors: [
+                $doctrineExtractor,
+                $reflectionExtractor
+            ]
+        );
+    }
+
+    protected function getExtensions(): array
+    {
+        $autoType = $this->getConfiguredAutoType(['id']);
+
+        return [
+            ...parent::getExtensions(),
+            new PreloadedExtension([$autoType], []),
+        ];
     }
 }
