@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -23,7 +21,7 @@ final readonly class AutoTypeCustom
 {
     /**
      * @param array<string, mixed> $options
-     * @param class-string|null $type
+     * @param class-string|null    $type
      */
     public function __construct(
         private array $options = [],
@@ -31,8 +29,7 @@ final readonly class AutoTypeCustom
         private ?string $name = null,
         private ?bool $excluded = null,
         private ?bool $embedded = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @return childOptions

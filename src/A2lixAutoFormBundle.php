@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -23,13 +21,15 @@ final class A2lixAutoFormBundle extends AbstractBundle
     #[\Override]
     public function configure(DefinitionConfigurator $definition): void
     {
+        /** @psalm-suppress UndefinedMethod */
+        /** @psalm-suppress MixedMethodCall */
         $definition->rootNode()
             ->children()
-                ->arrayNode('children_excluded')
-                ->scalarPrototype()->end()
-                ->defaultValue(['id'])
-                ->info('Class properties to exclude from autoType children. (Default: id)')
-                ->end()
+            ->arrayNode('children_excluded')
+            ->scalarPrototype()->end()
+            ->defaultValue(['id'])
+            ->info('Class properties to exclude from autoType children. (Default: id)')
+            ->end()
             ->end()
         ;
     }
@@ -41,7 +41,7 @@ final class A2lixAutoFormBundle extends AbstractBundle
 
         $container->services()
             ->get('a2lix_auto_form.form.type.auto_type')
-            ->arg(1, $config['children_excluded'])
+            ->arg('$globalExcludedChildren', $config['children_excluded'])
         ;
     }
 }

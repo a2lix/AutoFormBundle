@@ -8,9 +8,15 @@
     findUnusedBaselineEntry="true"
 >
     <projectFiles>
-        <directory name="src" />
+        <directory name="*" />
         <ignoreFiles>
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <MissingConstructor errorLevel="suppress" /> <!-- PHP8 Property hook -->
+        <PropertyNotSetInConstructor errorLevel="suppress" /> <!-- PHP8 Property hook -->
+        <RedundantPropertyInitializationCheck errorLevel="suppress" /> <!-- PHP8 Property hook -->
+    </issueHandlers>
 </psalm>

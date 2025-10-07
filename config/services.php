@@ -20,12 +20,11 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
         ->set('a2lix_auto_form.form.builder.auto_type_builder', AutoTypeBuilder::class)
         ->args([
-            service('property_info'),
+            '$propertyInfoExtractor' => service('property_info'),
         ])
         ->set('a2lix_auto_form.form.type.auto_type', AutoType::class)
         ->args([
-            service('a2lix_auto_form.form.builder.auto_type_builder'),
-            null, // children_excluded config option
+            '$autoTypeBuilder' => service('a2lix_auto_form.form.builder.auto_type_builder'),
         ])
         ->tag('form.type')
     ;

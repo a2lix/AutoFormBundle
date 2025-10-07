@@ -10,8 +10,8 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 RUN set -eux; \
 	install-php-extensions \
 		@composer \
-		# apcu \
-		# opcache \
+		apcu \
+		opcache \
 		xdebug \
 	;
 

@@ -9,15 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace A2lix\AutoFormBundle\Tests\Form\Type;
+namespace A2lix\AutoFormBundle\Tests\Fixtures;
 
-use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
-
-/**
- * @internal
- *
- * @coversNothing
- */
-final class AutoTypeEntityTest extends TypeTestCase
+enum ProductStatus
 {
+    case Available;
+    case Unavailable;
 }

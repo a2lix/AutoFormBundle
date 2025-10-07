@@ -1,5 +1,5 @@
 {
-  "name": "PHP CLI",
+  "name": "A2lix - AutoFormBundle",
   "build": {
     "dockerfile": "Dockerfile"
   },

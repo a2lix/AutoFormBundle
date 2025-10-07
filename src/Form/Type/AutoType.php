@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -59,6 +57,7 @@ class AutoType extends AbstractType
             'children_embedded' => [],
             'builder' => null,
         ]);
+
         $resolver->setAllowedTypes('builder', ['null', 'callable']);
         $resolver->setInfo('builder', 'A callable that accepts two arguments (FormBuilderInterface $builder, string[] $classProperties). It should not return anything.');
 

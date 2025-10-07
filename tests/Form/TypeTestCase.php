@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -51,9 +49,10 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     private function getPropertyInfoExtractor(): PropertyInfoExtractor
     {
-        $config = ORMSetup::createAttributeMetadataConfig([__DIR__ . '/../Fixtures/Entity'], true);
-        $config->setProxyDir(__DIR__ . '/../proxies');
-        $config->setProxyNamespace('EntityProxy');
+        $config = ORMSetup::createAttributeMetadataConfig([__DIR__.'/../Fixtures/Entity'], true);
+        // $config->setProxyDir(__DIR__.'/../proxies');
+        // $config->setProxyNamespace('EntityProxy');
+        $config->enableNativeLazyObjects(true);
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
         $entityManager = new EntityManager($connection, $config);
@@ -64,21 +63,22 @@ abstract class TypeTestCase extends BaseTypeTestCase
         return new PropertyInfoExtractor(
             listExtractors: [
                 $reflectionExtractor,
-                $doctrineExtractor
+                $doctrineExtractor,
             ],
-            typeExtractors:[
+            typeExtractors: [
                 $doctrineExtractor,
                 new PhpStanExtractor(),
                 new PhpDocExtractor(),
-                $reflectionExtractor
+                $reflectionExtractor,
             ],
             accessExtractors: [
                 $doctrineExtractor,
-                $reflectionExtractor
+                $reflectionExtractor,
             ]
         );
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         $autoType = $this->getConfiguredAutoType(['id']);

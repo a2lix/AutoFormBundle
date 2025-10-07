@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -14,10 +12,10 @@ declare(strict_types=1);
 namespace A2lix\AutoFormBundle\Form\Builder;
 
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
-use Symfony\Component\Form\FormInterface;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\TypeInfo\Type as TypeInfo;
 use Symfony\Component\TypeInfo\TypeIdentifier;
@@ -37,18 +35,19 @@ class AutoTypeBuilder
      */
     public function buildChildren(FormBuilderInterface $builder, array $formOptions): void
     {
-        $dataClass = $this->getDataClass($builder->getForm());
+        $dataClass = $this->getDataClass($form = $builder->getForm());
 
         if (null === $classProperties = $this->propertyInfoExtractor->getProperties($dataClass)) {
-            throw new \RuntimeException(sprintf('Unable to extract properties of "%s".', $dataClass));
+            throw new \RuntimeException(\sprintf('Unable to extract properties of "%s".', $dataClass));
         }
 
         $refClass = new \ReflectionClass($dataClass);
         $allChildrenExcluded = '*' === $formOptions['children_excluded'];
         $allChildrenEmbedded = '*' === $formOptions['children_embedded'];
+        $formLevel = $this->getFormLevel($form);
 
         foreach ($classProperties as $classProperty) {
-            // Issue: DateTimeImmutable PHP8.4
+            // Due to issue with DateTimeImmutable PHP8.4
             if (!$refClass->hasProperty($classProperty)) {
                 continue;
             }
@@ -61,10 +60,11 @@ class AutoTypeBuilder
 
             $refProperty = $refClass->getProperty($classProperty);
             $propAttributeOptions = ($refProperty->getAttributes(AutoTypeCustom::class)[0] ?? null)
-                ?->newInstance()?->getOptions() ?? [];
+                ?->newInstance()?->getOptions() ?? []
+            ;
 
             // FORM.children[PROP] callable? Add early
-            if (is_callable($propFormOptions)) {
+            if (\is_callable($propFormOptions)) {
                 /** @var FormBuilderInterface */
                 $childBuilder = ($propFormOptions)($builder, $propAttributeOptions);
                 $this->addChild($builder, $childBuilder);
@@ -81,7 +81,7 @@ class AutoTypeBuilder
 
             if (null === $propFormOptions) {
                 /** @var list<string> $formOptions['children_excluded'] */
-                $formChildExcluded = $allChildrenExcluded || in_array($classProperty, $formOptions['children_excluded'], true)
+                $formChildExcluded = $allChildrenExcluded || \in_array($classProperty, $formOptions['children_excluded'], true)
                     || ($propAttributeOptions['child_excluded'] ?? false);
 
                 // Excluded at form or attribute level? Continue early
@@ -96,13 +96,13 @@ class AutoTypeBuilder
                 ...$propAttributeOptions,
             ];
 
-            // classProperty.propertyInfo? Enrich childOptions
-            if (null !== $propertyTypeInfo = $this->propertyInfoExtractor->getType($dataClass, $classProperty)) {
+            // PropertyInfo? Enrich childOptions
+            if (null !== $propTypeInfo = $this->propertyInfoExtractor->getType($dataClass, $classProperty)) {
                 /** @psalm-suppress RiskyTruthyFalsyComparison */
                 /** @var list<string> $formOptions['children_embedded'] */
-                $formChildEmbedded = $allChildrenEmbedded || in_array($classProperty, $formOptions['children_embedded'], true)
+                $formChildEmbedded = $allChildrenEmbedded || \in_array($classProperty, $formOptions['children_embedded'], true)
                     || ($propAttributeOptions['child_embedded'] ?? false);
-                $childOptions = $this->updateChildOptions($childOptions, $propertyTypeInfo, $formChildEmbedded);
+                $childOptions = $this->updateChildOptions($childOptions, $propTypeInfo, $formChildEmbedded, $formLevel);
             }
 
             $this->addChild($builder, $classProperty, $childOptions);
@@ -112,7 +112,7 @@ class AutoTypeBuilder
         // Remaining FORM.children[PROP] unrelated to dataClass? E.g: mapped:false OR inherit_data:true
         foreach ($formOptions['children'] as $childProperty => $childOptions) {
             // FORM.children[PROP] callable? Continue early
-            if (is_callable($childOptions)) {
+            if (\is_callable($childOptions)) {
                 /** @var FormBuilderInterface */
                 $childBuilder = ($childOptions)($builder);
                 $this->addChild($builder, $childBuilder);
@@ -133,6 +133,7 @@ class AutoTypeBuilder
     {
         if ($child instanceof FormBuilderInterface) {
             $builder->add($child);
+
             return;
         }
 
@@ -186,24 +187,28 @@ class AutoTypeBuilder
      */
     private function getAssociationTargetClass(string $class, string $childName): string
     {
-        if (null === $propertyTypeInfo = $this->propertyInfoExtractor->getType($class, $childName)) {
-            throw new \RuntimeException(sprintf('Unable to find the association target class of "%s" in %s.', $childName, $class));
+        if (null === $propTypeInfo = $this->propertyInfoExtractor->getType($class, $childName)) {
+            throw new \RuntimeException(\sprintf('Unable to find the association target class of "%s" in %s.', $childName, $class));
         }
 
-        $innerType = $propertyTypeInfo instanceof TypeInfo\CollectionType ? $propertyTypeInfo->getCollectionValueType() : $propertyTypeInfo;
+        $innerType = $propTypeInfo instanceof TypeInfo\CollectionType ? $propTypeInfo->getCollectionValueType() : $propTypeInfo;
         if (!$innerType instanceof TypeInfo\ObjectType) {
-            throw new \RuntimeException(sprintf('Unable to find the association target class of "%s" in %s.', $childName, $class));
+            throw new \RuntimeException(\sprintf('Unable to find the association target class of "%s" in %s.', $childName, $class));
         }
 
         return $innerType->getClassName();
     }
 
-    private function updateChildOptions(array $baseChildOptions, TypeInfo $propertyTypeInfo, bool $formChildEmbedded): array
-    {
-        $isObject = $propertyTypeInfo->isIdentifiedBy(TypeIdentifier::OBJECT);
+    private function updateChildOptions(
+        array $baseChildOptions,
+        TypeInfo $propTypeInfo,
+        bool $formChildEmbedded,
+        int $formLevel,
+    ): array {
+        $isObject = $propTypeInfo->isIdentifiedBy(TypeIdentifier::OBJECT);
 
-        if (!$isObject && !$propertyTypeInfo instanceof TypeInfo\CollectionType) {
-            // TODO Enrich child_type & required?
+        if (!$isObject && !$propTypeInfo instanceof TypeInfo\CollectionType) {
+            // TODO Enrich child_type & required
             return $baseChildOptions;
         }
 
@@ -212,16 +217,18 @@ class AutoTypeBuilder
         }
 
         // Embeddable collection?
-        if ($propertyTypeInfo instanceof TypeInfo\CollectionType) {
-            $baseCollOptions =  [
+        if ($propTypeInfo instanceof TypeInfo\CollectionType) {
+            $baseCollOptions = [
                 'child_type' => CollectionType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
+                'delete_empty' => true,
                 'by_reference' => false,
+                'prototype_name' => '__name'. $formLevel .'__',
                 ...$baseChildOptions,
             ];
 
-            $collValueType = $propertyTypeInfo->getCollectionValueType();
+            $collValueType = $propTypeInfo->getCollectionValueType();
 
             // Object?
             if ($collValueType instanceof TypeInfo\ObjectType) {
@@ -237,19 +244,34 @@ class AutoTypeBuilder
             }
 
             // Builtin
-            // TODO Enrich entry_type?
+            // TODO Enrich entry_type
             return $baseCollOptions;
         }
 
         // Embeddable object
         /** @var TypeInfo\ObjectType */
-        $innerType = $propertyTypeInfo instanceof TypeInfo\NullableType ? $propertyTypeInfo->getWrappedType() : $propertyTypeInfo;
+        $innerType = $propTypeInfo instanceof TypeInfo\NullableType ? $propTypeInfo->getWrappedType() : $propTypeInfo;
 
         return [
             'child_type' => AutoType::class,
             'data_class' => $innerType->getClassName(),
-            'required' => $propertyTypeInfo->isNullable(),
-            ...$baseChildOptions
+            'required' => $propTypeInfo->isNullable(),
+            ...$baseChildOptions,
         ];
+    }
+
+    private function getFormLevel(FormInterface $form): int
+    {
+        if ($form->isRoot()) {
+            return 0;
+        }
+
+        $level = 0;
+        while (null !== $formParent = $form->getParent()) {
+            $form = $formParent;
+            $level++;
+        }
+
+        return $level;
     }
 }
