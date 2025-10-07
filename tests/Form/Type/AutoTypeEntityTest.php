@@ -12,12 +12,12 @@
 namespace A2lix\AutoFormBundle\Tests\Form\Type;
 
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 
 /**
  * @internal
- *
- * @coversNothing
  */
+#[CoversNothing]
 final class AutoTypeEntityTest extends TypeTestCase
 {
 }

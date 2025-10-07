@@ -31,6 +31,9 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     protected ?AutoTypeBuilder $autoTypeBuilder = null;
 
+    /**
+     * @param list<string> $childrenExcluded
+     */
     protected function getConfiguredAutoType(array $childrenExcluded = []): AutoType
     {
         return new AutoType($this->getAutoTypeBuilder(), $childrenExcluded);
@@ -49,13 +52,13 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     private function getPropertyInfoExtractor(): PropertyInfoExtractor
     {
-        $config = ORMSetup::createAttributeMetadataConfig([__DIR__.'/../Fixtures/Entity'], true);
+        $configuration = ORMSetup::createAttributeMetadataConfig([__DIR__.'/../Fixtures/Entity'], true);
         // $config->setProxyDir(__DIR__.'/../proxies');
         // $config->setProxyNamespace('EntityProxy');
-        $config->enableNativeLazyObjects(true);
+        $configuration->enableNativeLazyObjects(true);
 
-        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
-        $entityManager = new EntityManager($connection, $config);
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $configuration);
+        $entityManager = new EntityManager($connection, $configuration);
 
         $doctrineExtractor = new DoctrineExtractor($entityManager);
         $reflectionExtractor = new ReflectionExtractor();

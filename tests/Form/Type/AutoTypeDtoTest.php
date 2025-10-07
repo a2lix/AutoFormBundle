@@ -14,6 +14,7 @@ namespace A2lix\AutoFormBundle\Tests\Form\Type;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
 use A2lix\AutoFormBundle\Tests\Fixtures\Dto\Product1;
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Core\Type as FormType;
 
@@ -21,35 +22,37 @@ use Symfony\Component\Form\Extension\Core\Type as FormType;
  * @internal
  *
  * @psalm-suppress PropertyNotSetInConstructor
- *
- * @coversNothing
  */
+#[CoversNothing]
 final class AutoTypeDtoTest extends TypeTestCase
 {
-    #[DataProvider('provideScenarios')]
-    public function testScenario(DtoScenario $scenario): void
+    #[DataProvider('provideScenarioCases')]
+    public function testScenario(DtoScenario $dtoScenario): void
     {
         $form = $this->factory
-            ->createBuilder(AutoType::class, $scenario->dto, $scenario->formOptions)
+            ->createBuilder(AutoType::class, $dtoScenario->dto, $dtoScenario->formOptions)
             ->getForm()
         ;
 
-        self::assertSame(array_keys($scenario->expectedForm), array_keys($form->all()));
+        self::assertSame(array_keys($dtoScenario->expectedForm), array_keys($form->all()));
         foreach ($form->all() as $childName => $child) {
             /** @var string $childName */
             /** @psalm-suppress PossiblyUndefinedArrayOffset */
-            if (null !== $expectedType = $scenario->expectedForm[$childName]['expected_type'] ?? null) {
-                self::assertSame($expectedType, $child->getConfig()->getType()->getInnerType()::class);
+            if (null !== $expectedType = $dtoScenario->expectedForm[$childName]['expected_type'] ?? null) {
+                self::assertSame($child->getConfig()->getType()->getInnerType()::class, $expectedType);
             }
 
-            $expectedPartialOptions = $scenario->expectedForm[$childName];
+            $expectedPartialOptions = $dtoScenario->expectedForm[$childName];
             $actualOptions = $child->getConfig()->getOptions();
 
             self::assertSame($expectedPartialOptions, array_intersect_key($actualOptions, $expectedPartialOptions), $childName);
         }
     }
 
-    public static function provideScenarios(): iterable
+    /**
+     * @return \Iterator<array<int, DtoScenario>>
+     */
+    public static function provideScenarioCases(): iterable
     {
         yield 'Product1 without formOptions' => [
             new DtoScenario(

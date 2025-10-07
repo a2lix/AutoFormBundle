@@ -224,7 +224,7 @@ class AutoTypeBuilder
                 'allow_delete' => true,
                 'delete_empty' => true,
                 'by_reference' => false,
-                'prototype_name' => '__name'. $formLevel .'__',
+                'prototype_name' => '__name'.$formLevel.'__',
                 ...$baseChildOptions,
             ];
 
@@ -269,7 +269,7 @@ class AutoTypeBuilder
         $level = 0;
         while (null !== $formParent = $form->getParent()) {
             $form = $formParent;
-            $level++;
+            ++$level;
         }
 
         return $level;
