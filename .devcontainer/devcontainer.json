@@ -5,7 +5,14 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": [ "bmewburn.vscode-intelephense-client", "xdebug.php-debug", "getpsalm.psalm-vscode-plugin" ]
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug",
+        "getpsalm.psalm-vscode-plugin"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
     }
   },
   "remoteUser": "vscode"

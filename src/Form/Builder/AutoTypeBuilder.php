@@ -52,10 +52,6 @@ class AutoTypeBuilder
                 continue;
             }
 
-            // if (!$this->propertyInfoExtractor->isWritable($dataClass, $classProperty)) {
-            //     continue;
-            // }
-
             $propFormOptions = $formOptions['children'][$classProperty] ?? null;
 
             $refProperty = $refClass->getProperty($classProperty);
@@ -102,7 +98,10 @@ class AutoTypeBuilder
                 /** @var list<string> $formOptions['children_embedded'] */
                 $formChildEmbedded = $allChildrenEmbedded || \in_array($classProperty, $formOptions['children_embedded'], true)
                     || ($propAttributeOptions['child_embedded'] ?? false);
-                $childOptions = $this->updateChildOptions($childOptions, $propTypeInfo, $formChildEmbedded, $formLevel);
+
+                if ($formChildEmbedded) {
+                    $childOptions = $this->updateChildOptions($childOptions, $propTypeInfo, $formLevel);
+                }
             }
 
             $this->addChild($builder, $classProperty, $childOptions);
@@ -199,20 +198,9 @@ class AutoTypeBuilder
         return $innerType->getClassName();
     }
 
-    private function updateChildOptions(
-        array $baseChildOptions,
-        TypeInfo $propTypeInfo,
-        bool $formChildEmbedded,
-        int $formLevel,
-    ): array {
-        $isObject = $propTypeInfo->isIdentifiedBy(TypeIdentifier::OBJECT);
-
-        if (!$isObject && !$propTypeInfo instanceof TypeInfo\CollectionType) {
-            // TODO Enrich child_type & required
-            return $baseChildOptions;
-        }
-
-        if (!$formChildEmbedded) {
+    private function updateChildOptions(array $baseChildOptions, TypeInfo $propTypeInfo, int $formLevel): array
+    {
+        if ($propTypeInfo->isSatisfiedBy($this->isTypeInfoWithMatchingNativeFormType(...))) {
             return $baseChildOptions;
         }
 
@@ -244,7 +232,6 @@ class AutoTypeBuilder
             }
 
             // Builtin
-            // TODO Enrich entry_type
             return $baseCollOptions;
         }
 
@@ -258,6 +245,26 @@ class AutoTypeBuilder
             'required' => $propTypeInfo->isNullable(),
             ...$baseChildOptions,
         ];
+    }
+
+    private static function isTypeInfoWithMatchingNativeFormType(TypeInfo $propTypeInfo): bool
+    {
+        if ($propTypeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
+            return false;
+        }
+
+        if (!$propTypeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
+            return true;
+        }
+
+        return $propTypeInfo->isIdentifiedBy(\BackedEnum::class)
+            || $propTypeInfo->isIdentifiedBy(\DateTimeImmutable::class)
+            || $propTypeInfo->isIdentifiedBy(\DateTimeImmutable::class)
+            || $propTypeInfo->isIdentifiedBy(\DateInterval::class)
+            || $propTypeInfo->isIdentifiedBy(\DateTimeZone::class)
+            || $propTypeInfo->isIdentifiedBy('Symfony\Component\HttpFoundation\File\File')
+            || $propTypeInfo->isIdentifiedBy('Symfony\Component\Uid\Ulid')
+            || $propTypeInfo->isIdentifiedBy('Symfony\Component\Uid\Uuid');
     }
 
     private function getFormLevel(FormInterface $form): int
