@@ -18,19 +18,23 @@ jobs:
           php-version: '8.4'
 
       - name: Cache Composer packages
-        id: composer-cache
         uses: actions/cache@v4
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-8.4-${{ hashFiles(''**/composer.lock'') }}
+          path: |
+            vendor
+            ~/.composer/cache
+          key: ${{ runner.os }}-php-8.4-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-php-8.4-
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Run php-cs-fixer
-        run: vendor/bin/php-cs-fixer check --diff --verbose
+      - name: Run php-cs-fixer (dry run)
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
 
   tests:
     runs-on: ubuntu-latest
@@ -52,17 +56,21 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: Cache Composer packages
-        id: composer-cache
         uses: actions/cache@v4
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-${{ hashFiles(''**/composer.lock'') }}
+          path: |
+            vendor
+            ~/.composer/cache
+          key: ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-
 
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
       - name: Update dependencies for Symfony ${{ matrix.symfony }}
         run: |
-          composer require "symfony/config:${{ matrix.symfony }}" "symfony/dependency-injection:${{ matrix.symfony }}" "symfony/doctrine-bridge:${{ matrix.symfony }}" "symfony/form:${{ matrix.symfony }}" "symfony/http-kernel:${{ matrix.symfony }}" "symfony/property-info:${{ matrix.symfony }}" "symfony/cache:${{ matrix.symfony }}" "symfony/validator:${{ matrix.symfony }}" "symfony/var-dumper:${{ matrix.symfony }}" --no-update
+          composer require "symfony/config:${{ matrix.symfony }}" "symfony/dependency-injection:${{ matrix.symfony }}" "symfony/doctrine-bridge:${{ matrix.symfony }}" "symfony/form:${{ matrix.symfony }}" --no-update
           composer update --prefer-dist --no-progress --optimize-autoloader
 
       - name: Run psalm
@@ -70,3 +78,6 @@ jobs:
 
       - name: Run phpunit
         run: vendor/bin/phpunit
+
+      - name: Check for outdated dependencies
+        run: composer outdated
