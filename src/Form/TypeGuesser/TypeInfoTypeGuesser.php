@@ -18,7 +18,6 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type as TypeInfo;
-use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
@@ -51,7 +50,7 @@ class TypeInfoTypeGuesser implements FormTypeGuesserInterface
 
         if ($typeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
             if ($typeInfo->isIdentifiedBy(\UnitEnum::class)) {
-                /** @var ObjectType */
+                /** @var TypeInfo\ObjectType */
                 $innerType = $typeInfo instanceof TypeInfo\NullableType ? $typeInfo->getWrappedType() : $typeInfo;
 
                 return new TypeGuess(CoreType\EnumType::class, ['class' => $innerType->getClassName()], Guess::HIGH_CONFIDENCE);

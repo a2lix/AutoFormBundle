@@ -39,14 +39,14 @@ final class AutoTypeDtoTest extends TypeTestCase
             /** @var string $childName */
             /** @psalm-suppress PossiblyUndefinedArrayOffset */
             if (null !== $expectedType = $dtoScenario->expectedForm[$childName]['expected_type'] ?? null) {
-                self::assertSame($child->getConfig()->getType()->getInnerType()::class, $expectedType, sprintf('Type of "%s"', $childName));
+                self::assertSame($child->getConfig()->getType()->getInnerType()::class, $expectedType, \sprintf('Type of "%s"', $childName));
             }
 
             $expectedPartialOptions = $dtoScenario->expectedForm[$childName];
             unset($expectedPartialOptions['expected_type']);
             $actualOptions = $child->getConfig()->getOptions();
 
-            self::assertSame($expectedPartialOptions, array_intersect_key($actualOptions, $expectedPartialOptions), sprintf('Options of "%s"', $childName));
+            self::assertSame($expectedPartialOptions, array_intersect_key($actualOptions, $expectedPartialOptions), \sprintf('Options of "%s"', $childName));
         }
     }
 

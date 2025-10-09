@@ -262,8 +262,12 @@ class AutoTypeBuilder
         // Check matching some objects with high confidence FormType
         return $propTypeInfo->isIdentifiedBy(
             \UnitEnum::class,
-            \DateTime::class, \DateTimeImmutable::class, \DateInterval::class, \DateTimeZone::class,
-            'Symfony\Component\Uid\Ulid', 'Symfony\Component\Uid\Uuid',
+            \DateTime::class,
+            \DateTimeImmutable::class,
+            \DateInterval::class,
+            \DateTimeZone::class,
+            'Symfony\Component\Uid\Ulid',
+            'Symfony\Component\Uid\Uuid',
             'Symfony\Component\HttpFoundation\File\File',
         );
     }

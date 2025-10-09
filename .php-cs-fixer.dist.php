@@ -11,8 +11,7 @@ HEADER;
 
 
 $finder = (new PhpCsFixer\Finder())
-    ->in(['src', 'tests'])
-;
+    ->in(['src', 'tests']);
 
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
@@ -29,7 +28,7 @@ return (new PhpCsFixer\Config())
         'header_comment' => ['header' => $header],
         'class_attributes_separation' => ['elements' => ['method' => 'one']],
         'class_definition' => ['inline_constructor_arguments' => true],
-        'date_time_immutable' => true,
+        // 'date_time_immutable' => true,
         'global_namespace_import' => ['import_classes' => false, 'import_constants' => false, 'import_functions' => false],
         'method_argument_space' => ['on_multiline' => 'ensure_fully_multiline', 'attribute_placement' => 'ignore'],
         'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
