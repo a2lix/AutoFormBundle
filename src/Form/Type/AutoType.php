@@ -61,8 +61,8 @@ class AutoType extends AbstractType
         $resolver->setAllowedTypes('builder', ['null', 'callable']);
         $resolver->setInfo('builder', 'A callable that accepts two arguments (FormBuilderInterface $builder, string[] $classProperties). It should not return anything.');
 
-        $resolver->setNormalizer('data_class', static function (Options $options, string $value): string {
-            if (empty($value)) {
+        $resolver->setNormalizer('data_class', static function (Options $options, ?string $value): string {
+            if (null === $value) {
                 throw new \RuntimeException('Missing "data_class" option of "AutoType".');
             }
 

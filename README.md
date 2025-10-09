@@ -21,14 +21,17 @@ composer require a2lix/auto-form-bundle
 The simplest way to use `AutoType` is directly in your controller. It will generate a form based on the properties of the entity or DTO you pass it.
 
 ```php
-use A2lix\AutoFormBundle\Form\Type\AutoType;
+// ...
 
 class TaskController extends AbstractController
 {
-    public function new(): Response
+    public function new(Request $request): Response
     {
         $task = new Task(); // Any entity or DTO
-        $form = $this->createForm(AutoType::class, $task);
+        $form = $this->createForm(AutoType::class, $task)
+            ->add('save', SubmitType::class)
+            ->handleRequest($request)
+        ;
 
         // ...
     }
@@ -49,24 +52,23 @@ Options passed directly to the form will always take precedence over attributes.
 This is the most flexible way to configure your form. Here is a comprehensive example:
 
 ```php
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+// ...
 
 class TaskController extends AbstractController
 {
-    public function new(FormFactoryInterface $formFactory): Response
+    public function new(Request $request, FormFactoryInterface $formFactory): Response
     {
         $product = new Product(); // Any entity or DTO
         $form = $formFactory->createNamed('product', AutoType::class, $product, [
-            // 1. Exclude properties from the form.
+            // 1. Optional define which properties should be excluded from the form.
             // Use '*' for an "exclude-by-default" strategy.
             'children_excluded' => ['id', 'internalRef'],
 
-            // 2. Define which relations should be rendered as embedded forms.
+            // 2. Optional define which properties should be rendered as embedded forms.
             // Use '*' to embed all relational properties.
             'children_embedded' => ['category', 'tags'],
 
-            // 3. Customize, override, or add fields.
+            // 3. Optional customize, override, or add fields.
             'children' => [
                 // Override an existing property with new options
                 'description' => [
@@ -88,16 +90,21 @@ class TaskController extends AbstractController
                     // It must return a new FormBuilderInterface instance.
                     return $builder->create('price', MoneyType::class, ['currency' => 'EUR']);
                 },
+
+                // Add a new field to the form
+                'save' => [
+                    'child_type' => SubmitType::class,
+                ],
             ],
 
-            // 4. For final modifications on the complete form builder.
+            // 4. Optional final modifications on the complete form builder.
             'builder' => function(FormBuilderInterface $builder, array $classProperties): void {
                 // This callable runs after all children have been added.
                 if (isset($classProperties['code'])) {
                     $builder->remove('code');
                 }
             },
-        ]);
+        ])->handleRequest($request);
 
         // ...
     }

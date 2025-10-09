@@ -2,3 +2,4 @@
 .phpunit.cache
 composer.lock
 vendor/*
+dump.html

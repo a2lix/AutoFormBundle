@@ -39,13 +39,14 @@ final class AutoTypeDtoTest extends TypeTestCase
             /** @var string $childName */
             /** @psalm-suppress PossiblyUndefinedArrayOffset */
             if (null !== $expectedType = $dtoScenario->expectedForm[$childName]['expected_type'] ?? null) {
-                self::assertSame($child->getConfig()->getType()->getInnerType()::class, $expectedType);
+                self::assertSame($child->getConfig()->getType()->getInnerType()::class, $expectedType, sprintf('Type of "%s"', $childName));
             }
 
             $expectedPartialOptions = $dtoScenario->expectedForm[$childName];
+            unset($expectedPartialOptions['expected_type']);
             $actualOptions = $child->getConfig()->getOptions();
 
-            self::assertSame($expectedPartialOptions, array_intersect_key($actualOptions, $expectedPartialOptions), $childName);
+            self::assertSame($expectedPartialOptions, array_intersect_key($actualOptions, $expectedPartialOptions), sprintf('Options of "%s"', $childName));
         }
     }
 
@@ -54,7 +55,7 @@ final class AutoTypeDtoTest extends TypeTestCase
      */
     public static function provideScenarioCases(): iterable
     {
-        yield 'Product1 without formOptions' => [
+        yield 'Product1 with default behavior, no options' => [
             new DtoScenario(
                 dto: new Product1(),
                 expectedForm: [
@@ -62,7 +63,7 @@ final class AutoTypeDtoTest extends TypeTestCase
                         'expected_type' => FormType\TextType::class,
                     ],
                     'code' => [
-                        'expected_type' => FormType\TextType::class,
+                        'expected_type' => FormType\IntegerType::class,
                     ],
                     'tags' => [
                         'expected_type' => FormType\TextType::class,
@@ -74,13 +75,124 @@ final class AutoTypeDtoTest extends TypeTestCase
                         'expected_type' => FormType\TextType::class,
                     ],
                     'status' => [
-                        'expected_type' => FormType\TextType::class,
+                        'expected_type' => FormType\EnumType::class,
                     ],
                     'validityStartAt' => [
-                        'expected_type' => FormType\TextType::class,
+                        'expected_type' => FormType\DateTimeType::class,
                     ],
                     'validityEndAt' => [
+                        'expected_type' => FormType\DateTimeType::class,
+                    ],
+                    'description' => [
                         'expected_type' => FormType\TextType::class,
+                    ],
+                ],
+            ),
+        ];
+
+        yield 'Product1 with children_embedded = *' => [
+            new DtoScenario(
+                dto: new Product1(),
+                formOptions: [
+                    'children_embedded' => '*',
+                ],
+                expectedForm: [
+                    'title' => [
+                        'expected_type' => FormType\TextType::class,
+                    ],
+                    'code' => [
+                        'expected_type' => FormType\IntegerType::class,
+                    ],
+                    'tags' => [
+                        'expected_type' => FormType\CollectionType::class,
+                    ],
+                    'mediaMain' => [
+                        'expected_type' => FormType\TextType::class,
+                    ],
+                    'mediaColl' => [
+                        'expected_type' => FormType\CollectionType::class,
+                    ],
+                    'status' => [
+                        'expected_type' => FormType\EnumType::class,
+                    ],
+                    'validityStartAt' => [
+                        'expected_type' => FormType\DateTimeType::class,
+                    ],
+                    'validityEndAt' => [
+                        'expected_type' => FormType\DateTimeType::class,
+                    ],
+                    'description' => [
+                        'expected_type' => FormType\TextType::class,
+                    ],
+                ],
+            ),
+        ];
+
+        yield 'Product1 with children_embedded = [mediaColl]' => [
+            new DtoScenario(
+                dto: new Product1(),
+                formOptions: [
+                    'children_embedded' => ['mediaColl'],
+                ],
+                expectedForm: [
+                    'title' => [
+                        'expected_type' => FormType\TextType::class,
+                    ],
+                    'code' => [
+                        'expected_type' => FormType\IntegerType::class,
+                    ],
+                    'tags' => [
+                        'expected_type' => FormType\TextType::class,
+                    ],
+                    'mediaMain' => [
+                        'expected_type' => FormType\TextType::class,
+                    ],
+                    'mediaColl' => [
+                        'expected_type' => FormType\CollectionType::class,
+                    ],
+                    'status' => [
+                        'expected_type' => FormType\EnumType::class,
+                    ],
+                    'validityStartAt' => [
+                        'expected_type' => FormType\DateTimeType::class,
+                    ],
+                    'validityEndAt' => [
+                        'expected_type' => FormType\DateTimeType::class,
+                    ],
+                    'description' => [
+                        'expected_type' => FormType\TextType::class,
+                    ],
+                ],
+            ),
+        ];
+
+        yield 'Product1 with children_excluded = *' => [
+            new DtoScenario(
+                dto: new Product1(),
+                formOptions: [
+                    'children_excluded' => '*',
+                ],
+                expectedForm: [],
+            ),
+        ];
+
+        yield 'Product1 with children_excluded = *, custom selection' => [
+            new DtoScenario(
+                dto: new Product1(),
+                formOptions: [
+                    'children_excluded' => '*',
+                    'children' => [
+                        'title' => [],
+                        'code' => [],
+                        'description' => [],
+                    ],
+                ],
+                expectedForm: [
+                    'title' => [
+                        'expected_type' => FormType\TextType::class,
+                    ],
+                    'code' => [
+                        'expected_type' => FormType\IntegerType::class,
                     ],
                     'description' => [
                         'expected_type' => FormType\TextType::class,

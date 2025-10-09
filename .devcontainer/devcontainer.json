@@ -1,5 +1,5 @@
 {
-  "name": "A2lix - AutoFormBundle",
+  "name": "A2LiX - AutoFormBundle",
   "build": {
     "dockerfile": "Dockerfile"
   },

@@ -200,7 +200,7 @@ class AutoTypeBuilder
 
     private function updateChildOptions(array $baseChildOptions, TypeInfo $propTypeInfo, int $formLevel): array
     {
-        if ($propTypeInfo->isSatisfiedBy($this->isTypeInfoWithMatchingNativeFormType(...))) {
+        if ($propTypeInfo->isSatisfiedBy(self::isTypeInfoWithMatchingNativeFormType(...))) {
             return $baseChildOptions;
         }
 
@@ -249,22 +249,23 @@ class AutoTypeBuilder
 
     private static function isTypeInfoWithMatchingNativeFormType(TypeInfo $propTypeInfo): bool
     {
+        // Check matching some array array with high confidence FormType handling 'multiple' option
         if ($propTypeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
-            return false;
+            return $propTypeInfo instanceof TypeInfo\GenericType
+                && $propTypeInfo->getVariableTypes()[1]->isIdentifiedBy(\UnitEnum::class, \DateTimeZone::class);
         }
 
         if (!$propTypeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
             return true;
         }
 
-        return $propTypeInfo->isIdentifiedBy(\BackedEnum::class)
-            || $propTypeInfo->isIdentifiedBy(\DateTimeImmutable::class)
-            || $propTypeInfo->isIdentifiedBy(\DateTimeImmutable::class)
-            || $propTypeInfo->isIdentifiedBy(\DateInterval::class)
-            || $propTypeInfo->isIdentifiedBy(\DateTimeZone::class)
-            || $propTypeInfo->isIdentifiedBy('Symfony\Component\HttpFoundation\File\File')
-            || $propTypeInfo->isIdentifiedBy('Symfony\Component\Uid\Ulid')
-            || $propTypeInfo->isIdentifiedBy('Symfony\Component\Uid\Uuid');
+        // Check matching some objects with high confidence FormType
+        return $propTypeInfo->isIdentifiedBy(
+            \UnitEnum::class,
+            \DateTime::class, \DateTimeImmutable::class, \DateInterval::class, \DateTimeZone::class,
+            'Symfony\Component\Uid\Ulid', 'Symfony\Component\Uid\Uuid',
+            'Symfony\Component\HttpFoundation\File\File',
+        );
     }
 
     private function getFormLevel(FormInterface $form): int

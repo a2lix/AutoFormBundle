@@ -36,23 +36,35 @@ class TypeInfoTypeGuesser implements FormTypeGuesserInterface
             return null;
         }
 
-        if ($typeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
-            if ($typeInfo->isIdentifiedBy(\BackedEnum::class)) {
-                /** @var ObjectType $typeInfo */
-                $className = $typeInfo->getClassName();
-                $multiple = $typeInfo->isIdentifiedBy(TypeIdentifier::ARRAY);
+        // FormTypes handling 'multiple' option
+        if ($typeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
+            /** @var TypeInfo\CollectionType $typeInfo */
+            $collValueType = $typeInfo->getCollectionValueType();
+            /** @var TypeInfo\ObjectType $collValueType */
 
-                return new TypeGuess(CoreType\EnumType::class, ['class' => $className, 'multiple' => $multiple], Guess::HIGH_CONFIDENCE);
+            return match (true) {
+                $collValueType->isIdentifiedBy(\UnitEnum::class) => new TypeGuess(CoreType\EnumType::class, ['class' => $collValueType->getClassName(), 'multiple' => true], Guess::HIGH_CONFIDENCE),
+                $collValueType->isIdentifiedBy(\DateTimeZone::class) => new TypeGuess(CoreType\TimezoneType::class, ['input' => 'datetimezone', 'multiple' => true], Guess::HIGH_CONFIDENCE),
+                default => new TypeGuess(CoreType\TextType::class, [], Guess::LOW_CONFIDENCE)
+            };
+        }
+
+        if ($typeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
+            if ($typeInfo->isIdentifiedBy(\UnitEnum::class)) {
+                /** @var ObjectType */
+                $innerType = $typeInfo instanceof TypeInfo\NullableType ? $typeInfo->getWrappedType() : $typeInfo;
+
+                return new TypeGuess(CoreType\EnumType::class, ['class' => $innerType->getClassName()], Guess::HIGH_CONFIDENCE);
             }
 
             return match (true) {
+                $typeInfo->isIdentifiedBy(\DateTime::class) => new TypeGuess(CoreType\DateTimeType::class, [], Guess::HIGH_CONFIDENCE),
                 $typeInfo->isIdentifiedBy(\DateTimeImmutable::class) => new TypeGuess(CoreType\DateTimeType::class, ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE),
-                $typeInfo->isIdentifiedBy(\DateTimeImmutable::class) => new TypeGuess(CoreType\DateTimeType::class, [], Guess::HIGH_CONFIDENCE),
                 $typeInfo->isIdentifiedBy(\DateInterval::class) => new TypeGuess(CoreType\DateIntervalType::class, [], Guess::HIGH_CONFIDENCE),
                 $typeInfo->isIdentifiedBy(\DateTimeZone::class) => new TypeGuess(CoreType\TimezoneType::class, ['input' => 'datetimezone'], Guess::HIGH_CONFIDENCE),
-                $typeInfo->isIdentifiedBy('Symfony\Component\HttpFoundation\File\File') => new TypeGuess(CoreType\FileType::class, [], Guess::HIGH_CONFIDENCE),
                 $typeInfo->isIdentifiedBy('Symfony\Component\Uid\Ulid') => new TypeGuess(CoreType\UlidType::class, [], Guess::HIGH_CONFIDENCE),
                 $typeInfo->isIdentifiedBy('Symfony\Component\Uid\Uuid') => new TypeGuess(CoreType\UuidType::class, [], Guess::HIGH_CONFIDENCE),
+                $typeInfo->isIdentifiedBy('Symfony\Component\HttpFoundation\File\File') => new TypeGuess(CoreType\FileType::class, [], Guess::HIGH_CONFIDENCE),
                 default => new TypeGuess(CoreType\TextType::class, [], Guess::LOW_CONFIDENCE)
             };
         }
