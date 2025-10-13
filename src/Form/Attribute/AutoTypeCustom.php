@@ -14,7 +14,7 @@ namespace A2lix\AutoFormBundle\Form\Attribute;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
 
 /**
- * @psalm-import-type childOptions from AutoType
+ * @psalm-import-type ChildOptions from AutoType
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final readonly class AutoTypeCustom
@@ -32,7 +32,7 @@ final readonly class AutoTypeCustom
     ) {}
 
     /**
-     * @return childOptions
+     * @return ChildOptions
      */
     public function getOptions(): array
     {

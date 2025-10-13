@@ -34,7 +34,7 @@ return (new PhpCsFixer\Config())
         'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
         'multiline_promoted_properties' => true,
         'no_superfluous_phpdoc_tags' => ['allow_mixed' => true, 'allow_unused_params' => true],
-        'nullable_type_declaration_for_default_null_value' => ['use_nullable_type_declaration' => true],
+        'nullable_type_declaration_for_default_null_value' => true,
         'numeric_literal_separator' => true,
         'operator_linebreak' => ['only_booleans' => true, 'position' => 'beginning'],
         'ordered_imports' => ['sort_algorithm' => 'alpha', 'imports_order' => ['class', 'function', 'const']],

@@ -18,20 +18,20 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @psalm-type childOptions = array{
+ * @psalm-type ChildOptions = array{
  *    child_type?: class-string,
  *    child_name?: string,
  *    child_excluded?: bool,
  *    child_embedded?: bool,
  *    ...<string, mixed>
  * }
- * @psalm-type childBuilderCallable = callable(FormBuilderInterface $builder, array $propAttributeOptions): FormBuilderInterface
- * @psalm-type formBuilderCallable = callable(FormBuilderInterface $builder, string[] $classProperties): void
- * @psalm-type formOptionsDefaults = array{
- *    children: array<string, childOptions|childBuilderCallable>|[],
+ * @psalm-type ChildBuilderCallable = callable(FormBuilderInterface $builder, array $propAttributeOptions): FormBuilderInterface
+ * @psalm-type FormBuilderCallable = callable(FormBuilderInterface $builder, string[] $classProperties): void
+ * @psalm-type FormOptionsDefaults = array{
+ *    children: array<string, ChildOptions|ChildBuilderCallable>|[],
  *    children_excluded: list<string>|"*",
  *    children_embedded: list<string>|"*",
- *    builder: formBuilderCallable|null,
+ *    builder: FormBuilderCallable|null,
  * }
  */
 class AutoType extends AbstractType

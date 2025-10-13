@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -27,37 +29,23 @@ use Symfony\Component\Form\Extension\Core\Type as FormType;
 final class AutoTypeDtoTest extends TypeTestCase
 {
     #[DataProvider('provideScenarioCases')]
-    public function testScenario(DtoScenario $dtoScenario): void
+    public function testScenario(TestScenario $testScenario): void
     {
         $form = $this->factory
-            ->createBuilder(AutoType::class, $dtoScenario->dto, $dtoScenario->formOptions)
-            ->getForm()
-        ;
+            ->createBuilder(AutoType::class, $testScenario->obj, $testScenario->formOptions)
+            ->getForm();
 
-        self::assertSame(array_keys($dtoScenario->expectedForm), array_keys($form->all()));
-        foreach ($form->all() as $childName => $child) {
-            /** @var string $childName */
-            /** @psalm-suppress PossiblyUndefinedArrayOffset */
-            if (null !== $expectedType = $dtoScenario->expectedForm[$childName]['expected_type'] ?? null) {
-                self::assertSame($child->getConfig()->getType()->getInnerType()::class, $expectedType, \sprintf('Type of "%s"', $childName));
-            }
-
-            $expectedPartialOptions = $dtoScenario->expectedForm[$childName];
-            unset($expectedPartialOptions['expected_type']);
-            $actualOptions = $child->getConfig()->getOptions();
-
-            self::assertSame($expectedPartialOptions, array_intersect_key($actualOptions, $expectedPartialOptions), \sprintf('Options of "%s"', $childName));
-        }
+        self::assertFormChildren($testScenario->expectedForm, $form->all());
     }
 
     /**
-     * @return \Iterator<array<int, DtoScenario>>
+     * @return \Iterator<array<int, TestScenario>>
      */
     public static function provideScenarioCases(): iterable
     {
         yield 'Product1 with default behavior, no options' => [
-            new DtoScenario(
-                dto: new Product1(),
+            new TestScenario(
+                obj: new Product1(),
                 expectedForm: [
                     'title' => [
                         'expected_type' => FormType\TextType::class,
@@ -91,8 +79,8 @@ final class AutoTypeDtoTest extends TypeTestCase
         ];
 
         yield 'Product1 with children_embedded = *' => [
-            new DtoScenario(
-                dto: new Product1(),
+            new TestScenario(
+                obj: new Product1(),
                 formOptions: [
                     'children_embedded' => '*',
                 ],
@@ -105,12 +93,30 @@ final class AutoTypeDtoTest extends TypeTestCase
                     ],
                     'tags' => [
                         'expected_type' => FormType\CollectionType::class,
+                        'entry_type' => "Symfony\Component\Form\Extension\Core\Type\TextType",
+                        'entry_options' => [
+                            "block_name" => "entry"
+                        ],
                     ],
                     'mediaMain' => [
-                        'expected_type' => FormType\TextType::class,
+                        'expected_type' => AutoType::class,
+                        'expected_children' => [
+                            'url' => [
+                                'expected_type' => FormType\TextType::class,
+                                'help' => 'media.url_help',
+                            ],
+                            'description' => [
+                                'expected_type' => FormType\TextareaType::class,
+                            ],
+                        ],
                     ],
                     'mediaColl' => [
                         'expected_type' => FormType\CollectionType::class,
+                        'entry_type' => "A2lix\AutoFormBundle\Form\Type\AutoType",
+                        'entry_options' => [
+                            "data_class" => "A2lix\AutoFormBundle\Tests\Fixtures\Dto\Media1",
+                            "block_name" => "entry"
+                        ],
                     ],
                     'status' => [
                         'expected_type' => FormType\EnumType::class,
@@ -129,8 +135,8 @@ final class AutoTypeDtoTest extends TypeTestCase
         ];
 
         yield 'Product1 with children_embedded = [mediaColl]' => [
-            new DtoScenario(
-                dto: new Product1(),
+            new TestScenario(
+                obj: new Product1(),
                 formOptions: [
                     'children_embedded' => ['mediaColl'],
                 ],
@@ -149,6 +155,10 @@ final class AutoTypeDtoTest extends TypeTestCase
                     ],
                     'mediaColl' => [
                         'expected_type' => FormType\CollectionType::class,
+                        'entry_options' => [
+                            "data_class" => "A2lix\AutoFormBundle\Tests\Fixtures\Dto\Media1",
+                            "block_name" => "entry"
+                        ],
                     ],
                     'status' => [
                         'expected_type' => FormType\EnumType::class,
@@ -167,8 +177,8 @@ final class AutoTypeDtoTest extends TypeTestCase
         ];
 
         yield 'Product1 with children_excluded = *' => [
-            new DtoScenario(
-                dto: new Product1(),
+            new TestScenario(
+                obj: new Product1(),
                 formOptions: [
                     'children_excluded' => '*',
                 ],
@@ -176,15 +186,20 @@ final class AutoTypeDtoTest extends TypeTestCase
             ),
         ];
 
-        yield 'Product1 with children_excluded = *, custom selection' => [
-            new DtoScenario(
-                dto: new Product1(),
+        yield 'Product1 with children_excluded = *, custom selection with overrides' => [
+            new TestScenario(
+                obj: new Product1(),
                 formOptions: [
                     'children_excluded' => '*',
                     'children' => [
                         'title' => [],
-                        'code' => [],
-                        'description' => [],
+                        'code' => [
+                            'label' => 'product.code_label',
+                            'required' => false,
+                        ],
+                        'description' => [
+                            'child_type' => FormType\TextareaType::class,
+                        ],
                     ],
                 ],
                 expectedForm: [
@@ -193,24 +208,14 @@ final class AutoTypeDtoTest extends TypeTestCase
                     ],
                     'code' => [
                         'expected_type' => FormType\IntegerType::class,
+                        'label' => 'product.code_label',
+                        'required' => false,
                     ],
                     'description' => [
-                        'expected_type' => FormType\TextType::class,
+                        'expected_type' => FormType\TextareaType::class,
                     ],
                 ],
             ),
         ];
     }
-}
-
-class DtoScenario
-{
-    /**
-     * @param array<string, array{expected_type?: class-string, ...}> $expectedForm
-     */
-    public function __construct(
-        public readonly ?object $dto,
-        public readonly array $formOptions = [],
-        public readonly array $expectedForm = [],
-    ) {}
 }

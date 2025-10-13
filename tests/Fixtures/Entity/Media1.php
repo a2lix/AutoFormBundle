@@ -11,7 +11,9 @@
 
 namespace A2lix\AutoFormBundle\Tests\Fixtures\Entity;
 
+use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Form\Extension\Core\Type as FormType;
 
 #[ORM\Entity]
 class Media1
@@ -22,15 +24,19 @@ class Media1
     public ?int $id = null;
 
     #[ORM\Column]
-    public \DateTimeImmutable $created;
+    #[AutoTypeCustom(excluded: true)]
+    public \DateTimeImmutable $createdAt;
 
     #[ORM\Column]
+    #[AutoTypeCustom(options: ['help' => 'media.url_help'])]
     public string $url;
 
     #[ORM\Column(nullable: true)]
+    #[AutoTypeCustom(type: FormType\TextareaType::class)]
     public ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Product1::class, inversedBy: 'mediaColl')]
     #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id', nullable: false)]
+    #[AutoTypeCustom(excluded: true)]
     public Product1 $product;
 }

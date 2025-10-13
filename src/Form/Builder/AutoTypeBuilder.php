@@ -21,8 +21,7 @@ use Symfony\Component\TypeInfo\Type as TypeInfo;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
- * @psalm-import-type formOptionsDefaults from AutoType
- * @psalm-import-type childOptions from AutoType
+ * @psalm-import-type FormOptionsDefaults from AutoType
  */
 class AutoTypeBuilder
 {
@@ -31,7 +30,7 @@ class AutoTypeBuilder
     ) {}
 
     /**
-     * @param formOptionsDefaults $formOptions
+     * @param FormOptionsDefaults $formOptions
      */
     public function buildChildren(FormBuilderInterface $builder, array $formOptions): void
     {
@@ -200,11 +199,12 @@ class AutoTypeBuilder
 
     private function updateChildOptions(array $baseChildOptions, TypeInfo $propTypeInfo, int $formLevel): array
     {
-        if ($propTypeInfo->isSatisfiedBy(self::isTypeInfoWithMatchingNativeFormType(...))) {
+        // TypeInfo matching native FormType? Abort, guessers are enough
+        if (self::isTypeInfoWithMatchingNativeFormType($propTypeInfo)) {
             return $baseChildOptions;
         }
 
-        // Embeddable collection?
+        // Embeddable collection (object or builtin)?
         if ($propTypeInfo instanceof TypeInfo\CollectionType) {
             $baseCollOptions = [
                 'child_type' => CollectionType::class,
@@ -249,17 +249,18 @@ class AutoTypeBuilder
 
     private static function isTypeInfoWithMatchingNativeFormType(TypeInfo $propTypeInfo): bool
     {
-        // Check matching some array array with high confidence FormType handling 'multiple' option
+        // Array? Some can match a native FormType with high confidence ('multiple' option)
         if ($propTypeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
             return $propTypeInfo instanceof TypeInfo\GenericType
                 && $propTypeInfo->getVariableTypes()[1]->isIdentifiedBy(\UnitEnum::class, \DateTimeZone::class);
         }
 
+        // Builtin? Native FormType will be ok.
         if (!$propTypeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
             return true;
         }
 
-        // Check matching some objects with high confidence FormType
+        // Some objects with high confidence FormType
         return $propTypeInfo->isIdentifiedBy(
             \UnitEnum::class,
             \DateTime::class,

@@ -11,11 +11,16 @@
 
 namespace A2lix\AutoFormBundle\Tests\Fixtures\Dto;
 
+use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
+use Symfony\Component\Form\Extension\Core\Type as FormType;
+
 class Media1
 {
     public function __construct(
         public readonly ?string $id = null,
+        #[AutoTypeCustom(options: ['help' => 'media.url_help'])]
         public readonly ?string $url = null,
+        #[AutoTypeCustom(type: FormType\TextareaType::class)]
         private ?string $description = null,
     ) {}
 

@@ -14,6 +14,7 @@ namespace A2lix\AutoFormBundle\Tests\Form;
 use A2lix\AutoFormBundle\Form\Builder\AutoTypeBuilder;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
 use A2lix\AutoFormBundle\Form\TypeGuesser\TypeInfoTypeGuesser;
+use A2lix\AutoFormBundle\Tests\Form\Type\TestScenario;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +22,7 @@ use Doctrine\ORM\ORMSetup;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
@@ -34,6 +36,9 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
 
+/**
+ * @psalm-import-type ExpectedChildren from TestScenario
+ */
 abstract class TypeTestCase extends BaseTypeTestCase
 {
     use ValidatorExtensionTrait;
@@ -41,15 +46,14 @@ abstract class TypeTestCase extends BaseTypeTestCase
     private ?EntityManagerInterface $entityManager = null;
 
     #[\Override]
-    protected function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
-
-        // VarDumper::setHandler(function (mixed $var) {
-        //     (new HtmlDumper())->dump(
-        //         (new VarCloner())->cloneVar($var), __DIR__.'/../../dump.html'
-        //     );
-        // });
+        VarDumper::setHandler(function (mixed $var) {
+            /** @psalm-suppress PossiblyInvalidArgument */
+            (new HtmlDumper())->dump(
+                (new VarCloner())->cloneVar($var), @fopen(__DIR__.'/../../dump.html', 'a')
+            );
+        });
     }
 
     #[\Override]
@@ -64,6 +68,37 @@ abstract class TypeTestCase extends BaseTypeTestCase
             ...parent::getExtensions(),
             new PreloadedExtension([$autoType], [], $this->getFormTypeGuesserChain()),
         ];
+    }
+
+    /**
+     * @param ExpectedChildren $expectedForm
+     * @param array<array-key, FormInterface> $formChildren
+     */
+    protected static function assertFormChildren(array $expectedForm, array $formChildren, string $parentPath = ''): void
+    {
+        self::assertSame(array_keys($expectedForm), array_keys($formChildren));
+
+        foreach ($formChildren as $childName => $child) {
+            /** @var string $childName */
+            $expectedChildOptions = $expectedForm[$childName];
+            $childPath = $parentPath. '.' . $childName;
+
+            if (null !== $expectedType = $expectedChildOptions['expected_type'] ?? null) {
+                self::assertSame($expectedType, $child->getConfig()->getType()->getInnerType()::class, \sprintf('Type of "%s"', $childPath));
+            }
+
+            /** @var ExpectedChildren|null $expectedChildOptions['expected_children'] */
+            if (null !== $expectedChildren = $expectedChildOptions['expected_children'] ?? null) {
+                self::assertFormChildren($expectedChildren, $child->all(), $childPath);
+            }
+
+            unset($expectedChildOptions['expected_type'], $expectedChildOptions['expected_children']);
+            $actualOptions = $child->getConfig()->getOptions();
+
+            /** @psalm-suppress RedundantCondition */
+            /** @psalm-suppress TypeDoesNotContainNull */
+            self::assertSame($expectedChildOptions, array_intersect_key($actualOptions, $expectedChildOptions ?? []), \sprintf('Options of "%s"', $childPath));
+        }
     }
 
     private function getEntityManager(): EntityManagerInterface
