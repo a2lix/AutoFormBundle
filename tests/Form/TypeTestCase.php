@@ -48,10 +48,11 @@ abstract class TypeTestCase extends BaseTypeTestCase
     #[\Override]
     public static function setUpBeforeClass(): void
     {
-        VarDumper::setHandler(function (mixed $var) {
+        VarDumper::setHandler(static function (mixed $var): void {
             /** @psalm-suppress PossiblyInvalidArgument */
             (new HtmlDumper())->dump(
-                (new VarCloner())->cloneVar($var), @fopen(__DIR__.'/../../dump.html', 'a')
+                (new VarCloner())->cloneVar($var),
+                @fopen(__DIR__.'/../../dump.html', 'a')
             );
         });
     }
@@ -71,7 +72,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
     }
 
     /**
-     * @param ExpectedChildren $expectedForm
+     * @param ExpectedChildren                $expectedForm
      * @param array<array-key, FormInterface> $formChildren
      */
     protected static function assertFormChildren(array $expectedForm, array $formChildren, string $parentPath = ''): void
@@ -81,7 +82,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
         foreach ($formChildren as $childName => $child) {
             /** @var string $childName */
             $expectedChildOptions = $expectedForm[$childName];
-            $childPath = $parentPath. '.' . $childName;
+            $childPath = $parentPath.'.'.$childName;
 
             if (null !== $expectedType = $expectedChildOptions['expected_type'] ?? null) {
                 self::assertSame($expectedType, $child->getConfig()->getType()->getInnerType()::class, \sprintf('Type of "%s"', $childPath));

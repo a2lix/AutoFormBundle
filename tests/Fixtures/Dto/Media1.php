@@ -18,8 +18,10 @@ class Media1
 {
     public function __construct(
         public readonly ?string $id = null,
+
         #[AutoTypeCustom(options: ['help' => 'media.url_help'])]
         public readonly ?string $url = null,
+
         #[AutoTypeCustom(type: FormType\TextareaType::class)]
         private ?string $description = null,
     ) {}

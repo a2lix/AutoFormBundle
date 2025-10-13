@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -31,7 +29,8 @@ final class AutoTypeEntityTest extends TypeTestCase
     {
         $form = $this->factory
             ->createBuilder(AutoType::class, $testScenario->obj, $testScenario->formOptions)
-            ->getForm();
+            ->getForm()
+        ;
 
         self::assertFormChildren($testScenario->expectedForm, $form->all());
     }
@@ -91,9 +90,9 @@ final class AutoTypeEntityTest extends TypeTestCase
                     ],
                     'tags' => [
                         'expected_type' => FormType\CollectionType::class,
-                        'entry_type' => "Symfony\Component\Form\Extension\Core\Type\TextType",
+                        'entry_type' => 'Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType',
                         'entry_options' => [
-                            "block_name" => "entry"
+                            'block_name' => 'entry',
                         ],
                     ],
                     'mediaMain' => [
@@ -110,10 +109,10 @@ final class AutoTypeEntityTest extends TypeTestCase
                     ],
                     'mediaColl' => [
                         'expected_type' => FormType\CollectionType::class,
-                        'entry_type' => "A2lix\AutoFormBundle\Form\Type\AutoType",
+                        'entry_type' => 'A2lix\\AutoFormBundle\\Form\\Type\\AutoType',
                         'entry_options' => [
-                            "data_class" => "A2lix\AutoFormBundle\Tests\Fixtures\Entity\Media1",
-                            "block_name" => "entry"
+                            'data_class' => 'A2lix\\AutoFormBundle\\Tests\\Fixtures\\Entity\\Media1',
+                            'block_name' => 'entry',
                         ],
                     ],
                     'status' => [
@@ -154,8 +153,8 @@ final class AutoTypeEntityTest extends TypeTestCase
                     'mediaColl' => [
                         'expected_type' => FormType\CollectionType::class,
                         'entry_options' => [
-                            "data_class" => "A2lix\AutoFormBundle\Tests\Fixtures\Entity\Media1",
-                            "block_name" => "entry"
+                            'data_class' => 'A2lix\\AutoFormBundle\\Tests\\Fixtures\\Entity\\Media1',
+                            'block_name' => 'entry',
                         ],
                     ],
                     'status' => [
