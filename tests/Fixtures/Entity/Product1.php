@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -11,10 +13,12 @@
 
 namespace A2lix\AutoFormBundle\Tests\Fixtures\Entity;
 
+use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Tests\Fixtures\ProductStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Form\Extension\Core\Type as CoreType;
 
 #[ORM\Entity]
 class Product1
@@ -22,12 +26,14 @@ class Product1
     #[ORM\Id]
     #[ORM\Column]
     #[ORM\GeneratedValue]
+    #[AutoTypeCustom(excluded: true)]
     public ?int $id = null;
 
     #[ORM\Column]
     public string $title;
 
     #[ORM\Column(nullable: true)]
+    #[AutoTypeCustom(type: CoreType\TextareaType::class, name: 'desc', options: ['attr' => ['rows' => 2]])]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -45,8 +51,14 @@ class Product1
     #[ORM\OneToMany(targetEntity: Media1::class, mappedBy: 'product', cascade: ['all'], orphanRemoval: true)]
     public Collection $mediaColl;
 
-    #[ORM\Column]
+    #[ORM\Column(enumType: ProductStatus::class)]
     public ProductStatus $status;
+
+    /**
+     * @var list<ProductStatus>
+     */
+    #[ORM\Column(type: 'simple_array', enumType: ProductStatus::class)]
+    public array $statusList;
 
     #[ORM\Column]
     public \DateTimeImmutable $validityStartAt;

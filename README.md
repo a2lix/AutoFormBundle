@@ -143,7 +143,7 @@ You can use a callable in the `children` option to create complex fields that ma
 
 ```php
 'children' => [
-    'validity_range' => function (FormBuilderInterface $builder): FormBuilderInterface {
+    '_' => function (FormBuilderInterface $builder): FormBuilderInterface {
         return $builder
             ->create('validity_range', FormType::class, ['inherit_data' => true])
                 ->add('startsAt', DateType::class, [/* ... */])

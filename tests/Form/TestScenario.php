@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace A2lix\AutoFormBundle\Tests\Form\Type;
+namespace A2lix\AutoFormBundle\Tests\Form;
 
 /**
  * @psalm-type ExpectedChildren = array<string, array{

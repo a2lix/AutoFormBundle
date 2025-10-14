@@ -57,6 +57,10 @@ class AutoTypeBuilder
             $propAttributeOptions = ($refProperty->getAttributes(AutoTypeCustom::class)[0] ?? null)
                 ?->newInstance()?->getOptions() ?? []
             ;
+            // Custom name?
+            if (null !== ($propAttributeOptions['child_name'] ?? null)) {
+                $propAttributeOptions['property_path'] = $classProperty;
+            }
 
             // FORM.children[PROP] callable? Add early
             if (\is_callable($propFormOptions)) {
@@ -75,6 +79,7 @@ class AutoTypeBuilder
             }
 
             if (null === $propFormOptions) {
+                /** @psalm-suppress RiskyTruthyFalsyComparison */
                 /** @var list<string> $formOptions['children_excluded'] */
                 $formChildExcluded = $allChildrenExcluded || \in_array($classProperty, $formOptions['children_excluded'], true)
                     || ($propAttributeOptions['child_excluded'] ?? false);
@@ -87,8 +92,8 @@ class AutoTypeBuilder
             }
 
             $childOptions = [
-                ...($propFormOptions ?? []),
                 ...$propAttributeOptions,
+                ...($propFormOptions ?? []),
             ];
 
             // PropertyInfo? Enrich childOptions
@@ -249,18 +254,19 @@ class AutoTypeBuilder
 
     private static function isTypeInfoWithMatchingNativeFormType(TypeInfo $propTypeInfo): bool
     {
-        // Array? Some can match a native FormType with high confidence ('multiple' option)
-        if ($propTypeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
-            return $propTypeInfo instanceof TypeInfo\GenericType
-                && $propTypeInfo->getVariableTypes()[1]->isIdentifiedBy(\UnitEnum::class, \DateTimeZone::class);
+        // Array? Some native FormTypes with high confidence ('multiple' option) can match
+        if ($propTypeInfo instanceof TypeInfo\CollectionType) {
+            $collValueType = $propTypeInfo->getCollectionValueType();
+
+            return $collValueType->isIdentifiedBy(\UnitEnum::class, \DateTimeZone::class);
         }
 
-        // Builtin? Native FormType will be ok.
+        // Builtin? Native FormType should fine
         if (!$propTypeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
             return true;
         }
 
-        // Some objects with high confidence FormType
+        // Otherwise, some native FormTypes with high confidence can match
         return $propTypeInfo->isIdentifiedBy(
             \UnitEnum::class,
             \DateTime::class,

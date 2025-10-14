@@ -2,7 +2,7 @@
     "name": "a2lix/auto-form-bundle",
     "type": "symfony-bundle",
     "description": "Automate form building",
-    "keywords": ["symfony", "form", "field", "automate", "automation", "magic", "building"],
+    "keywords": ["symfony", "form", "field", "auto", "automate", "automation", "magic", "building"],
     "homepage": "https://github.com/a2lix/AutoFormBundle",
     "license": "MIT",
     "authors": [
@@ -19,19 +19,18 @@
         "php": ">=8.2",
         "symfony/config": "^7.3",
         "symfony/dependency-injection": "^7.3",
-        "symfony/doctrine-bridge": "^7.3",
         "symfony/form": "^7.3",
-        "symfony/http-kernel": "^7.3",
         "symfony/property-info": "^7.3",
         "phpdocumentor/reflection-docblock": "^5.6"
     },
-    "require-dev": {
+    "require-dev": {        
         "doctrine/orm": "^3.5",
         "friendsofphp/php-cs-fixer": "^3.87",
         "kubawerlos/php-cs-fixer-custom-fixers": "^3.34",
         "phpunit/phpunit": "^12.3",
         "rector/rector": "^2.1",
         "symfony/cache": "^7.3",
+        "symfony/doctrine-bridge": "^7.3",
         "symfony/validator": "^7.3",
         "symfony/var-dumper": "^7.3",
         "vimeo/psalm": "^6.13"

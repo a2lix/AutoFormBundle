@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -12,7 +14,7 @@
 namespace A2lix\AutoFormBundle\Tests\Fixtures\Dto;
 
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
-use Symfony\Component\Form\Extension\Core\Type as FormType;
+use Symfony\Component\Form\Extension\Core\Type as CoreType;
 
 class Media1
 {
@@ -22,7 +24,7 @@ class Media1
         #[AutoTypeCustom(options: ['help' => 'media.url_help'])]
         public readonly ?string $url = null,
 
-        #[AutoTypeCustom(type: FormType\TextareaType::class)]
+        #[AutoTypeCustom(type: CoreType\TextareaType::class)]
         private ?string $description = null,
     ) {}
 

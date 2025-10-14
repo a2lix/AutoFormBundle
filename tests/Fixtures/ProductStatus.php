@@ -11,8 +11,8 @@
 
 namespace A2lix\AutoFormBundle\Tests\Fixtures;
 
-enum ProductStatus
+enum ProductStatus: string
 {
-    case Available;
-    case Unavailable;
+    case Available = 'available';
+    case Unavailable = 'unavailable';
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -13,7 +15,7 @@ namespace A2lix\AutoFormBundle\Tests\Fixtures\Entity;
 
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Form\Extension\Core\Type as FormType;
+use Symfony\Component\Form\Extension\Core\Type as CoreType;
 
 #[ORM\Entity]
 class Media1
@@ -32,7 +34,7 @@ class Media1
     public string $url;
 
     #[ORM\Column(nullable: true)]
-    #[AutoTypeCustom(type: FormType\TextareaType::class)]
+    #[AutoTypeCustom(type: CoreType\TextareaType::class)]
     public ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Product1::class, inversedBy: 'mediaColl')]
