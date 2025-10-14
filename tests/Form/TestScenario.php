@@ -18,7 +18,7 @@ namespace A2lix\AutoFormBundle\Tests\Form;
  *   ...
  * }>
  */
-class TestScenario
+final class TestScenario
 {
     /**
      * @param ExpectedChildren $expectedForm

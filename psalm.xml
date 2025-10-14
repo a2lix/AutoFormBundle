@@ -11,6 +11,8 @@
         <directory name="*" />
         <ignoreFiles>
             <directory name="vendor" />
+            <directory name="tests/Fixtures" />
+            <file name="src/A2lixAutoFormBundle.php" />
         </ignoreFiles>
     </projectFiles>
 
@@ -18,5 +20,18 @@
         <MissingConstructor errorLevel="suppress" /> <!-- PHP8 Property hook -->
         <PropertyNotSetInConstructor errorLevel="suppress" /> <!-- PHP8 Property hook -->
         <RedundantPropertyInitializationCheck errorLevel="suppress" /> <!-- PHP8 Property hook -->
+
+        <PossiblyUnusedMethod>
+            <errorLevel type="suppress">
+                <file name="src/Form/Attribute/AutoTypeCustom.php" />
+                <file name="tests/Form/DataProviderDto.php" />
+                <file name="tests/Form/DataProviderEntity.php" />
+            </errorLevel>
+        </PossiblyUnusedMethod>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <file name="tests/Form/Type/AutoTypeTest.php" />
+            </errorLevel>
+        </UnusedClass>
     </issueHandlers>
 </psalm>

@@ -34,7 +34,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *    builder: FormBuilderCallable|null,
  * }
  */
-class AutoType extends AbstractType
+final class AutoType extends AbstractType
 {
     public function __construct(
         private readonly AutoTypeBuilder $autoTypeBuilder,

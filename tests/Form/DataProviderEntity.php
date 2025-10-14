@@ -18,7 +18,7 @@ use A2lix\AutoFormBundle\Tests\Fixtures\ProductStatus;
 use Symfony\Component\Form\Extension\Core\Type as CoreType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class DataProviderEntity
+final class DataProviderEntity
 {
     /**
      * @return \Iterator<array<int, TestScenario>>

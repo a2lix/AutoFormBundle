@@ -21,7 +21,7 @@ use Symfony\Component\TypeInfo\Type as TypeInfo;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
-class TypeInfoTypeGuesser implements FormTypeGuesserInterface
+final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
 {
     public function __construct(
         private readonly TypeResolverInterface $typeResolver,

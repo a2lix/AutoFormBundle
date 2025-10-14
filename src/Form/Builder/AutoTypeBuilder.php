@@ -23,7 +23,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 /**
  * @psalm-import-type FormOptionsDefaults from AutoType
  */
-class AutoTypeBuilder
+final class AutoTypeBuilder
 {
     public function __construct(
         private readonly PropertyInfoExtractorInterface $propertyInfoExtractor,
