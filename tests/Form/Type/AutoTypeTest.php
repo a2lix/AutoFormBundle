@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormInterface;
  * @internal
  *
  * @psalm-suppress PropertyNotSetInConstructor
+ *
  * @psalm-import-type ExpectedChildren from TestScenario
  */
 #[CoversNothing]

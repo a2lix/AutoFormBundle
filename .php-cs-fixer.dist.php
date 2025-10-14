@@ -77,7 +77,7 @@ return (new PhpCsFixer\Config())
         PhpCsFixerCustomFixers\Fixer\PhpdocSelfAccessorFixer::name() => true,
         PhpCsFixerCustomFixers\Fixer\PhpdocTypesCommaSpacesFixer::name() => true,
         PhpCsFixerCustomFixers\Fixer\PhpdocTypesTrimFixer::name() => true,
-        PhpCsFixerCustomFixers\Fixer\FunctionParameterSeparationFixer::name() => true,
+        // PhpCsFixerCustomFixers\Fixer\FunctionParameterSeparationFixer::name() => true,
         PhpCsFixerCustomFixers\Fixer\PhpdocPropertySortedFixer::name() => true,
         PhpCsFixerCustomFixers\Fixer\PromotedConstructorPropertyFixer::name() => true,
         PhpCsFixerCustomFixers\Fixer\ReadonlyPromotedPropertiesFixer::name() => true,

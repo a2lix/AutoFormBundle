@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -48,7 +46,7 @@ class DataProviderEntity
                     ],
                     'status' => [
                         'expected_type' => CoreType\EnumType::class,
-                        'class' => ProductStatus::class
+                        'class' => ProductStatus::class,
                     ],
                     'statusList' => [
                         'expected_type' => CoreType\EnumType::class,
@@ -116,7 +114,7 @@ class DataProviderEntity
                     ],
                     'status' => [
                         'expected_type' => CoreType\EnumType::class,
-                        'class' => ProductStatus::class
+                        'class' => ProductStatus::class,
                     ],
                     'statusList' => [
                         'expected_type' => CoreType\EnumType::class,
@@ -249,25 +247,21 @@ class DataProviderEntity
                 formOptions: [
                     'children_excluded' => '*',
                     'children' => [
-                        'description' => function (FormBuilderInterface $builder, array $propAttributeOptions): FormBuilderInterface {
-                            return $builder->create('description', CoreType\TextareaType::class, [
-                                'attr' => $propAttributeOptions['attr'],
-                                'label' => 'product.description_label',
-                            ]);
-                        },
-                        '_ignoredNaming_' => function (FormBuilderInterface $builder): FormBuilderInterface {
-                            return $builder
-                                ->create('validity_range', CoreType\FormType::class, ['inherit_data' => true])
-                                    ->add('validityStartAt', CoreType\DateType::class)
-                                    ->add('validityEndAt', CoreType\DateType::class);
-                        },
+                        'description' => static fn (FormBuilderInterface $builder, array $propAttributeOptions): FormBuilderInterface => $builder->create('description', CoreType\TextareaType::class, [
+                            'attr' => $propAttributeOptions['attr'],
+                            'label' => 'product.description_label',
+                        ]),
+                        '_ignoredNaming_' => static fn (FormBuilderInterface $builder): FormBuilderInterface => $builder
+                            ->create('validity_range', CoreType\FormType::class, ['inherit_data' => true])
+                            ->add('validityStartAt', CoreType\DateType::class)
+                            ->add('validityEndAt', CoreType\DateType::class),
                         'agreement' => [
                             'child_type' => CoreType\CheckboxType::class,
                             'mapped' => false,
                         ],
                     ],
                     /** @psalm-suppress UnusedClosureParam */
-                    'builder' => function(FormBuilderInterface $builder, array $classProperties): void {
+                    'builder' => static function (FormBuilderInterface $builder, array $classProperties): void {
                         $builder->add('save', CoreType\SubmitType::class);
                     },
                 ],

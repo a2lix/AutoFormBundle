@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -20,10 +18,8 @@ class Media1
 {
     public function __construct(
         public readonly ?string $id = null,
-
         #[AutoTypeCustom(options: ['help' => 'media.url_help'])]
         public readonly ?string $url = null,
-
         #[AutoTypeCustom(type: CoreType\TextareaType::class)]
         private ?string $description = null,
     ) {}
