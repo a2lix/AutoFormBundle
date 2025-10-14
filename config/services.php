@@ -27,9 +27,9 @@ return static function (ContainerConfigurator $container): void {
         ->set('a2lix_auto_form.form.type.auto_type', AutoType::class)
         ->args([
             '$autoTypeBuilder' => service('a2lix_auto_form.form.builder.auto_type_builder'),
+            '$globalExcludedChildren' => abstract_arg('globalExcludedChildren'),
         ])
         ->tag('form.type')
-
 
         ->set('a2lix_auto_form.type_guesser.type_info', TypeInfoTypeGuesser::class)
         ->args([

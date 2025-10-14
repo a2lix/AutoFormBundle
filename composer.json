@@ -20,6 +20,7 @@
         "symfony/config": "^7.3",
         "symfony/dependency-injection": "^7.3",
         "symfony/form": "^7.3",
+        "symfony/http-kernel": "^7.3",
         "symfony/property-info": "^7.3",
         "phpdocumentor/reflection-docblock": "^5.6"
     },
