@@ -15,18 +15,17 @@
             "homepage": "https://github.com/a2lix/AutoFormBundle/contributors"
         }
     ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": ">=8.4",
-        "symfony/config": "^7.3.4|^7.4|^8.0",
-        "symfony/dependency-injection": "^7.3.4|^7.4|^8.0",
-        "symfony/form": "^7.3.4|^7.4|^8.0",
-        "symfony/http-kernel": "^7.3.4|^7.4|^8.0",
-        "symfony/property-info": "^7.3.4|^7.4|^8.0",
+        "symfony/config": "^7.3|^7.4|^8.0",
+        "symfony/dependency-injection": "^7.3|^7.4|^8.0",
+        "symfony/form": "^7.3|^7.4|^8.0",
+        "symfony/http-kernel": "^7.3|^7.4|^8.0",
+        "symfony/property-info": "^7.3|^7.4|^8.0",
+        "symfony/type-info": "^7.3.4|^7.4|^8.0",
         "phpdocumentor/reflection-docblock": "^5.6"
     },
-    "require-dev": {        
+    "require-dev": {
         "doctrine/orm": "^3.5",
         "friendsofphp/php-cs-fixer": "^3.87",
         "kubawerlos/php-cs-fixer-custom-fixers": "^3.34",

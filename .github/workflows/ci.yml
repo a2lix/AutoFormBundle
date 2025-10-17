@@ -57,17 +57,43 @@ jobs:
         run: vendor/bin/psalm
 
   tests:
-    name: PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, deps ${{ matrix.dependencies }}
+    name: PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, deps ${{ matrix.deps_name }}
     runs-on: ubuntu-latest
-    needs:
-      - lint
-      - static-analysis
+    continue-on-error: ${{ matrix.stability == 'dev' }}
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.4']
-        symfony: ['7.3.*', '7.4.*', '8.0.*']
-        dependencies: ['lowest', 'stable']
+        include:
+          # Symfony 7.3 (stable)
+          - php: '8.4'
+            symfony: '7.3'
+            composer_args: '--prefer-stable'
+            stability: 'stable'
+            deps_name: 'stable'
+          - php: '8.4'
+            symfony: '7.3'
+            composer_args: '--prefer-lowest'
+            stability: 'stable'
+            deps_name: 'lowest'
+
+          # Symfony 7.4 (dev)
+          - php: '8.4'
+            symfony: '7.4'
+            composer_args: '--prefer-stable'
+            stability: 'dev'
+            deps_name: 'stable'
+          - php: '8.4'
+            symfony: '7.4'
+            composer_args: '--prefer-lowest'
+            stability: 'dev'
+            deps_name: 'lowest'
+
+          # Symfony 8.0 (dev)
+          - php: '8.4'
+            symfony: '8.0'
+            composer_args: '--prefer-stable'
+            stability: 'dev'
+            deps_name: 'stable'
 
     steps:
       - uses: actions/checkout@v4
@@ -77,33 +103,35 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
+      - name: Cache global Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-global-cache
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-global-cache
+
+      - name: symfony/flex is required to install the correct symfony version
+        run: |
+          composer global config --no-plugins allow-plugins.symfony/flex true
+          composer global require symfony/flex --quiet
+
+      - name: Configure Composer stability
+        run: composer config minimum-stability ${{ matrix.stability }}
+
+      - name: Configure Symfony version for symfony/flex
+        run: composer config extra.symfony.require "${{ matrix.symfony }}.*"
+
       - name: Cache Composer packages
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-${{ matrix.dependencies }}-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-${{ matrix.dependencies }}-
+          key: ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-${{ matrix.deps_name }}-${{ hashFiles('**/composer.json', '**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php }}-symfony-${{ matrix.symfony }}-${{ matrix.deps_name }}-
 
-      - name: Update dependencies for Symfony ${{ matrix.symfony }}
-        run: >
-          composer require "symfony/config:${{ matrix.symfony }}"
-          "symfony/dependency-injection:${{ matrix.symfony }}"
-          "symfony/form:${{ matrix.symfony }}"
-          "symfony/http-kernel:${{ matrix.symfony }}"
-          "symfony/property-info:${{ matrix.symfony }}"
-          "symfony/cache:${{ matrix.symfony }}"
-          "symfony/doctrine-bridge:${{ matrix.symfony }}"
-          "symfony/validator:${{ matrix.symfony }}"
-          "symfony/var-dumper:${{ matrix.symfony }}"
-          --no-update --no-scripts --no-plugins
-
-      - name: Install dependencies (${{ matrix.dependencies }})
-        run: |
-          if [ "${{ matrix.dependencies }}" = "lowest" ]; then
-            composer update --prefer-lowest --no-progress --no-scripts --no-plugins
-          else
-            composer update --prefer-stable --no-progress --no-scripts --no-plugins
-          fi
+      - name: Install dependencies (${{ matrix.deps_name }})
+        run: composer update ${{ matrix.composer_args }} --no-progress --no-scripts --no-plugins
       
       - name: Run phpunit
         run: vendor/bin/phpunit
