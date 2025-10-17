@@ -45,8 +45,8 @@ abstract class TypeTestCase extends BaseTypeTestCase
     {
         VarDumper::setHandler(static function (mixed $var): void {
             /** @psalm-suppress PossiblyInvalidArgument */
-            (new HtmlDumper())->dump(
-                (new VarCloner())->cloneVar($var),
+            new HtmlDumper()->dump(
+                new VarCloner()->cloneVar($var),
                 @fopen(__DIR__.'/../../dump.html', 'a')
             );
         });

@@ -160,46 +160,14 @@ final class AutoTypeBuilder
      */
     private function getDataClass(FormInterface $form): string
     {
-        // Form data_class config? (With old proxy handling)
-        if (null !== $dataClass = $form->getConfig()->getDataClass()) {
-            if (false !== $pos = strrpos($dataClass, '\\__CG__\\')) {
+        do {
+            if (null !== $dataClass = $form->getConfig()->getDataClass()) {
                 /** @var class-string */
-                return substr($dataClass, $pos + 8);
+                return $dataClass;
             }
-
-            /** @var class-string */
-            return $dataClass;
-        }
-
-        // Loop parent form to get closest data_class config
-        while (null !== $formParent = $form->getParent()) {
-            if (null === $dataClass = $formParent->getConfig()->getDataClass()) {
-                $form = $formParent;
-
-                continue;
-            }
-
-            return $this->getAssociationTargetClass($dataClass, (string) $form->getPropertyPath());
-        }
+        } while (null !== $form = $form->getParent());
 
         throw new \RuntimeException('Unable to get dataClass');
-    }
-
-    /**
-     * @return class-string
-     */
-    private function getAssociationTargetClass(string $class, string $childName): string
-    {
-        if (null === $propTypeInfo = $this->propertyInfoExtractor->getType($class, $childName)) {
-            throw new \RuntimeException(\sprintf('Unable to find the association target class of "%s" in %s.', $childName, $class));
-        }
-
-        $innerType = $propTypeInfo instanceof TypeInfo\CollectionType ? $propTypeInfo->getCollectionValueType() : $propTypeInfo;
-        if (!$innerType instanceof TypeInfo\ObjectType) {
-            throw new \RuntimeException(\sprintf('Unable to find the association target class of "%s" in %s.', $childName, $class));
-        }
-
-        return $innerType->getClassName();
     }
 
     private function updateChildOptions(array $baseChildOptions, TypeInfo $propTypeInfo, int $formLevel): array
