@@ -15,6 +15,8 @@
             "homepage": "https://github.com/a2lix/AutoFormBundle/contributors"
         }
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=8.4",
         "symfony/config": "^7.3.4|^7.4|^8.0",
