@@ -18,15 +18,15 @@ namespace A2lix\AutoFormBundle\Tests\Form;
  *   ...
  * }>
  */
-final class TestScenario
+final readonly class TestScenario
 {
     /**
      * @param array<string, mixed> $formOptions
      * @param ExpectedChildren     $expectedForm
      */
     public function __construct(
-        public readonly ?object $obj,
-        public readonly array $formOptions = [],
-        public readonly array $expectedForm = [],
+        public ?object $obj,
+        public array $formOptions = [],
+        public array $expectedForm = [],
     ) {}
 }

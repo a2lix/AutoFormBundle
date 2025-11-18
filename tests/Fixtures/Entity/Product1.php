@@ -11,6 +11,7 @@
 
 namespace A2lix\AutoFormBundle\Tests\Fixtures\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Tests\Fixtures\ProductStatus;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -56,7 +57,7 @@ class Product1
     /**
      * @var list<ProductStatus>
      */
-    #[ORM\Column(type: 'simple_array', enumType: ProductStatus::class)]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ProductStatus::class)]
     public array $statusList;
 
     #[ORM\Column]

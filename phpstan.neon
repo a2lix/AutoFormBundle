@@ -1,6 +1,18 @@
 parameters:
     editorUrl: 'vscode://file/%%file%%:%%line%%'
-    level: 9
+    level: 10
     paths:
         - src
         - tests
+    excludePaths:
+        - src/A2lixAutoFormBundle.php
+        - tests/Fixtures/*
+
+    # Stricter setup
+    checkMissingCallableSignature: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    #checkUninitializedProperties: true
+    checkBenevolentUnionTypes: true
+    rememberPossiblyImpureFunctionValues: false
+    #reportPossiblyNonexistentGeneralArrayOffset: true
+    reportPossiblyNonexistentConstantArrayOffset: true

@@ -32,13 +32,10 @@ final class AutoType extends AbstractType
         private readonly array $globalExcludedChildren = [],
     ) {}
 
-    /**
-     * @param FormBuilderInterface<mixed> $builder
-     * @param FormOptionsDefaults         $options
-     */
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var FormOptionsDefaults $options */
         $this->autoTypeBuilder->buildChildren($builder, $options);
     }
 
@@ -53,8 +50,8 @@ final class AutoType extends AbstractType
             'builder' => null,
         ]);
 
-        $resolver->setAllowedTypes('children_excluded', 'string[]');
-        $resolver->setAllowedTypes('children_embedded', 'string[]');
+        $resolver->setAllowedTypes('children_excluded', 'string[]|string');
+        $resolver->setAllowedTypes('children_embedded', 'string[]|string');
         $resolver->setAllowedTypes('children_groups', 'string[]|null');
         $resolver->setAllowedTypes('builder', 'callable|null');
         $resolver->setInfo('builder', 'A callable that accepts two arguments (FormBuilderInterface $builder, string[] $classProperties). It should not return anything.');

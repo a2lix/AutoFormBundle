@@ -21,10 +21,10 @@ use Symfony\Component\TypeInfo\Type as TypeInfo;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
-final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
+final readonly class TypeInfoTypeGuesser implements FormTypeGuesserInterface
 {
     public function __construct(
-        private readonly TypeResolverInterface $typeResolver,
+        private TypeResolverInterface $typeResolver,
     ) {}
 
     #[\Override]
@@ -108,13 +108,13 @@ final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
     {
         try {
             $refProperty = new \ReflectionProperty($class, $property);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
         try {
             return $this->typeResolver->resolve($refProperty);
-        } catch (UnsupportedException $e) {
+        } catch (UnsupportedException) {
             return null;
         }
     }

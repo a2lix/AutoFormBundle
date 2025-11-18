@@ -21,7 +21,6 @@ final class A2lixAutoFormBundle extends AbstractBundle
     #[\Override]
     public function configure(DefinitionConfigurator $definition): void
     {
-        // @phpstan-ignore method.notFound
         $definition->rootNode()
             ->children()
             ->arrayNode('children_excluded')
@@ -33,9 +32,6 @@ final class A2lixAutoFormBundle extends AbstractBundle
         ;
     }
 
-    /**
-     * @param array{children_excluded: list<string>} $config
-     */
     #[\Override]
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {

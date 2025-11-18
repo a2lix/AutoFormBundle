@@ -39,10 +39,10 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *    builder: FormBuilderCallable|null,
  * }
  */
-final class AutoTypeBuilder
+final readonly class AutoTypeBuilder
 {
     public function __construct(
-        private readonly PropertyInfoExtractorInterface $propertyInfoExtractor,
+        private PropertyInfoExtractorInterface $propertyInfoExtractor,
     ) {}
 
     /**
