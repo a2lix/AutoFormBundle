@@ -38,6 +38,7 @@ class Product1
     public int $code;
 
     #[ORM\Column]
+    // @phpstan-ignore missingType.iterableValue
     public array $tags = [];
 
     #[ORM\ManyToOne(targetEntity: Media1::class)]
@@ -65,6 +66,7 @@ class Product1
     public \DateTimeImmutable $validityEndAt;
 
     #[ORM\Column]
+    // @phpstan-ignore property.onlyWritten
     private \DateTimeImmutable $createdAt;
 
     public function __construct()

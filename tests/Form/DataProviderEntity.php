@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -247,11 +249,11 @@ final class DataProviderEntity
                 formOptions: [
                     'children_excluded' => '*',
                     'children' => [
-                        'description' => static fn (FormBuilderInterface $builder, array $propAttributeOptions): FormBuilderInterface => $builder->create('description', CoreType\TextareaType::class, [
+                        'description' => static fn(FormBuilderInterface $builder, array $propAttributeOptions): FormBuilderInterface => $builder->create('description', CoreType\TextareaType::class, [
                             'attr' => $propAttributeOptions['attr'],
                             'label' => 'product.description_label',
                         ]),
-                        '_ignoredNaming_' => static fn (FormBuilderInterface $builder): FormBuilderInterface => $builder
+                        '_ignoredNaming_' => static fn(FormBuilderInterface $builder): FormBuilderInterface => $builder
                             ->create('validity_range', CoreType\FormType::class, ['inherit_data' => true])
                             ->add('validityStartAt', CoreType\DateType::class)
                             ->add('validityEndAt', CoreType\DateType::class),
@@ -260,7 +262,6 @@ final class DataProviderEntity
                             'mapped' => false,
                         ],
                     ],
-                    /** @psalm-suppress UnusedClosureParam */
                     'builder' => static function (FormBuilderInterface $builder, array $classProperties): void {
                         $builder->add('save', CoreType\SubmitType::class);
                     },

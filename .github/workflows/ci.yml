@@ -55,8 +55,8 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Run psalm
-        run: vendor/bin/psalm
+      - name: Run phpstan
+        run: vendor/bin/phpstan analyse --memory-limit=2G
 
   tests:
     name: PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, deps ${{ matrix.composer_args }}

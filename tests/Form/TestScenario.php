@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -12,7 +14,7 @@
 namespace A2lix\AutoFormBundle\Tests\Form;
 
 /**
- * @psalm-type ExpectedChildren = array<string, array{
+ * @phpstan-type ExpectedChildren = array<string, array{
  *   expected_type?: class-string,
  *   expected_children?: mixed,
  *   ...
@@ -21,6 +23,7 @@ namespace A2lix\AutoFormBundle\Tests\Form;
 final class TestScenario
 {
     /**
+     * @param array<string, mixed> $formOptions
      * @param ExpectedChildren $expectedForm
      */
     public function __construct(

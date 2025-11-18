@@ -38,9 +38,10 @@ final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
         // FormTypes handling 'multiple' option
         if ($typeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
             /** @var TypeInfo\CollectionType $typeInfo */
+            // @phpstan-ignore missingType.generics
             $collValueType = $typeInfo->getCollectionValueType();
-            /** @var TypeInfo\ObjectType $collValueType */
 
+            /** @var TypeInfo\ObjectType<mixed> $collValueType */
             return match (true) {
                 $collValueType->isIdentifiedBy(\UnitEnum::class) => new TypeGuess(CoreType\EnumType::class, ['class' => $collValueType->getClassName(), 'multiple' => true], Guess::HIGH_CONFIDENCE),
                 $collValueType->isIdentifiedBy(\DateTimeZone::class) => new TypeGuess(CoreType\TimezoneType::class, ['input' => 'datetimezone', 'multiple' => true], Guess::HIGH_CONFIDENCE),
@@ -50,7 +51,7 @@ final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
 
         if ($typeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
             if ($typeInfo->isIdentifiedBy(\UnitEnum::class)) {
-                /** @var TypeInfo\ObjectType */
+                /** @var TypeInfo\ObjectType<mixed> */
                 $innerType = $typeInfo instanceof TypeInfo\NullableType ? $typeInfo->getWrappedType() : $typeInfo;
 
                 return new TypeGuess(CoreType\EnumType::class, ['class' => $innerType->getClassName()], Guess::HIGH_CONFIDENCE);

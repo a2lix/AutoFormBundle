@@ -29,13 +29,16 @@
         "doctrine/orm": "^3.5",
         "friendsofphp/php-cs-fixer": "^3.87",
         "kubawerlos/php-cs-fixer-custom-fixers": "^3.34",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^12.3",
         "rector/rector": "^2.1",
         "symfony/cache": "^7.3",
         "symfony/doctrine-bridge": "^7.3",
         "symfony/validator": "^7.3",
-        "symfony/var-dumper": "^7.3",
-        "vimeo/psalm": "^6.13"
+        "symfony/var-dumper": "^7.3"
     },
     "suggest": {
         "a2lix/translation-form-bundle": "For translation form"
@@ -44,8 +47,8 @@
         "cs-fixer": [
             "php-cs-fixer fix --verbose"
         ],
-        "psalm": [
-            "psalm"
+        "phpstan": [
+            "phpstan analyse --memory-limit=2G"
         ],
         "phpunit": [
             "phpunit"
@@ -54,7 +57,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "phpstan/extension-installer": true
         }
     },
     "autoload": {

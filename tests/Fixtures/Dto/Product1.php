@@ -38,6 +38,7 @@ class Product1
         public readonly ?array $statusList = null,
         public readonly ?\DateTimeImmutable $validityStartAt = null,
         public readonly ?\DateTimeImmutable $validityEndAt = null,
+        // @phpstan-ignore property.onlyWritten
         private ?\DateTimeImmutable $createdAt = null,
     ) {
         $this->mediaColl ??= new ArrayCollection();
