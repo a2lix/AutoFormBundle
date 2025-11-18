@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -36,13 +34,14 @@ final class AutoTypeTest extends TypeTestCase
     {
         $form = $this->factory
             ->createBuilder(AutoType::class, $testScenario->obj, $testScenario->formOptions)
-            ->getForm();
+            ->getForm()
+        ;
 
         self::assertFormChildren($testScenario->expectedForm, $form->all());
     }
 
     /**
-     * @param ExpectedChildren                $expectedForm
+     * @param ExpectedChildren                       $expectedForm
      * @param array<array-key, FormInterface<mixed>> $formChildren
      */
     private static function assertFormChildren(array $expectedForm, array $formChildren, string $parentPath = ''): void
@@ -52,7 +51,7 @@ final class AutoTypeTest extends TypeTestCase
         foreach ($formChildren as $childName => $child) {
             /** @var string $childName */
             $expectedChildOptions = $expectedForm[$childName];
-            $childPath = $parentPath . '.' . $childName;
+            $childPath = $parentPath.'.'.$childName;
 
             if (null !== $expectedType = $expectedChildOptions['expected_type'] ?? null) {
                 self::assertSame($expectedType, $child->getConfig()->getType()->getInnerType()::class, \sprintf('Type of "%s"', $childPath));

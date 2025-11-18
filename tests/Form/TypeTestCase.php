@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -49,7 +47,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
             new HtmlDumper()->dump(
                 new VarCloner()->cloneVar($var),
                 // @phpstan-ignore argument.type
-                @fopen(__DIR__ . '/../../dump.html', 'a')
+                @fopen(__DIR__.'/../../dump.html', 'a')
             );
         });
     }
@@ -74,7 +72,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
             return $this->entityManager;
         }
 
-        $configuration = ORMSetup::createAttributeMetadataConfig([__DIR__ . '/../Fixtures/Entity'], true);
+        $configuration = ORMSetup::createAttributeMetadataConfig([__DIR__.'/../Fixtures/Entity'], true);
         $configuration->enableNativeLazyObjects(true);
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $configuration);

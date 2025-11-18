@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -21,6 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @phpstan-import-type FormOptionsDefaults from AutoTypeBuilder
+ *
  * @extends AbstractType<mixed>
  */
 final class AutoType extends AbstractType

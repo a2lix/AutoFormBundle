@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -49,7 +47,7 @@ final class AutoTypeBuilder
 
     /**
      * @param FormBuilderInterface<mixed> $builder
-     * @param FormOptionsDefaults $formOptions
+     * @param FormOptionsDefaults         $formOptions
      */
     public function buildChildren(FormBuilderInterface $builder, array $formOptions): void
     {
@@ -75,8 +73,9 @@ final class AutoTypeBuilder
 
             $refProperty = $refClass->getProperty($classProperty);
             $propAttributeOptions = ($refProperty->getAttributes(AutoTypeCustom::class)[0] ?? null)
-                ?->newInstance()?->getOptions() ?? [];
-            
+                ?->newInstance()?->getOptions() ?? []
+            ;
+
             // TODO child_groups handling
 
             // Custom name?
@@ -154,9 +153,9 @@ final class AutoTypeBuilder
     }
 
     /**
-     * @param FormBuilderInterface<mixed> $builder
+     * @param FormBuilderInterface<mixed>        $builder
      * @param string|FormBuilderInterface<mixed> $child
-     * @param ChildOptions $options
+     * @param ChildOptions                       $options
      */
     private function addChild(FormBuilderInterface $builder, string|FormBuilderInterface $child, array $options = []): void
     {
@@ -186,6 +185,7 @@ final class AutoTypeBuilder
 
     /**
      * @param FormInterface<mixed> $form
+     *
      * @return class-string
      */
     private function getDataClass(FormInterface $form): string
@@ -202,6 +202,7 @@ final class AutoTypeBuilder
 
     /**
      * @param ChildOptions $baseChildOptions
+     *
      * @return ChildOptions
      */
     private function updateChildOptions(array $baseChildOptions, TypeInfo $propTypeInfo, int $formLevel): array
@@ -219,7 +220,7 @@ final class AutoTypeBuilder
                 'allow_delete' => true,
                 'delete_empty' => true,
                 'by_reference' => false,
-                'prototype_name' => '__name' . $formLevel . '__',
+                'prototype_name' => '__name'.$formLevel.'__',
                 ...$baseChildOptions,
             ];
 
