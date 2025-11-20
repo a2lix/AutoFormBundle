@@ -5,6 +5,7 @@
 [![Total Downloads](https://poser.pugx.org/a2lix/auto-form-bundle/downloads)](https://packagist.org/packages/a2lix/auto-form-bundle)
 [![License](https://poser.pugx.org/a2lix/auto-form-bundle/license)](https://packagist.org/packages/a2lix/auto-form-bundle)
 [![Build Status](https://github.com/a2lix/AutoFormBundle/actions/workflows/ci.yml/badge.svg)](https://github.com/a2lix/AutoFormBundle/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/a2lix/AutoFormBundle/branch/main/graph/badge.svg)](https://codecov.io/gh/a2lix/AutoFormBundle)
 
 Stop writing boilerplate form code. This bundle provides a single, powerful `AutoType` form type that automatically generates a complete Symfony form from any PHP class.
 
