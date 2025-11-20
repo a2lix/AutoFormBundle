@@ -15,6 +15,7 @@ use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Tests\Fixtures\ProductStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Form\Extension\Core\Type as CoreType;
 
@@ -37,34 +38,34 @@ class Product1
     #[ORM\Column]
     public int $code;
 
+    /** @var list<string> */
     #[ORM\Column]
     public array $tags = [];
 
     #[ORM\ManyToOne(targetEntity: Media1::class)]
     public ?Media1 $mediaMain = null;
 
-    /**
-     * @var Collection<int, Media1>
-     */
+    /** @var Collection<int, Media1> */
     #[ORM\OneToMany(targetEntity: Media1::class, mappedBy: 'product', cascade: ['all'], orphanRemoval: true)]
     public Collection $mediaColl;
 
     #[ORM\Column(enumType: ProductStatus::class)]
     public ProductStatus $status;
 
-    /**
-     * @var list<ProductStatus>
-     */
-    #[ORM\Column(type: 'simple_array', enumType: ProductStatus::class)]
+    /** @var list<ProductStatus> */
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ProductStatus::class)]
     public array $statusList;
 
     #[ORM\Column]
+    #[AutoTypeCustom(groups: ['Default', 'validity'])]
     public \DateTimeImmutable $validityStartAt;
 
     #[ORM\Column]
+    #[AutoTypeCustom(groups: ['Default', 'validity'])]
     public \DateTimeImmutable $validityEndAt;
 
     #[ORM\Column]
+    // @phpstan-ignore property.onlyWritten
     private \DateTimeImmutable $createdAt;
 
     public function __construct()

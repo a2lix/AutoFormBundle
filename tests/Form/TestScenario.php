@@ -12,20 +12,21 @@
 namespace A2lix\AutoFormBundle\Tests\Form;
 
 /**
- * @psalm-type ExpectedChildren = array<string, array{
+ * @phpstan-type ExpectedChildren = array<string, array{
  *   expected_type?: class-string,
  *   expected_children?: mixed,
  *   ...
  * }>
  */
-final class TestScenario
+final readonly class TestScenario
 {
     /**
-     * @param ExpectedChildren $expectedForm
+     * @param array<string, mixed> $formOptions
+     * @param ExpectedChildren     $expectedForm
      */
     public function __construct(
-        public readonly ?object $obj,
-        public readonly array $formOptions = [],
-        public readonly array $expectedForm = [],
+        public ?object $obj,
+        public array $formOptions = [],
+        public array $expectedForm = [],
     ) {}
 }

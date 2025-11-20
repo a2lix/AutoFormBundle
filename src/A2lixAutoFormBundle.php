@@ -21,8 +21,6 @@ final class A2lixAutoFormBundle extends AbstractBundle
     #[\Override]
     public function configure(DefinitionConfigurator $definition): void
     {
-        /** @psalm-suppress UndefinedMethod */
-        /** @psalm-suppress MixedMethodCall */
         $definition->rootNode()
             ->children()
             ->arrayNode('children_excluded')

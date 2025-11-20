@@ -18,24 +18,15 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @psalm-type ChildOptions = array{
- *    child_type?: class-string,
- *    child_name?: string,
- *    child_excluded?: bool,
- *    child_embedded?: bool,
- *    ...<string, mixed>
- * }
- * @psalm-type ChildBuilderCallable = callable(FormBuilderInterface $builder, array $propAttributeOptions): FormBuilderInterface
- * @psalm-type FormBuilderCallable = callable(FormBuilderInterface $builder, string[] $classProperties): void
- * @psalm-type FormOptionsDefaults = array{
- *    children: array<string, ChildOptions|ChildBuilderCallable>|[],
- *    children_excluded: list<string>|"*",
- *    children_embedded: list<string>|"*",
- *    builder: FormBuilderCallable|null,
- * }
+ * @phpstan-import-type FormOptionsDefaults from AutoTypeBuilder
+ *
+ * @extends AbstractType<mixed>
  */
 final class AutoType extends AbstractType
 {
+    /**
+     * @param list<string> $globalExcludedChildren
+     */
     public function __construct(
         private readonly AutoTypeBuilder $autoTypeBuilder,
         private readonly array $globalExcludedChildren = [],
@@ -44,7 +35,7 @@ final class AutoType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @psalm-suppress MixedArgumentTypeCoercion */
+        /** @var FormOptionsDefaults $options */
         $this->autoTypeBuilder->buildChildren($builder, $options);
     }
 
@@ -55,10 +46,14 @@ final class AutoType extends AbstractType
             'children' => [],
             'children_excluded' => $this->globalExcludedChildren,
             'children_embedded' => [],
+            'children_groups' => null,
             'builder' => null,
         ]);
 
-        $resolver->setAllowedTypes('builder', ['null', 'callable']);
+        $resolver->setAllowedTypes('children_excluded', 'string[]|string');
+        $resolver->setAllowedTypes('children_embedded', 'string[]|string');
+        $resolver->setAllowedTypes('children_groups', 'string[]|null');
+        $resolver->setAllowedTypes('builder', 'callable|null');
         $resolver->setInfo('builder', 'A callable that accepts two arguments (FormBuilderInterface $builder, string[] $classProperties). It should not return anything.');
 
         $resolver->setNormalizer('data_class', static function (Options $options, ?string $value): string {
@@ -67,6 +62,11 @@ final class AutoType extends AbstractType
             }
 
             return $value;
+        });
+
+        $resolver->setDefault('validation_groups', static function (Options $options): ?array {
+            /** @var list<string>|null */
+            return $options['children_groups'];
         });
     }
 }

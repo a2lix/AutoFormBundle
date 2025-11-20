@@ -21,10 +21,10 @@ use Symfony\Component\TypeInfo\Type as TypeInfo;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
-final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
+final readonly class TypeInfoTypeGuesser implements FormTypeGuesserInterface
 {
     public function __construct(
-        private readonly TypeResolverInterface $typeResolver,
+        private TypeResolverInterface $typeResolver,
     ) {}
 
     #[\Override]
@@ -38,9 +38,10 @@ final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
         // FormTypes handling 'multiple' option
         if ($typeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
             /** @var TypeInfo\CollectionType $typeInfo */
+            // @phpstan-ignore missingType.generics
             $collValueType = $typeInfo->getCollectionValueType();
-            /** @var TypeInfo\ObjectType $collValueType */
 
+            /** @var TypeInfo\ObjectType<mixed> $collValueType */
             return match (true) {
                 $collValueType->isIdentifiedBy(\UnitEnum::class) => new TypeGuess(CoreType\EnumType::class, ['class' => $collValueType->getClassName(), 'multiple' => true], Guess::HIGH_CONFIDENCE),
                 $collValueType->isIdentifiedBy(\DateTimeZone::class) => new TypeGuess(CoreType\TimezoneType::class, ['input' => 'datetimezone', 'multiple' => true], Guess::HIGH_CONFIDENCE),
@@ -50,7 +51,7 @@ final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
 
         if ($typeInfo->isIdentifiedBy(TypeIdentifier::OBJECT)) {
             if ($typeInfo->isIdentifiedBy(\UnitEnum::class)) {
-                /** @var TypeInfo\ObjectType */
+                /** @var TypeInfo\ObjectType<mixed> */
                 $innerType = $typeInfo instanceof TypeInfo\NullableType ? $typeInfo->getWrappedType() : $typeInfo;
 
                 return new TypeGuess(CoreType\EnumType::class, ['class' => $innerType->getClassName()], Guess::HIGH_CONFIDENCE);
@@ -107,13 +108,13 @@ final class TypeInfoTypeGuesser implements FormTypeGuesserInterface
     {
         try {
             $refProperty = new \ReflectionProperty($class, $property);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             return null;
         }
 
         try {
             return $this->typeResolver->resolve($refProperty);
-        } catch (UnsupportedException $e) {
+        } catch (UnsupportedException) {
             return null;
         }
     }

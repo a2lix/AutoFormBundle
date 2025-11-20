@@ -140,11 +140,16 @@ final class DataProviderEntity
             ),
         ];
 
-        yield 'Entity - Product1 with children_embedded = [mediaColl]' => [
+        yield 'Entity - Product1 with children_embedded & child_embedded' => [
             new TestScenario(
                 obj: new Product1(),
                 formOptions: [
                     'children_embedded' => ['mediaColl'],
+                    'children' => [
+                        'tags' => [
+                            'child_embedded' => true,
+                        ],
+                    ],
                 ],
                 expectedForm: [
                     'title' => [
@@ -154,7 +159,11 @@ final class DataProviderEntity
                         'expected_type' => CoreType\IntegerType::class,
                     ],
                     'tags' => [
-                        'expected_type' => CoreType\TextType::class,
+                        'expected_type' => CoreType\CollectionType::class,
+                        'entry_type' => CoreType\TextType::class,
+                        'entry_options' => [
+                            'block_name' => 'entry',
+                        ],
                     ],
                     'mediaMain' => [
                         'expected_type' => CoreType\TextType::class,
@@ -203,7 +212,7 @@ final class DataProviderEntity
             ),
         ];
 
-        yield 'Entity - Product1 with children_excluded = *, custom selection with overrides' => [
+        yield 'Entity - Product1 with children_excluded = *, custom overrides' => [
             new TestScenario(
                 obj: new Product1(),
                 formOptions: [
@@ -241,6 +250,72 @@ final class DataProviderEntity
             ),
         ];
 
+        yield 'Entity - Product1 with children_excluded & child_excluded' => [
+            new TestScenario(
+                obj: new Product1(),
+                formOptions: [
+                    'children_excluded' => ['tags', 'mediaMain', 'mediaColl', 'status', 'statusList', 'validityStartAt', 'validityEndAt'],
+                    'children' => [
+                        'code' => [
+                            'child_excluded' => true,
+                        ],
+                        'description' => [
+                            'child_excluded' => true,
+                        ],
+                    ],
+                ],
+                expectedForm: [
+                    'title' => [
+                        'expected_type' => CoreType\TextType::class,
+                    ],
+                ],
+            ),
+        ];
+
+        yield 'Entity - Product1 with children_groups' => [
+            new TestScenario(
+                obj: new Product1(),
+                formOptions: [
+                    'children_groups' => ['unknownGrp'],
+                ],
+                expectedForm: [
+                ],
+            ),
+        ];
+
+        yield 'Entity - Product1 with children_groups & child_groups' => [
+            new TestScenario(
+                obj: new Product1(),
+                formOptions: [
+                    'children_groups' => ['onTheFlyGrp', 'validity'],
+                    'children' => [
+                        'title' => [
+                            'child_groups' => ['onTheFlyGrp'],
+                        ],
+                        'code' => [
+                            'child_groups' => ['onTheFlyGrp', 'validity'],
+                        ],
+                    ],
+                ],
+                expectedForm: [
+                    'title' => [
+                        'expected_type' => CoreType\TextType::class,
+                    ],
+                    'code' => [
+                        'expected_type' => CoreType\IntegerType::class,
+                    ],
+                    'validityStartAt' => [
+                        'expected_type' => CoreType\DateTimeType::class,
+                        'input' => 'datetime_immutable',
+                    ],
+                    'validityEndAt' => [
+                        'expected_type' => CoreType\DateTimeType::class,
+                        'input' => 'datetime_immutable',
+                    ],
+                ],
+            ),
+        ];
+
         yield 'Entity - Product1 with children & builder callables' => [
             new TestScenario(
                 obj: new Product1(),
@@ -260,7 +335,6 @@ final class DataProviderEntity
                             'mapped' => false,
                         ],
                     ],
-                    /** @psalm-suppress UnusedClosureParam */
                     'builder' => static function (FormBuilderInterface $builder, array $classProperties): void {
                         $builder->add('save', CoreType\SubmitType::class);
                     },

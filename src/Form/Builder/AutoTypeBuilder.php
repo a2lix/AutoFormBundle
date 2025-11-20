@@ -21,16 +21,33 @@ use Symfony\Component\TypeInfo\Type as TypeInfo;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
- * @psalm-import-type FormOptionsDefaults from AutoType
+ * @phpstan-type ChildOptions array{
+ *    child_type?: class-string,
+ *    child_name?: string,
+ *    child_excluded?: bool,
+ *    child_embedded?: bool,
+ *    child_groups?: list<string>,
+ *    ...
+ * }
+ * @phpstan-type ChildBuilderCallable callable(FormBuilderInterface<mixed> $builder, ?array<string, mixed> $propAttributeOptions): FormBuilderInterface<mixed>
+ * @phpstan-type FormBuilderCallable callable(FormBuilderInterface<mixed> $builder, list<string> $classProperties): void
+ * @phpstan-type FormOptionsDefaults array{
+ *    children: array<string, ChildOptions|ChildBuilderCallable>,
+ *    children_excluded: list<string>|"*",
+ *    children_embedded: list<string>|"*",
+ *    children_groups: list<string>|null,
+ *    builder: FormBuilderCallable|null,
+ * }
  */
-final class AutoTypeBuilder
+final readonly class AutoTypeBuilder
 {
     public function __construct(
-        private readonly PropertyInfoExtractorInterface $propertyInfoExtractor,
+        private PropertyInfoExtractorInterface $propertyInfoExtractor,
     ) {}
 
     /**
-     * @param FormOptionsDefaults $formOptions
+     * @param FormBuilderInterface<mixed> $builder
+     * @param FormOptionsDefaults         $formOptions
      */
     public function buildChildren(FormBuilderInterface $builder, array $formOptions): void
     {
@@ -43,8 +60,10 @@ final class AutoTypeBuilder
         $refClass = new \ReflectionClass($dataClass);
         $allChildrenExcluded = '*' === $formOptions['children_excluded'];
         $allChildrenEmbedded = '*' === $formOptions['children_embedded'];
+        $childrenGroups = $formOptions['children_groups'] ?? ['Default'];
         $formLevel = $this->getFormLevel($form);
 
+        /** @var list<string> $classProperties */
         foreach ($classProperties as $classProperty) {
             // Due to issue with DateTimeImmutable PHP8.4
             if (!$refClass->hasProperty($classProperty)) {
@@ -57,6 +76,7 @@ final class AutoTypeBuilder
             $propAttributeOptions = ($refProperty->getAttributes(AutoTypeCustom::class)[0] ?? null)
                 ?->newInstance()?->getOptions() ?? []
             ;
+
             // Custom name?
             if (null !== ($propAttributeOptions['child_name'] ?? null)) {
                 $propAttributeOptions['property_path'] = $classProperty;
@@ -64,44 +84,40 @@ final class AutoTypeBuilder
 
             // FORM.children[PROP] callable? Add early
             if (\is_callable($propFormOptions)) {
-                /** @var FormBuilderInterface */
                 $childBuilder = ($propFormOptions)($builder, $propAttributeOptions);
                 $this->addChild($builder, $childBuilder);
                 unset($formOptions['children'][$classProperty]);
                 continue;
             }
 
-            // FORM.children[PROP].child_excluded? Continue early
-            /** @psalm-suppress RiskyTruthyFalsyComparison */
-            if ($propFormOptions['child_excluded'] ?? false) {
-                unset($formOptions['children'][$classProperty]);
-                continue;
-            }
-
-            if (null === $propFormOptions) {
-                /** @psalm-suppress RiskyTruthyFalsyComparison */
-                /** @var list<string> $formOptions['children_excluded'] */
-                $formChildExcluded = $allChildrenExcluded || \in_array($classProperty, $formOptions['children_excluded'], true)
-                    || ($propAttributeOptions['child_excluded'] ?? false);
-
-                // Excluded at form or attribute level? Continue early
-                if ($formChildExcluded) {
-                    unset($formOptions['children'][$classProperty]);
-                    continue;
-                }
-            }
-
+            /** @var ChildOptions */
             $childOptions = [
                 ...$propAttributeOptions,
                 ...($propFormOptions ?? []),
             ];
 
+            // @phpstan-ignore argument.type
+            $formChildExcluded = ((null === $propFormOptions) && ($allChildrenExcluded || \in_array($classProperty, $formOptions['children_excluded'], true)))
+                || ($childOptions['child_excluded'] ?? false);
+
+            // Excluded child? Continue early
+            if ($formChildExcluded) {
+                unset($formOptions['children'][$classProperty]);
+                continue;
+            }
+
+            // Invalid matching group? Continue early
+            $childGroups = $childOptions['child_groups'] ?? ['Default'];
+            if ([] === array_intersect($childrenGroups, $childGroups)) {
+                unset($formOptions['children'][$classProperty]);
+                continue;
+            }
+
             // PropertyInfo? Enrich childOptions
             if (null !== $propTypeInfo = $this->propertyInfoExtractor->getType($dataClass, $classProperty)) {
-                /** @psalm-suppress RiskyTruthyFalsyComparison */
-                /** @var list<string> $formOptions['children_embedded'] */
+                // @phpstan-ignore argument.type
                 $formChildEmbedded = $allChildrenEmbedded || \in_array($classProperty, $formOptions['children_embedded'], true)
-                    || ($propAttributeOptions['child_embedded'] ?? false);
+                    || ($childOptions['child_embedded'] ?? false);
 
                 if ($formChildEmbedded) {
                     $childOptions = $this->updateChildOptions($childOptions, $propTypeInfo, $formLevel);
@@ -116,13 +132,11 @@ final class AutoTypeBuilder
         foreach ($formOptions['children'] as $childProperty => $childOptions) {
             // FORM.children[PROP] callable? Continue early
             if (\is_callable($childOptions)) {
-                /** @var FormBuilderInterface */
-                $childBuilder = ($childOptions)($builder);
+                $childBuilder = ($childOptions)($builder, null);
                 $this->addChild($builder, $childBuilder);
                 continue;
             }
 
-            /** @var string $childProperty */
             $this->addChild($builder, $childProperty, $childOptions);
         }
 
@@ -132,6 +146,11 @@ final class AutoTypeBuilder
         }
     }
 
+    /**
+     * @param FormBuilderInterface<mixed>        $builder
+     * @param string|FormBuilderInterface<mixed> $child
+     * @param ChildOptions                       $options
+     */
     private function addChild(FormBuilderInterface $builder, string|FormBuilderInterface $child, array $options = []): void
     {
         if ($child instanceof FormBuilderInterface) {
@@ -147,15 +166,20 @@ final class AutoTypeBuilder
             'child_name' => $child,
             'child_type' => null,
         ];
-        unset($options['child_name'], $options['child_type'], $options['child_excluded'], $options['child_embedded']);
+        unset(
+            $options['child_name'],
+            $options['child_type'],
+            $options['child_excluded'],
+            $options['child_embedded'],
+            $options['child_groups'],
+        );
 
-        /** @var string $name */
-        /** @var class-string|null $type */
-        /** @var array<string, mixed> $options */
         $builder->add($name, $type, $options);
     }
 
     /**
+     * @param FormInterface<mixed> $form
+     *
      * @return class-string
      */
     private function getDataClass(FormInterface $form): string
@@ -170,6 +194,11 @@ final class AutoTypeBuilder
         throw new \RuntimeException('Unable to get dataClass');
     }
 
+    /**
+     * @param ChildOptions $baseChildOptions
+     *
+     * @return ChildOptions
+     */
     private function updateChildOptions(array $baseChildOptions, TypeInfo $propTypeInfo, int $formLevel): array
     {
         // TypeInfo matching native FormType? Abort, guessers are enough
@@ -193,12 +222,12 @@ final class AutoTypeBuilder
 
             // Object?
             if ($collValueType instanceof TypeInfo\ObjectType) {
-                /** @psalm-suppress InvalidOperand */
                 return [
                     'entry_type' => AutoType::class,
                     ...$baseCollOptions,
                     'entry_options' => [
                         'data_class' => $collValueType->getClassName(),
+                        // @phpstan-ignore nullCoalesce.offset
                         ...($baseCollOptions['entry_options'] ?? []),
                     ],
                 ];
@@ -209,7 +238,7 @@ final class AutoTypeBuilder
         }
 
         // Embeddable object
-        /** @var TypeInfo\ObjectType */
+        /** @var TypeInfo\ObjectType<mixed> */
         $innerType = $propTypeInfo instanceof TypeInfo\NullableType ? $propTypeInfo->getWrappedType() : $propTypeInfo;
 
         return [
@@ -247,6 +276,9 @@ final class AutoTypeBuilder
         );
     }
 
+    /**
+     * @param FormInterface<mixed> $form
+     */
     private function getFormLevel(FormInterface $form): int
     {
         if ($form->isRoot()) {

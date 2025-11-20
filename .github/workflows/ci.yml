@@ -4,12 +4,17 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -37,7 +42,9 @@ jobs:
     name: Static Analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -55,8 +62,8 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Run psalm
-        run: vendor/bin/psalm
+      - name: Run phpstan
+        run: vendor/bin/phpstan analyse --memory-limit=2G
 
   tests:
     name: PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, deps ${{ matrix.composer_args }}
@@ -74,6 +81,7 @@ jobs:
             symfony: '7.3'
             composer_args: '--prefer-stable'
             stability: 'stable'
+            coverage: true
           - php: '8.4'
             symfony: '7.3'
             composer_args: '--prefer-lowest'
@@ -92,12 +100,15 @@ jobs:
             stability: 'dev'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          coverage: pcov
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -120,6 +131,18 @@ jobs:
 
       - name: Install dependencies
         run: composer update ${{ matrix.composer_args }} --no-progress --no-scripts --no-plugins
-      
+
       - name: Run phpunit
-        run: vendor/bin/phpunit
+        run: |
+          if [[ "${{ matrix.coverage }}" == "true" ]]; then
+            mkdir -p build/logs
+            vendor/bin/phpunit --coverage-clover coverage.xml
+          else
+            vendor/bin/phpunit
+          fi
+
+      - name: Upload coverage to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

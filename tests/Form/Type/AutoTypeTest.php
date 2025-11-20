@@ -11,23 +11,27 @@
 
 namespace A2lix\AutoFormBundle\Tests\Form\Type;
 
+use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
+use A2lix\AutoFormBundle\Form\Builder\AutoTypeBuilder;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
+use A2lix\AutoFormBundle\Form\TypeGuesser\TypeInfoTypeGuesser;
 use A2lix\AutoFormBundle\Tests\Form\DataProviderDto;
 use A2lix\AutoFormBundle\Tests\Form\DataProviderEntity;
 use A2lix\AutoFormBundle\Tests\Form\TestScenario;
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Symfony\Component\Form\FormInterface;
 
 /**
  * @internal
  *
- * @psalm-suppress PropertyNotSetInConstructor
- *
- * @psalm-import-type ExpectedChildren from TestScenario
+ * @phpstan-import-type ExpectedChildren from TestScenario
  */
-#[CoversNothing]
+#[CoversClass(AutoType::class)]
+#[CoversClass(AutoTypeBuilder::class)]
+#[CoversClass(AutoTypeCustom::class)]
+#[CoversClass(TypeInfoTypeGuesser::class)]
 final class AutoTypeTest extends TypeTestCase
 {
     #[DataProviderExternal(DataProviderDto::class, 'provideScenarioCases')]
@@ -43,8 +47,8 @@ final class AutoTypeTest extends TypeTestCase
     }
 
     /**
-     * @param ExpectedChildren                $expectedForm
-     * @param array<array-key, FormInterface> $formChildren
+     * @param ExpectedChildren                       $expectedForm
+     * @param array<array-key, FormInterface<mixed>> $formChildren
      */
     private static function assertFormChildren(array $expectedForm, array $formChildren, string $parentPath = ''): void
     {
@@ -59,16 +63,15 @@ final class AutoTypeTest extends TypeTestCase
                 self::assertSame($expectedType, $child->getConfig()->getType()->getInnerType()::class, \sprintf('Type of "%s"', $childPath));
             }
 
-            /** @var ExpectedChildren|null $expectedChildOptions['expected_children'] */
             if (null !== $expectedChildren = $expectedChildOptions['expected_children'] ?? null) {
+                // @phpstan-ignore argument.type
                 self::assertFormChildren($expectedChildren, $child->all(), $childPath);
             }
 
             unset($expectedChildOptions['expected_type'], $expectedChildOptions['expected_children']);
             $actualOptions = $child->getConfig()->getOptions();
 
-            /** @psalm-suppress RedundantCondition */
-            /** @psalm-suppress TypeDoesNotContainNull */
+            // @phpstan-ignore nullCoalesce.variable, staticMethod.alreadyNarrowedType
             self::assertSame($expectedChildOptions, array_intersect_key($actualOptions, $expectedChildOptions ?? []), \sprintf('Options of "%s"', $childPath));
         }
     }
