@@ -36,7 +36,9 @@ class Product1
         public ?Collection $mediaColl = null,
         public readonly ?ProductStatus $status = null,
         public readonly ?array $statusList = null,
+        #[AutoTypeCustom(groups: ['Default', 'validity'])]
         public readonly ?\DateTimeImmutable $validityStartAt = null,
+        #[AutoTypeCustom(groups: ['Default', 'validity'])]
         public readonly ?\DateTimeImmutable $validityEndAt = null,
         // @phpstan-ignore property.onlyWritten
         private ?\DateTimeImmutable $createdAt = null,

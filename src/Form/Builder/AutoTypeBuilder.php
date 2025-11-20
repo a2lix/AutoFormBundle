@@ -111,7 +111,7 @@ final readonly class AutoTypeBuilder
             if ([] === array_intersect($childrenGroups, $childGroups)) {
                 unset($formOptions['children'][$classProperty]);
                 continue;
-            }            
+            }
 
             // PropertyInfo? Enrich childOptions
             if (null !== $propTypeInfo = $this->propertyInfoExtractor->getType($dataClass, $classProperty)) {

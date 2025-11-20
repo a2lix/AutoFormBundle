@@ -276,7 +276,7 @@ final class DataProviderEntity
             new TestScenario(
                 obj: new Product1(),
                 formOptions: [
-                    'children_groups' => ['grp1'],
+                    'children_groups' => ['unknownGrp'],
                 ],
                 expectedForm: [
                 ],
@@ -287,16 +287,13 @@ final class DataProviderEntity
             new TestScenario(
                 obj: new Product1(),
                 formOptions: [
-                    'children_groups' => ['grp1', 'grp2'],
+                    'children_groups' => ['onTheFlyGrp', 'validity'],
                     'children' => [
                         'title' => [
-                            'child_groups' => ['grp1'],
+                            'child_groups' => ['onTheFlyGrp'],
                         ],
                         'code' => [
-                            'child_groups' => ['grp2'],
-                        ],
-                        'description' => [
-                            'child_groups' => ['grp1', 'grp2'],
+                            'child_groups' => ['onTheFlyGrp', 'validity'],
                         ],
                     ],
                 ],
@@ -307,8 +304,13 @@ final class DataProviderEntity
                     'code' => [
                         'expected_type' => CoreType\IntegerType::class,
                     ],
-                    'desc' => [
-                        'expected_type' => CoreType\TextareaType::class,
+                    'validityStartAt' => [
+                        'expected_type' => CoreType\DateTimeType::class,
+                        'input' => 'datetime_immutable',
+                    ],
+                    'validityEndAt' => [
+                        'expected_type' => CoreType\DateTimeType::class,
+                        'input' => 'datetime_immutable',
                     ],
                 ],
             ),

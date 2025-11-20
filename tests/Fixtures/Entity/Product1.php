@@ -11,11 +11,11 @@
 
 namespace A2lix\AutoFormBundle\Tests\Fixtures\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Tests\Fixtures\ProductStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Form\Extension\Core\Type as CoreType;
 
@@ -57,9 +57,11 @@ class Product1
     public array $statusList;
 
     #[ORM\Column]
+    #[AutoTypeCustom(groups: ['Default', 'validity'])]
     public \DateTimeImmutable $validityStartAt;
 
     #[ORM\Column]
+    #[AutoTypeCustom(groups: ['Default', 'validity'])]
     public \DateTimeImmutable $validityEndAt;
 
     #[ORM\Column]
