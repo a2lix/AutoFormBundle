@@ -135,6 +135,58 @@ class Product
 }
 ```
 
+### Conditional Fields with Groups
+
+You can conditionally include fields based on groups, similar to how Symfony's `validation_groups` work. This is useful for having different versions of a form (e.g., a "creation" version vs. an "edition" version).
+
+To enable this, pass a `children_groups` option to your form. This option specifies which groups of fields should be included.
+
+```php
+$form = $this->createForm(AutoType::class, $product, [
+    'children_groups' => ['product:edit'],
+]);
+```
+
+You can then assign fields to one or more groups using either form options or attributes.
+
+#### Via Form Options
+
+Use the `child_groups` option within the `children` configuration:
+
+```php
+// ...
+'children' => [
+    'name' => [
+        'child_groups' => ['product:edit', 'product:create'],
+    ],
+    'stock' => [
+        'child_groups' => ['product:edit'],
+    ],
+],
+// ...
+```
+
+In this example, if `children_groups` is set to `['product:edit']`, both `name` and `stock` will be included. If it's set to `['product:create']`, only `name` will be included.
+
+#### Via `#[AutoTypeCustom]` Attribute
+
+Use the `groups` property on the attribute:
+
+```php
+use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
+
+class Product
+{
+    #[AutoTypeCustom(groups: ['product:edit', 'product:create'])]
+    public ?string $name = null;
+
+    #[AutoTypeCustom(groups: ['product:edit'])]
+    public ?int $stock = null;
+}
+```
+
+If no `children_groups` option is provided to the form, all fields are included by default, regardless of whether they have groups assigned.
+
 ## Advanced Recipes
 
 ### Creating a Compound Field with `inherit_data`
