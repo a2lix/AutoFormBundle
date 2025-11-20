@@ -60,6 +60,7 @@ final readonly class AutoTypeBuilder
         $refClass = new \ReflectionClass($dataClass);
         $allChildrenExcluded = '*' === $formOptions['children_excluded'];
         $allChildrenEmbedded = '*' === $formOptions['children_embedded'];
+        $childrenGroups = $formOptions['children_groups'] ?? ['Default'];
         $formLevel = $this->getFormLevel($form);
 
         /** @var list<string> $classProperties */
@@ -76,8 +77,6 @@ final readonly class AutoTypeBuilder
                 ?->newInstance()?->getOptions() ?? []
             ;
 
-            // TODO child_groups handling
-
             // Custom name?
             if (null !== ($propAttributeOptions['child_name'] ?? null)) {
                 $propAttributeOptions['property_path'] = $classProperty;
@@ -85,29 +84,10 @@ final readonly class AutoTypeBuilder
 
             // FORM.children[PROP] callable? Add early
             if (\is_callable($propFormOptions)) {
-                /** @var ChildBuilderCallable $propFormOptions */
                 $childBuilder = ($propFormOptions)($builder, $propAttributeOptions);
                 $this->addChild($builder, $childBuilder);
                 unset($formOptions['children'][$classProperty]);
                 continue;
-            }
-
-            // FORM.children[PROP].child_excluded? Continue early
-            if ($propFormOptions['child_excluded'] ?? false) {
-                unset($formOptions['children'][$classProperty]);
-                continue;
-            }
-
-            if (null === $propFormOptions) {
-                // @phpstan-ignore argument.type
-                $formChildExcluded = $allChildrenExcluded || \in_array($classProperty, $formOptions['children_excluded'], true)
-                    || ($propAttributeOptions['child_excluded'] ?? false);
-
-                // Excluded at form or attribute level? Continue early
-                if ($formChildExcluded) {
-                    unset($formOptions['children'][$classProperty]);
-                    continue;
-                }
             }
 
             /** @var ChildOptions */
@@ -116,11 +96,28 @@ final readonly class AutoTypeBuilder
                 ...($propFormOptions ?? []),
             ];
 
+            // @phpstan-ignore argument.type
+            $formChildExcluded = ((null === $propFormOptions) && ($allChildrenExcluded || \in_array($classProperty, $formOptions['children_excluded'], true)))
+                || ($childOptions['child_excluded'] ?? false);
+
+            // Excluded child? Continue early
+            if ($formChildExcluded) {
+                unset($formOptions['children'][$classProperty]);
+                continue;
+            }
+
+            // Invalid matching group? Continue early
+            $childGroups = $childOptions['child_groups'] ?? ['Default'];
+            if ([] === array_intersect($childrenGroups, $childGroups)) {
+                unset($formOptions['children'][$classProperty]);
+                continue;
+            }            
+
             // PropertyInfo? Enrich childOptions
             if (null !== $propTypeInfo = $this->propertyInfoExtractor->getType($dataClass, $classProperty)) {
                 // @phpstan-ignore argument.type
                 $formChildEmbedded = $allChildrenEmbedded || \in_array($classProperty, $formOptions['children_embedded'], true)
-                    || ($propAttributeOptions['child_embedded'] ?? false);
+                    || ($childOptions['child_embedded'] ?? false);
 
                 if ($formChildEmbedded) {
                     $childOptions = $this->updateChildOptions($childOptions, $propTypeInfo, $formLevel);
@@ -135,19 +132,16 @@ final readonly class AutoTypeBuilder
         foreach ($formOptions['children'] as $childProperty => $childOptions) {
             // FORM.children[PROP] callable? Continue early
             if (\is_callable($childOptions)) {
-                /** @var ChildBuilderCallable $childOptions */
                 $childBuilder = ($childOptions)($builder, null);
                 $this->addChild($builder, $childBuilder);
                 continue;
             }
 
-            /** @var string $childProperty */
             $this->addChild($builder, $childProperty, $childOptions);
         }
 
         // FORM.builder callable? Final modifications
         if (null !== $builderFn = $formOptions['builder']) {
-            /** @var FormBuilderCallable $builderFn */
             ($builderFn)($builder, $classProperties);
         }
     }

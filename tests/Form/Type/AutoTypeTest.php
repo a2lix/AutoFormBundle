@@ -57,7 +57,6 @@ final class AutoTypeTest extends TypeTestCase
                 self::assertSame($expectedType, $child->getConfig()->getType()->getInnerType()::class, \sprintf('Type of "%s"', $childPath));
             }
 
-            /** @var ExpectedChildren|null $expectedChildOptions['expected_children'] */
             if (null !== $expectedChildren = $expectedChildOptions['expected_children'] ?? null) {
                 // @phpstan-ignore argument.type
                 self::assertFormChildren($expectedChildren, $child->all(), $childPath);
@@ -66,6 +65,7 @@ final class AutoTypeTest extends TypeTestCase
             unset($expectedChildOptions['expected_type'], $expectedChildOptions['expected_children']);
             $actualOptions = $child->getConfig()->getOptions();
 
+            // @phpstan-ignore nullCoalesce.variable, staticMethod.alreadyNarrowedType
             self::assertSame($expectedChildOptions, array_intersect_key($actualOptions, $expectedChildOptions ?? []), \sprintf('Options of "%s"', $childPath));
         }
     }

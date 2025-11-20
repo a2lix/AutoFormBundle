@@ -140,11 +140,16 @@ final class DataProviderDto
             ),
         ];
 
-        yield 'Dto - Product1 with children_embedded = [mediaColl]' => [
+        yield 'Dto - Product1 with children_embedded & child_embedded' => [
             new TestScenario(
                 obj: new Product1(),
                 formOptions: [
                     'children_embedded' => ['mediaColl'],
+                    'children' => [
+                        'tags' => [
+                            'child_embedded' => true,
+                        ],
+                    ],
                 ],
                 expectedForm: [
                     'title' => [
@@ -154,7 +159,11 @@ final class DataProviderDto
                         'expected_type' => CoreType\IntegerType::class,
                     ],
                     'tags' => [
-                        'expected_type' => CoreType\TextType::class,
+                        'expected_type' => CoreType\CollectionType::class,
+                        'entry_type' => CoreType\TextType::class,
+                        'entry_options' => [
+                            'block_name' => 'entry',
+                        ],
                     ],
                     'mediaMain' => [
                         'expected_type' => CoreType\TextType::class,
@@ -204,7 +213,7 @@ final class DataProviderDto
             ),
         ];
 
-        yield 'Dto - Product1 with children_excluded = *, custom selection with overrides' => [
+        yield 'Dto - Product1 with children_excluded = *, custom overrides' => [
             new TestScenario(
                 obj: new Product1(),
                 formOptions: [
@@ -237,6 +246,70 @@ final class DataProviderDto
                             'rows' => 4,
                         ],
                         'property_path' => 'description',
+                    ],
+                ],
+            ),
+        ];
+
+        yield 'Dto - Product1 with children_excluded & child_excluded' => [
+            new TestScenario(
+                obj: new Product1(),
+                formOptions: [
+                    'children_excluded' => ['tags', 'mediaMain', 'mediaColl', 'status', 'statusList', 'validityStartAt', 'validityEndAt'],
+                    'children' => [
+                        'code' => [
+                            'child_excluded' => true,
+                        ],
+                        'description' => [
+                            'child_excluded' => true,
+                        ],
+                    ],
+                ],
+                expectedForm: [
+                    'title' => [
+                        'expected_type' => CoreType\TextType::class,
+                    ],
+                ],
+            ),
+        ];
+
+        yield 'Dto - Product1 with children_groups' => [
+            new TestScenario(
+                obj: new Product1(),
+                formOptions: [
+                    'children_groups' => ['grp1'],
+                ],
+                expectedForm: [
+                ],
+            ),
+        ];
+
+        yield 'Dto - Product1 with children_groups & child_groups' => [
+            new TestScenario(
+                obj: new Product1(),
+                formOptions: [
+                    'children_groups' => ['grp1', 'grp2'],
+                    'children' => [
+                        'title' => [
+                            'child_groups' => ['grp1'],
+                        ],
+                        'code' => [
+                            'child_groups' => ['grp2'],
+                        ],
+                        'description' => [
+                            'child_groups' => ['grp1', 'grp2'],
+                        ],
+                    ],
+                ],
+                expectedForm: [
+                    'title' => [
+                        'expected_type' => CoreType\TextType::class,
+                    ],
+                    'code' => [
+                        'expected_type' => CoreType\IntegerType::class,
+                    ],
+                    'desc' => [
+                        'expected_type' => CoreType\TextareaType::class,
                     ],
                 ],
             ),

@@ -1,5 +1,4 @@
 parameters:
-    editorUrl: 'vscode://file/%%file%%:%%line%%'
     level: 10
     paths:
         - src
@@ -9,10 +8,13 @@ parameters:
         - tests/Fixtures/*
 
     # Stricter setup
-    checkMissingCallableSignature: true
     checkTooWideReturnTypesInProtectedAndPublicMethods: true
-    #checkUninitializedProperties: true
-    checkBenevolentUnionTypes: true
+    checkUninitializedProperties: true
     rememberPossiblyImpureFunctionValues: false
+    checkBenevolentUnionTypes: true
     #reportPossiblyNonexistentGeneralArrayOffset: true
     reportPossiblyNonexistentConstantArrayOffset: true
+    reportAlwaysTrueInLastCondition: true
+    reportAnyTypeWideningInVarTag: true
+    checkMissingOverrideMethodAttribute: true
+    checkMissingCallableSignature: true

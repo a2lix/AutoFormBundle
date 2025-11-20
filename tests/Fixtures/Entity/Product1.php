@@ -38,25 +38,21 @@ class Product1
     #[ORM\Column]
     public int $code;
 
+    /** @var list<string> */
     #[ORM\Column]
-    // @phpstan-ignore missingType.iterableValue
     public array $tags = [];
 
     #[ORM\ManyToOne(targetEntity: Media1::class)]
     public ?Media1 $mediaMain = null;
 
-    /**
-     * @var Collection<int, Media1>
-     */
+    /** @var Collection<int, Media1> */
     #[ORM\OneToMany(targetEntity: Media1::class, mappedBy: 'product', cascade: ['all'], orphanRemoval: true)]
     public Collection $mediaColl;
 
     #[ORM\Column(enumType: ProductStatus::class)]
     public ProductStatus $status;
 
-    /**
-     * @var list<ProductStatus>
-     */
+    /** @var list<ProductStatus> */
     #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ProductStatus::class)]
     public array $statusList;
 
