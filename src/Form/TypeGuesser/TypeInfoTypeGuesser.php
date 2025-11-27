@@ -37,6 +37,7 @@ final readonly class TypeInfoTypeGuesser implements FormTypeGuesserInterface
 
         // FormTypes handling 'multiple' option
         if ($typeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
+            dump($typeInfo);
             /** @var TypeInfo\CollectionType $typeInfo */
             // @phpstan-ignore missingType.generics
             $collValueType = $typeInfo->getCollectionValueType();

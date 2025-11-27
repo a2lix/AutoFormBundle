@@ -13,6 +13,7 @@ namespace A2lix\AutoFormBundle\Form\Builder;
 
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -26,6 +27,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *    child_name?: string,
  *    child_excluded?: bool,
  *    child_embedded?: bool,
+ *    child_translated?: bool,
  *    child_groups?: list<string>,
  *    ...
  * }
@@ -35,6 +37,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *    children: array<string, ChildOptions|ChildBuilderCallable>,
  *    children_excluded: list<string>|"*",
  *    children_embedded: list<string>|"*",
+ *    children_translated: bool,
  *    children_groups: list<string>|null,
  *    builder: FormBuilderCallable|null,
  * }
@@ -52,6 +55,7 @@ final readonly class AutoTypeBuilder
     public function buildChildren(FormBuilderInterface $builder, array $formOptions): void
     {
         $dataClass = $this->getDataClass($form = $builder->getForm());
+        dump($dataClass);
 
         if (null === $classProperties = $this->propertyInfoExtractor->getProperties($dataClass)) {
             throw new \RuntimeException(\sprintf('Unable to extract properties of "%s".', $dataClass));
@@ -61,7 +65,7 @@ final readonly class AutoTypeBuilder
         $allChildrenExcluded = '*' === $formOptions['children_excluded'];
         $allChildrenEmbedded = '*' === $formOptions['children_embedded'];
         $childrenGroups = $formOptions['children_groups'] ?? ['Default'];
-        $formLevel = $this->getFormLevel($form);
+        $formDepth = $this->getFormDepth($form);
 
         /** @var list<string> $classProperties */
         foreach ($classProperties as $classProperty) {
@@ -116,12 +120,17 @@ final readonly class AutoTypeBuilder
             // PropertyInfo? Enrich childOptions
             if (null !== $propTypeInfo = $this->propertyInfoExtractor->getType($dataClass, $classProperty)) {
                 // @phpstan-ignore argument.type
+                $formChildTranslated = ($formOptions['children_translated'] || ($childOptions['child_translated'] ?? false))
+                    && ('translations' === $classProperty);
+                // @phpstan-ignore argument.type
                 $formChildEmbedded = $allChildrenEmbedded || \in_array($classProperty, $formOptions['children_embedded'], true)
                     || ($childOptions['child_embedded'] ?? false);
 
-                if ($formChildEmbedded) {
-                    $childOptions = $this->updateChildOptions($childOptions, $propTypeInfo, $formLevel);
-                }
+                $childOptions = match (true) {
+                    $formChildTranslated => $this->updateTranslatedChildOptions($childOptions, $propTypeInfo, $refProperty),
+                    $formChildEmbedded => $this->updateEmbeddedChildOptions($childOptions, $propTypeInfo, $refProperty, $formDepth),
+                    default => $childOptions,
+                };
             }
 
             $this->addChild($builder, $classProperty, $childOptions);
@@ -171,6 +180,7 @@ final readonly class AutoTypeBuilder
             $options['child_type'],
             $options['child_excluded'],
             $options['child_embedded'],
+            $options['child_translated'],
             $options['child_groups'],
         );
 
@@ -193,14 +203,41 @@ final readonly class AutoTypeBuilder
 
         throw new \RuntimeException('Unable to get dataClass');
     }
+    /**
+     * @param ChildOptions $baseChildOptions
+     *
+     * @return ChildOptions
+     */
+    private function updateTranslatedChildOptions(
+        array $baseChildOptions,
+        TypeInfo $propTypeInfo,
+        \ReflectionProperty $refProperty,
+    ): array {
+        if (!$propTypeInfo instanceof TypeInfo\CollectionType) {
+            return [];
+        }
+
+        dump($refProperty);
+
+        return [
+            'child_type' => 'A2lix\TranslationFormBundle\Form\Type\TranslationsType',
+            'translation_class' => $propTypeInfo->getCollectionValueType()->getClassName(),
+            'required' => $propTypeInfo->isNullable(),
+            ...$baseChildOptions,
+        ];
+    }
 
     /**
      * @param ChildOptions $baseChildOptions
      *
      * @return ChildOptions
      */
-    private function updateChildOptions(array $baseChildOptions, TypeInfo $propTypeInfo, int $formLevel): array
-    {
+    private function updateEmbeddedChildOptions(
+        array $baseChildOptions,
+        TypeInfo $propTypeInfo,
+        \ReflectionProperty $refProperty,
+        int $formDepth
+    ): array {
         // TypeInfo matching native FormType? Abort, guessers are enough
         if (self::isTypeInfoWithMatchingNativeFormType($propTypeInfo)) {
             return $baseChildOptions;
@@ -214,7 +251,7 @@ final readonly class AutoTypeBuilder
                 'allow_delete' => true,
                 'delete_empty' => true,
                 'by_reference' => false,
-                'prototype_name' => '__name'.$formLevel.'__',
+                'prototype_name' => '__name'.$formDepth.'__',
                 ...$baseChildOptions,
             ];
 
@@ -279,18 +316,18 @@ final readonly class AutoTypeBuilder
     /**
      * @param FormInterface<mixed> $form
      */
-    private function getFormLevel(FormInterface $form): int
+    private function getFormDepth(FormInterface $form): int
     {
         if ($form->isRoot()) {
             return 0;
         }
 
-        $level = 0;
+        $depth = 0;
         while (null !== $formParent = $form->getParent()) {
             $form = $formParent;
-            ++$level;
+            ++$depth;
         }
 
-        return $level;
+        return $depth;
     }
 }

@@ -30,6 +30,7 @@ final readonly class AutoTypeCustom
         private ?string $name = null,
         private ?bool $excluded = null,
         private ?bool $embedded = null,
+        private ?bool $translated = null,
         private ?array $groups = null,
     ) {}
 
@@ -45,6 +46,7 @@ final readonly class AutoTypeCustom
             ...(null !== $this->name ? ['child_name' => $this->name] : []),
             ...(null !== $this->excluded ? ['child_excluded' => $this->excluded] : []),
             ...(null !== $this->embedded ? ['child_embedded' => $this->embedded] : []),
+            ...(null !== $this->embedded ? ['child_translated' => $this->translated] : []),
             ...(null !== $this->groups ? ['child_groups' => $this->groups] : []),
         ];
     }

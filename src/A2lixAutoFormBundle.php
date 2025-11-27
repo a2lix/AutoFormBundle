@@ -12,11 +12,12 @@
 namespace A2lix\AutoFormBundle;
 
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-final class A2lixAutoFormBundle extends AbstractBundle
+final class A2lixAutoFormBundle extends AbstractBundle implements CompilerPassInterface
 {
     #[\Override]
     public function configure(DefinitionConfigurator $definition): void
@@ -41,5 +42,19 @@ final class A2lixAutoFormBundle extends AbstractBundle
             ->get('a2lix_auto_form.form.type.auto_type')
             ->arg('$globalExcludedChildren', $config['children_excluded'])
         ;
+    }
+
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass($this);
+    }
+
+    public function process(ContainerBuilder $container): void
+    {
+        if ($container->hasExtension('a2lix_translation_form')) {
+            $container->getDefinition('a2lix_auto_form.form.type.auto_type')
+                ->setArgument('$globalTranslatedChildren', true)
+            ;
+        }
     }
 }
