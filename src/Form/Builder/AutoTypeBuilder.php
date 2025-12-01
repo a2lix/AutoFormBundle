@@ -27,7 +27,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *    child_name?: string,
  *    child_excluded?: bool,
  *    child_embedded?: bool,
- *    child_translated?: bool,
  *    child_groups?: list<string>,
  *    ...
  * }
@@ -37,9 +36,10 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *    children: array<string, ChildOptions|ChildBuilderCallable>,
  *    children_excluded: list<string>|"*",
  *    children_embedded: list<string>|"*",
- *    children_translated: bool,
  *    children_groups: list<string>|null,
  *    builder: FormBuilderCallable|null,
+ *    handle_translation_types: bool,
+ *    gedmo_only: bool,
  * }
  */
 final readonly class AutoTypeBuilder
@@ -55,7 +55,6 @@ final readonly class AutoTypeBuilder
     public function buildChildren(FormBuilderInterface $builder, array $formOptions): void
     {
         $dataClass = $this->getDataClass($form = $builder->getForm());
-        dump($dataClass);
 
         if (null === $classProperties = $this->propertyInfoExtractor->getProperties($dataClass)) {
             throw new \RuntimeException(\sprintf('Unable to extract properties of "%s".', $dataClass));
@@ -65,6 +64,8 @@ final readonly class AutoTypeBuilder
         $allChildrenExcluded = '*' === $formOptions['children_excluded'];
         $allChildrenEmbedded = '*' === $formOptions['children_embedded'];
         $childrenGroups = $formOptions['children_groups'] ?? ['Default'];
+        $handleTranslationTypes = $formOptions['handle_translation_types'];
+        $gedmoTranslatable = $handleTranslationTypes && (null !== ($refClass->getAttributes('Gedmo\Mapping\Annotation\TranslationEntity')[0] ?? null));
         $formDepth = $this->getFormDepth($form);
 
         /** @var list<string> $classProperties */
@@ -74,9 +75,22 @@ final readonly class AutoTypeBuilder
                 continue;
             }
 
-            $propFormOptions = $formOptions['children'][$classProperty] ?? null;
-
             $refProperty = $refClass->getProperty($classProperty);
+
+            // Gedmo Translatable property? Possible continue early
+            if ($gedmoTranslatable) {
+                $hasGedmoAttribute = null !== ($refProperty->getAttributes('Gedmo\Mapping\Annotation\Translatable')[0] ?? null);
+
+                if (
+                    ($formOptions['gedmo_only'] && !$hasGedmoAttribute)
+                    || (!$formOptions['gedmo_only'] && $hasGedmoAttribute)
+                ) {
+                    unset($formOptions['children'][$classProperty]);
+                    continue;
+                }
+            }
+
+            $propFormOptions = $formOptions['children'][$classProperty] ?? null;
             $propAttributeOptions = ($refProperty->getAttributes(AutoTypeCustom::class)[0] ?? null)
                 ?->newInstance()?->getOptions() ?? []
             ;
@@ -119,15 +133,13 @@ final readonly class AutoTypeBuilder
 
             // PropertyInfo? Enrich childOptions
             if (null !== $propTypeInfo = $this->propertyInfoExtractor->getType($dataClass, $classProperty)) {
-                // @phpstan-ignore argument.type
-                $formChildTranslated = ($formOptions['children_translated'] || ($childOptions['child_translated'] ?? false))
-                    && ('translations' === $classProperty);
+                $formChildTranslations = $handleTranslationTypes && ('translations' === $classProperty);
                 // @phpstan-ignore argument.type
                 $formChildEmbedded = $allChildrenEmbedded || \in_array($classProperty, $formOptions['children_embedded'], true)
                     || ($childOptions['child_embedded'] ?? false);
 
                 $childOptions = match (true) {
-                    $formChildTranslated => $this->updateTranslatedChildOptions($childOptions, $propTypeInfo, $refProperty),
+                    $formChildTranslations => $this->updateTranslationsChildOptions($childOptions, $dataClass, $gedmoTranslatable),
                     $formChildEmbedded => $this->updateEmbeddedChildOptions($childOptions, $propTypeInfo, $refProperty, $formDepth),
                     default => $childOptions,
                 };
@@ -135,6 +147,10 @@ final readonly class AutoTypeBuilder
 
             $this->addChild($builder, $classProperty, $childOptions);
             unset($formOptions['children'][$classProperty]);
+        }
+
+        if ($formOptions['gedmo_only']) {
+            return;
         }
 
         // Remaining FORM.children[PROP] unrelated to dataClass? E.g: mapped:false OR inherit_data:true
@@ -208,21 +224,15 @@ final readonly class AutoTypeBuilder
      *
      * @return ChildOptions
      */
-    private function updateTranslatedChildOptions(
+    private function updateTranslationsChildOptions(
         array $baseChildOptions,
-        TypeInfo $propTypeInfo,
-        \ReflectionProperty $refProperty,
+        string $translatableClass,
+        bool $gedmoTranslatable,
     ): array {
-        if (!$propTypeInfo instanceof TypeInfo\CollectionType) {
-            return [];
-        }
-
-        dump($refProperty);
-
         return [
             'child_type' => 'A2lix\TranslationFormBundle\Form\Type\TranslationsType',
-            'translation_class' => $propTypeInfo->getCollectionValueType()->getClassName(),
-            'required' => $propTypeInfo->isNullable(),
+            'translatable_class' => $translatableClass,
+            'gedmo' => $gedmoTranslatable,
             ...$baseChildOptions,
         ];
     }

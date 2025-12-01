@@ -32,7 +32,7 @@ final class AutoType extends AbstractType
         private readonly AutoTypeBuilder $autoTypeBuilder,
         private readonly array $globalExcludedChildren = [],
         private readonly array $globalEmbeddedChildren = [],
-        private readonly bool $globalTranslatedChildren = false,
+        private readonly bool $handleTranslationTypes = false,
     ) {}
 
     #[\Override]
@@ -49,9 +49,10 @@ final class AutoType extends AbstractType
             'children' => [],
             'children_excluded' => $this->globalExcludedChildren,
             'children_embedded' => $this->globalEmbeddedChildren,
-            'children_translated' => $this->globalTranslatedChildren,
             'children_groups' => null,
             'builder' => null,
+            'handle_translation_types' => $this->handleTranslationTypes,
+            'gedmo_only' => false,
         ]);
 
         $resolver->setAllowedTypes('children_excluded', 'string[]|string|callable');
@@ -74,11 +75,13 @@ final class AutoType extends AbstractType
             return $value;
         });
 
-        $resolver->setAllowedTypes('children_translated', 'bool');
         $resolver->setAllowedTypes('children_groups', 'string[]|null');
         $resolver->setAllowedTypes('builder', 'callable|null');
         $resolver->setInfo('builder', 'A callable (FormBuilderInterface $builder, string[] $classProperties): void');
 
+        // Translation options (translation_form_bundle required)
+        $resolver->setAllowedTypes('handle_translation_types', 'bool');
+        $resolver->setAllowedTypes('gedmo_only', 'bool');
         // Others defaults FormType:class options
         $resolver->setNormalizer('data_class', static function (Options $options, ?string $value): string {
             if (null === $value) {
