@@ -47,32 +47,38 @@ final class AutoType extends AbstractType
     {
         $resolver->setDefaults([
             'children' => [],
-            'children_excluded' => $this->globalExcludedChildren,
-            'children_embedded' => $this->globalEmbeddedChildren,
+            'children_excluded_' => $this->globalExcludedChildren,
+            'children_excluded' => null,
+            'children_embedded_' => $this->globalEmbeddedChildren,
+            'children_embedded' => null,
             'children_groups' => null,
             'builder' => null,
             'handle_translation_types' => $this->handleTranslationTypes,
             'gedmo_only' => false,
         ]);
 
-        $resolver->setAllowedTypes('children_excluded', 'string[]|string|callable');
+        $resolver->setAllowedTypes('children_excluded', 'string[]|string|callable|null');
         $resolver->setInfo('children_excluded', 'An array of properties, the * wildcard, or a callable (mixed $previousValue): mixed');
-        $resolver->addNormalizer('children_excluded', static function (Options $options, mixed $value): mixed {
+        $resolver->setNormalizer('children_excluded', static function (Options $options, mixed $value): mixed {
+            $defaultValue = $options['children_excluded_'];
+
             if (is_callable($value)) {
-                return ($value)($options['children_excluded']);
+                return $value($defaultValue);
             }
 
-            return $value;
+            return $value ?? $defaultValue;
         });
 
-        $resolver->setAllowedTypes('children_embedded', 'string[]|string|callable');
+        $resolver->setAllowedTypes('children_embedded', 'string[]|string|callable|null');
         $resolver->setInfo('children_embedded', 'An array of properties, the * wildcard, or a callable (mixed $previousValue): mixed');
-        $resolver->addNormalizer('children_embedded', static function (Options $options, mixed $value): mixed {
+        $resolver->setNormalizer('children_embedded', static function (Options $options, mixed $value): mixed {
+            $defaultValue = $options['children_embedded_'];
+
             if (is_callable($value)) {
-                return ($value)($options['children_embedded']);
+                return $value($defaultValue);
             }
 
-            return $value;
+            return $value ?? $defaultValue;
         });
 
         $resolver->setAllowedTypes('children_groups', 'string[]|null');

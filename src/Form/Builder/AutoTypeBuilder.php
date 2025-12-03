@@ -15,6 +15,7 @@ use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -81,10 +82,7 @@ final readonly class AutoTypeBuilder
             if ($gedmoTranslatable) {
                 $hasGedmoAttribute = null !== ($refProperty->getAttributes('Gedmo\Mapping\Annotation\Translatable')[0] ?? null);
 
-                if (
-                    ($formOptions['gedmo_only'] && !$hasGedmoAttribute)
-                    || (!$formOptions['gedmo_only'] && $hasGedmoAttribute)
-                ) {
+                if ($formOptions['gedmo_only'] xor $hasGedmoAttribute) {
                     unset($formOptions['children'][$classProperty]);
                     continue;
                 }
@@ -139,8 +137,8 @@ final readonly class AutoTypeBuilder
                     || ($childOptions['child_embedded'] ?? false);
 
                 $childOptions = match (true) {
-                    $formChildTranslations => $this->updateTranslationsChildOptions($childOptions, $dataClass, $gedmoTranslatable),
-                    $formChildEmbedded => $this->updateEmbeddedChildOptions($childOptions, $propTypeInfo, $refProperty, $formDepth),
+                    $formChildTranslations => $this->updateTranslationsChildOptions($dataClass, $gedmoTranslatable, $childOptions, $formOptions),
+                    $formChildEmbedded => $this->updateEmbeddedChildOptions($propTypeInfo, $childOptions, $formOptions, $formDepth, $refProperty),
                     default => $childOptions,
                 };
             }
@@ -196,7 +194,6 @@ final readonly class AutoTypeBuilder
             $options['child_type'],
             $options['child_excluded'],
             $options['child_embedded'],
-            $options['child_translated'],
             $options['child_groups'],
         );
 
@@ -225,14 +222,18 @@ final readonly class AutoTypeBuilder
      * @return ChildOptions
      */
     private function updateTranslationsChildOptions(
-        array $baseChildOptions,
         string $translatableClass,
         bool $gedmoTranslatable,
+        array $baseChildOptions,
+        array $formOptions,
     ): array {
         return [
             'child_type' => 'A2lix\TranslationFormBundle\Form\Type\TranslationsType',
             'translatable_class' => $translatableClass,
             'gedmo' => $gedmoTranslatable,
+            'children_excluded' => $baseChildOptions['child_excluded'] ?? $formOptions['children_embedded'],
+            'children_embedded' => $baseChildOptions['child_embedded'] ?? $formOptions['children_embedded'],
+            'children_groups' => $baseChildOptions['child_groups'] ?? $formOptions['children_groups'],
             ...$baseChildOptions,
         ];
     }
@@ -243,10 +244,11 @@ final readonly class AutoTypeBuilder
      * @return ChildOptions
      */
     private function updateEmbeddedChildOptions(
-        array $baseChildOptions,
         TypeInfo $propTypeInfo,
+        array $baseChildOptions,
+        array $formOptions,
+        int $formDepth,
         \ReflectionProperty $refProperty,
-        int $formDepth
     ): array {
         // TypeInfo matching native FormType? Abort, guessers are enough
         if (self::isTypeInfoWithMatchingNativeFormType($propTypeInfo)) {
@@ -274,6 +276,9 @@ final readonly class AutoTypeBuilder
                     ...$baseCollOptions,
                     'entry_options' => [
                         'data_class' => $collValueType->getClassName(),
+                        'children_excluded' => $baseChildOptions['child_excluded'] ?? $formOptions['children_embedded'],
+                        'children_embedded' => $baseChildOptions['child_embedded'] ?? $formOptions['children_embedded'],
+                        'children_groups' => $baseChildOptions['child_groups'] ?? $formOptions['children_groups'],
                         // @phpstan-ignore nullCoalesce.offset
                         ...($baseCollOptions['entry_options'] ?? []),
                     ],
@@ -292,6 +297,9 @@ final readonly class AutoTypeBuilder
             'child_type' => AutoType::class,
             'data_class' => $innerType->getClassName(),
             'required' => $propTypeInfo->isNullable(),
+            'children_excluded' => $baseChildOptions['child_excluded'] ?? $formOptions['children_embedded'],
+            'children_embedded' => $baseChildOptions['child_embedded'] ?? $formOptions['children_embedded'],
+            'children_groups' => $baseChildOptions['child_groups'] ?? $formOptions['children_groups'],
             ...$baseChildOptions,
         ];
     }
