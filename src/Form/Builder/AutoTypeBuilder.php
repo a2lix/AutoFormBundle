@@ -36,7 +36,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *    children: array<string, ChildOptions|ChildBuilderCallable>,
  *    children_excluded: list<string>|"*",
  *    children_embedded: list<string>|"*",
- *    children_groups: list<string>|null,
+ *    children_groups: list<string>,
  *    builder: FormBuilderCallable|null,
  *    handle_translation_types: bool,
  *    gedmo_only: bool,
@@ -135,6 +135,7 @@ final readonly class AutoTypeBuilder
                 $formChildEmbedded = $allChildrenEmbedded || \in_array($classProperty, $formOptions['children_embedded'], true)
                     || ($childOptions['child_embedded'] ?? false);
 
+                /** @var ChildOptions */
                 $childOptions = match (true) {
                     $formChildTranslations => $this->updateTranslationsChildOptions($dataClass, $gedmoTranslatable, $childOptions),
                     $formChildEmbedded => $this->updateEmbeddedChildOptions($propTypeInfo, $childOptions, $formDepth, $refProperty),
@@ -219,7 +220,7 @@ final readonly class AutoTypeBuilder
     /**
      * @param ChildOptions $baseChildOptions
      *
-     * @return ChildOptions
+     * @return array<string, mixed>
      */
     private function updateTranslationsChildOptions(
         string $translatableClass,
