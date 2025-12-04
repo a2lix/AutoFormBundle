@@ -60,7 +60,7 @@ final class AutoTypeTest extends TypeTestCase
             $childPath = $parentPath.'.'.$childName;
 
             if (null !== $expectedType = $expectedChildOptions['expected_type'] ?? null) {
-                self::assertSame($expectedType, $child->getConfig()->getType()->getInnerType()::class, \sprintf('Type of "%s"', $childPath));
+                self::assertSame($child->getConfig()->getType()->getInnerType()::class, $expectedType, \sprintf('Type of "%s"', $childPath));
             }
 
             if (null !== $expectedChildren = $expectedChildOptions['expected_children'] ?? null) {

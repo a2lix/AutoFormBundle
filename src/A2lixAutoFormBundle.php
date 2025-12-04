@@ -82,7 +82,7 @@ final class A2lixAutoFormBundle extends AbstractBundle implements CompilerPassIn
         ;
 
         $config = $container->getExtensionConfig($this->extensionAlias)[0];
-        $container->getDefinition('A2lix\TranslationFormBundle\Form\Type\TranslationsType')
+        $container->getDefinition('a2lix_translation_form.form.type.translations_type')
             ->setArguments([
                 '$globalExcludedChildren' => $config['children_excluded'] ?? [],
                 '$globalEmbeddedChildren' => $config['children_embedded'] ?? [],

@@ -40,6 +40,7 @@ final readonly class TypeInfoTypeGuesser implements FormTypeGuesserInterface
             if (!$typeInfo instanceof TypeInfo\CollectionType) {
                 throw new \RuntimeException(\sprintf('Unprecise PhpDoc array detected for "%s:%s". Fix it. For example: "@param list<Obj> $%s"', $class, $property, $property));
             }
+
             $collValueType = $typeInfo->getCollectionValueType();
 
             /** @var TypeInfo\ObjectType<mixed> $collValueType */

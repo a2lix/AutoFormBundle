@@ -38,7 +38,6 @@ final readonly class AutoTypeCustom
      */
     public function getOptions(): array
     {
-        /** @var ChildOptions */
         return [
             ...$this->options,
             ...(null !== $this->type ? ['child_type' => $this->type] : []),
