@@ -60,7 +60,7 @@ final class AutoType extends AbstractType
         $resolver->setAllowedTypes('children_excluded', 'string[]|string|callable|null');
         $resolver->setInfo('children_excluded', 'An array of properties, the * wildcard, or a callable (mixed $previousValue): mixed');
         $resolver->setNormalizer('children_excluded', static function (Options $options, mixed $value): mixed {
-            if (is_callable($value)) {
+            if (\is_callable($value)) {
                 return $value($options['children_excluded_']);
             }
 
@@ -70,7 +70,7 @@ final class AutoType extends AbstractType
         $resolver->setAllowedTypes('children_embedded', 'string[]|string|callable|null');
         $resolver->setInfo('children_embedded', 'An array of properties, the * wildcard, or a callable (mixed $previousValue): mixed');
         $resolver->setNormalizer('children_embedded', static function (Options $options, mixed $value): mixed {
-            if (is_callable($value)) {
+            if (\is_callable($value)) {
                 return $value($options['children_embedded_']);
             }
 

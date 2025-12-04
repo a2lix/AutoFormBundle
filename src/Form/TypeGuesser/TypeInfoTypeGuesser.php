@@ -38,12 +38,7 @@ final readonly class TypeInfoTypeGuesser implements FormTypeGuesserInterface
         // FormTypes handling 'multiple' option
         if ($typeInfo->isIdentifiedBy(TypeIdentifier::ARRAY)) {
             if (!$typeInfo instanceof TypeInfo\CollectionType) {
-                throw new \RuntimeException(sprintf(
-                    'Unprecise PhpDoc array detected for "%s:%s". Fix it. For example: "@param list<Obj> $%s"',
-                    $class,
-                    $property,
-                    $property,
-                ));
+                throw new \RuntimeException(\sprintf('Unprecise PhpDoc array detected for "%s:%s". Fix it. For example: "@param list<Obj> $%s"', $class, $property, $property));
             }
             $collValueType = $typeInfo->getCollectionValueType();
 

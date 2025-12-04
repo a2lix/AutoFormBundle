@@ -13,10 +13,8 @@ namespace A2lix\AutoFormBundle\Form\Builder;
 
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -217,6 +215,7 @@ final readonly class AutoTypeBuilder
 
         throw new \RuntimeException('Unable to get dataClass');
     }
+
     /**
      * @param ChildOptions $baseChildOptions
      *
@@ -287,12 +286,7 @@ final readonly class AutoTypeBuilder
         $innerType = $propTypeInfo instanceof TypeInfo\NullableType ? $propTypeInfo->getWrappedType() : $propTypeInfo;
 
         if (Collection::class === $innerType->getClassName()) {
-            throw new \RuntimeException(sprintf(
-                'Unprecise PhpDoc Collection detected for "%s:%s". Fix it. For example: "@param Collection<int, Obj> $%s"',
-                $refProperty->class,
-                $refProperty->name,
-                $refProperty->name,
-            ));
+            throw new \RuntimeException(\sprintf('Unprecise PhpDoc Collection detected for "%s:%s". Fix it. For example: "@param Collection<int, Obj> $%s"', $refProperty->class, $refProperty->name, $refProperty->name));
         }
 
         return [
