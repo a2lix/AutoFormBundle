@@ -21,7 +21,7 @@ class Media1
     #[ORM\Id]
     #[ORM\Column]
     #[ORM\GeneratedValue]
-    public ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\Column]
     #[AutoTypeCustom(excluded: true)]

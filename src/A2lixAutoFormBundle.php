@@ -44,6 +44,28 @@ final class A2lixAutoFormBundle extends AbstractBundle implements CompilerPassIn
         ;
     }
 
+    public function prependExtension(ContainerConfigurator $configurator, ContainerBuilder $container): void
+    {
+        if (!$container->hasExtension('a2lix_translation_form')) {
+            return;
+        }
+
+        $config = $container->getExtensionConfig($this->extensionAlias)[0];
+
+        if (null === ($config['children_excluded'] ?? null)) {
+            $container->prependExtensionConfig($this->extensionAlias, [
+                'children_excluded' => [
+                    'id',
+                    'newTranslations',
+                    'translatable',
+                    'locale',
+                    'currentLocale',
+                    'defaultLocale',
+                ],
+            ]);
+        }
+    }
+
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass($this);
@@ -51,10 +73,20 @@ final class A2lixAutoFormBundle extends AbstractBundle implements CompilerPassIn
 
     public function process(ContainerBuilder $container): void
     {
-        if ($container->hasExtension('a2lix_translation_form')) {
-            $container->getDefinition('a2lix_auto_form.form.type.auto_type')
-                ->setArgument('$handleTranslationTypes', true)
-            ;
+        if (!$container->hasExtension('a2lix_translation_form')) {
+            return;
         }
+
+        $container->getDefinition('a2lix_auto_form.form.type.auto_type')
+            ->setArgument('$handleTranslationTypes', true)
+        ;
+
+        $config = $container->getExtensionConfig($this->extensionAlias)[0];
+        $container->getDefinition('A2lix\TranslationFormBundle\Form\Type\TranslationsType')
+            ->setArguments([
+                '$globalExcludedChildren' => $config['children_excluded'] ?? [],
+                '$globalEmbeddedChildren' => $config['children_embedded'] ?? [],
+            ])
+        ;
     }
 }

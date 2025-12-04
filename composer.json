@@ -17,12 +17,12 @@
     ],
     "require": {
         "php": ">=8.4",
-        "symfony/config": "^7.3|^7.4|^8.0",
-        "symfony/dependency-injection": "^7.3|^7.4|^8.0",
-        "symfony/form": "^7.3|^7.4|^8.0",
-        "symfony/http-kernel": "^7.3|^7.4|^8.0",
-        "symfony/property-info": "^7.3|^7.4|^8.0",
-        "symfony/type-info": "^7.3.4|^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/form": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/property-info": "^7.4|^8.0",
+        "symfony/type-info": "^7.4|^8.0",
         "phpdocumentor/reflection-docblock": "^5.6"
     },
     "require-dev": {
@@ -36,10 +36,10 @@
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^12.3",
         "rector/rector": "^2.1",
-        "symfony/cache": "^7.3",
-        "symfony/doctrine-bridge": "^7.3",
-        "symfony/validator": "^7.3",
-        "symfony/var-dumper": "^7.3"
+        "symfony/cache": "^7.4",
+        "symfony/doctrine-bridge": "^7.4",
+        "symfony/validator": "^7.4",
+        "symfony/var-dumper": "^7.4"
     },
     "suggest": {
         "a2lix/translation-form-bundle": "For translation form"

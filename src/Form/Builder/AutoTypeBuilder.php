@@ -14,6 +14,7 @@ namespace A2lix\AutoFormBundle\Form\Builder;
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -64,7 +65,7 @@ final readonly class AutoTypeBuilder
         $refClass = new \ReflectionClass($dataClass);
         $allChildrenExcluded = '*' === $formOptions['children_excluded'];
         $allChildrenEmbedded = '*' === $formOptions['children_embedded'];
-        $childrenGroups = $formOptions['children_groups'] ?? ['Default'];
+        $childrenGroups = $formOptions['children_groups'];
         $handleTranslationTypes = $formOptions['handle_translation_types'];
         $gedmoTranslatable = $handleTranslationTypes && (null !== ($refClass->getAttributes('Gedmo\Mapping\Annotation\TranslationEntity')[0] ?? null));
         $formDepth = $this->getFormDepth($form);
@@ -137,8 +138,8 @@ final readonly class AutoTypeBuilder
                     || ($childOptions['child_embedded'] ?? false);
 
                 $childOptions = match (true) {
-                    $formChildTranslations => $this->updateTranslationsChildOptions($dataClass, $gedmoTranslatable, $childOptions, $formOptions),
-                    $formChildEmbedded => $this->updateEmbeddedChildOptions($propTypeInfo, $childOptions, $formOptions, $formDepth, $refProperty),
+                    $formChildTranslations => $this->updateTranslationsChildOptions($dataClass, $gedmoTranslatable, $childOptions),
+                    $formChildEmbedded => $this->updateEmbeddedChildOptions($propTypeInfo, $childOptions, $formDepth, $refProperty),
                     default => $childOptions,
                 };
             }
@@ -225,15 +226,11 @@ final readonly class AutoTypeBuilder
         string $translatableClass,
         bool $gedmoTranslatable,
         array $baseChildOptions,
-        array $formOptions,
     ): array {
         return [
             'child_type' => 'A2lix\TranslationFormBundle\Form\Type\TranslationsType',
             'translatable_class' => $translatableClass,
             'gedmo' => $gedmoTranslatable,
-            'children_excluded' => $baseChildOptions['child_excluded'] ?? $formOptions['children_embedded'],
-            'children_embedded' => $baseChildOptions['child_embedded'] ?? $formOptions['children_embedded'],
-            'children_groups' => $baseChildOptions['child_groups'] ?? $formOptions['children_groups'],
             ...$baseChildOptions,
         ];
     }
@@ -246,7 +243,6 @@ final readonly class AutoTypeBuilder
     private function updateEmbeddedChildOptions(
         TypeInfo $propTypeInfo,
         array $baseChildOptions,
-        array $formOptions,
         int $formDepth,
         \ReflectionProperty $refProperty,
     ): array {
@@ -276,9 +272,6 @@ final readonly class AutoTypeBuilder
                     ...$baseCollOptions,
                     'entry_options' => [
                         'data_class' => $collValueType->getClassName(),
-                        'children_excluded' => $baseChildOptions['child_excluded'] ?? $formOptions['children_embedded'],
-                        'children_embedded' => $baseChildOptions['child_embedded'] ?? $formOptions['children_embedded'],
-                        'children_groups' => $baseChildOptions['child_groups'] ?? $formOptions['children_groups'],
                         // @phpstan-ignore nullCoalesce.offset
                         ...($baseCollOptions['entry_options'] ?? []),
                     ],
@@ -293,13 +286,19 @@ final readonly class AutoTypeBuilder
         /** @var TypeInfo\ObjectType<mixed> */
         $innerType = $propTypeInfo instanceof TypeInfo\NullableType ? $propTypeInfo->getWrappedType() : $propTypeInfo;
 
+        if (Collection::class === $innerType->getClassName()) {
+            throw new \RuntimeException(sprintf(
+                'Unprecise PhpDoc Collection detected for "%s:%s". Fix it. For example: "@param Collection<int, Obj> $%s"',
+                $refProperty->class,
+                $refProperty->name,
+                $refProperty->name,
+            ));
+        }
+
         return [
             'child_type' => AutoType::class,
             'data_class' => $innerType->getClassName(),
             'required' => $propTypeInfo->isNullable(),
-            'children_excluded' => $baseChildOptions['child_excluded'] ?? $formOptions['children_embedded'],
-            'children_embedded' => $baseChildOptions['child_embedded'] ?? $formOptions['children_embedded'],
-            'children_groups' => $baseChildOptions['child_groups'] ?? $formOptions['children_groups'],
             ...$baseChildOptions,
         ];
     }

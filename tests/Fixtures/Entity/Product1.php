@@ -26,7 +26,7 @@ class Product1
     #[ORM\Column]
     #[ORM\GeneratedValue]
     #[AutoTypeCustom(excluded: true)]
-    public ?int $id = null;
+    public private(set) ?int $id = null;
 
     #[ORM\Column]
     public string $title;

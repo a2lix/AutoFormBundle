@@ -51,7 +51,7 @@ final class AutoType extends AbstractType
             'children_excluded' => null,
             'children_embedded_' => $this->globalEmbeddedChildren,
             'children_embedded' => null,
-            'children_groups' => null,
+            'children_groups' => ['Default'],
             'builder' => null,
             'handle_translation_types' => $this->handleTranslationTypes,
             'gedmo_only' => false,
@@ -60,25 +60,21 @@ final class AutoType extends AbstractType
         $resolver->setAllowedTypes('children_excluded', 'string[]|string|callable|null');
         $resolver->setInfo('children_excluded', 'An array of properties, the * wildcard, or a callable (mixed $previousValue): mixed');
         $resolver->setNormalizer('children_excluded', static function (Options $options, mixed $value): mixed {
-            $defaultValue = $options['children_excluded_'];
-
             if (is_callable($value)) {
-                return $value($defaultValue);
+                return $value($options['children_excluded_']);
             }
 
-            return $value ?? $defaultValue;
+            return $value ?? $options['children_excluded_'];
         });
 
         $resolver->setAllowedTypes('children_embedded', 'string[]|string|callable|null');
         $resolver->setInfo('children_embedded', 'An array of properties, the * wildcard, or a callable (mixed $previousValue): mixed');
         $resolver->setNormalizer('children_embedded', static function (Options $options, mixed $value): mixed {
-            $defaultValue = $options['children_embedded_'];
-
             if (is_callable($value)) {
-                return $value($defaultValue);
+                return $value($options['children_embedded_']);
             }
 
-            return $value ?? $defaultValue;
+            return $value ?? $options['children_embedded_'];
         });
 
         $resolver->setAllowedTypes('children_groups', 'string[]|null');
