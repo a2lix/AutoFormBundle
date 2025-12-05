@@ -34,16 +34,6 @@ final class A2lixAutoFormBundle extends AbstractBundle implements CompilerPassIn
     }
 
     #[\Override]
-    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
-    {
-        $container->import('../config/services.php');
-
-        $container->services()
-            ->get('a2lix_auto_form.form.type.auto_type')
-            ->arg('$globalExcludedChildren', $config['children_excluded'])
-        ;
-    }
-
     public function prependExtension(ContainerConfigurator $configurator, ContainerBuilder $container): void
     {
         if (!$container->hasExtension('a2lix_translation_form')) {
@@ -66,11 +56,24 @@ final class A2lixAutoFormBundle extends AbstractBundle implements CompilerPassIn
         }
     }
 
+    #[\Override]
+    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+    {
+        $container->import('../config/services.php');
+
+        $container->services()
+            ->get('a2lix_auto_form.form.type.auto_type')
+            ->arg('$globalExcludedChildren', $config['children_excluded'])
+        ;
+    }
+
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass($this);
     }
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasExtension('a2lix_translation_form')) {

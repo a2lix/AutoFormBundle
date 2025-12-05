@@ -217,6 +217,12 @@ a2lix_auto_form:
     children_excluded: [id, createdAt]
 ```
 
+## Translations
+
+If you need to manage form translations, please see the [A2lix TranslationFormBundle](https://github.com/a2lix/TranslationFormBundle), which is designed to work with this bundle.
+
+A complete demonstration is also available at [a2lix/demo](https://github.com/a2lix/Demo).
+
 ## License
 
 This package is available under the [MIT license](LICENSE).
