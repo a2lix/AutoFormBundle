@@ -13,6 +13,7 @@ namespace A2lix\AutoFormBundle\Form\Builder;
 
 use A2lix\AutoFormBundle\Form\Attribute\AutoTypeCustom;
 use A2lix\AutoFormBundle\Form\Type\AutoType;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -35,8 +36,10 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *    children: array<string, ChildOptions|ChildBuilderCallable>,
  *    children_excluded: list<string>|"*",
  *    children_embedded: list<string>|"*",
- *    children_groups: list<string>|null,
+ *    children_groups: list<string>,
  *    builder: FormBuilderCallable|null,
+ *    handle_translation_types: bool,
+ *    gedmo_only: bool,
  * }
  */
 final readonly class AutoTypeBuilder
@@ -60,8 +63,10 @@ final readonly class AutoTypeBuilder
         $refClass = new \ReflectionClass($dataClass);
         $allChildrenExcluded = '*' === $formOptions['children_excluded'];
         $allChildrenEmbedded = '*' === $formOptions['children_embedded'];
-        $childrenGroups = $formOptions['children_groups'] ?? ['Default'];
-        $formLevel = $this->getFormLevel($form);
+        $childrenGroups = $formOptions['children_groups'];
+        $handleTranslationTypes = $formOptions['handle_translation_types'];
+        $gedmoTranslatable = $handleTranslationTypes && (null !== ($refClass->getAttributes('Gedmo\Mapping\Annotation\TranslationEntity')[0] ?? null));
+        $formDepth = $this->getFormDepth($form);
 
         /** @var list<string> $classProperties */
         foreach ($classProperties as $classProperty) {
@@ -70,9 +75,19 @@ final readonly class AutoTypeBuilder
                 continue;
             }
 
-            $propFormOptions = $formOptions['children'][$classProperty] ?? null;
-
             $refProperty = $refClass->getProperty($classProperty);
+
+            // Gedmo Translatable property? Possible continue early
+            if ($gedmoTranslatable) {
+                $hasGedmoAttribute = null !== ($refProperty->getAttributes('Gedmo\Mapping\Annotation\Translatable')[0] ?? null);
+
+                if ($formOptions['gedmo_only'] xor $hasGedmoAttribute) {
+                    unset($formOptions['children'][$classProperty]);
+                    continue;
+                }
+            }
+
+            $propFormOptions = $formOptions['children'][$classProperty] ?? null;
             $propAttributeOptions = ($refProperty->getAttributes(AutoTypeCustom::class)[0] ?? null)
                 ?->newInstance()?->getOptions() ?? []
             ;
@@ -115,17 +130,25 @@ final readonly class AutoTypeBuilder
 
             // PropertyInfo? Enrich childOptions
             if (null !== $propTypeInfo = $this->propertyInfoExtractor->getType($dataClass, $classProperty)) {
+                $formChildTranslations = $handleTranslationTypes && ('translations' === $classProperty);
                 // @phpstan-ignore argument.type
                 $formChildEmbedded = $allChildrenEmbedded || \in_array($classProperty, $formOptions['children_embedded'], true)
                     || ($childOptions['child_embedded'] ?? false);
 
-                if ($formChildEmbedded) {
-                    $childOptions = $this->updateChildOptions($childOptions, $propTypeInfo, $formLevel);
-                }
+                /** @var ChildOptions */
+                $childOptions = match (true) {
+                    $formChildTranslations => $this->updateTranslationsChildOptions($dataClass, $gedmoTranslatable, $childOptions),
+                    $formChildEmbedded => $this->updateEmbeddedChildOptions($propTypeInfo, $childOptions, $formDepth, $refProperty),
+                    default => $childOptions,
+                };
             }
 
             $this->addChild($builder, $classProperty, $childOptions);
             unset($formOptions['children'][$classProperty]);
+        }
+
+        if ($formOptions['gedmo_only']) {
+            return;
         }
 
         // Remaining FORM.children[PROP] unrelated to dataClass? E.g: mapped:false OR inherit_data:true
@@ -197,10 +220,32 @@ final readonly class AutoTypeBuilder
     /**
      * @param ChildOptions $baseChildOptions
      *
+     * @return array<string, mixed>
+     */
+    private function updateTranslationsChildOptions(
+        string $translatableClass,
+        bool $gedmoTranslatable,
+        array $baseChildOptions,
+    ): array {
+        return [
+            'child_type' => 'A2lix\TranslationFormBundle\Form\Type\TranslationsType',
+            'translatable_class' => $translatableClass,
+            'gedmo' => $gedmoTranslatable,
+            ...$baseChildOptions,
+        ];
+    }
+
+    /**
+     * @param ChildOptions $baseChildOptions
+     *
      * @return ChildOptions
      */
-    private function updateChildOptions(array $baseChildOptions, TypeInfo $propTypeInfo, int $formLevel): array
-    {
+    private function updateEmbeddedChildOptions(
+        TypeInfo $propTypeInfo,
+        array $baseChildOptions,
+        int $formDepth,
+        \ReflectionProperty $refProperty,
+    ): array {
         // TypeInfo matching native FormType? Abort, guessers are enough
         if (self::isTypeInfoWithMatchingNativeFormType($propTypeInfo)) {
             return $baseChildOptions;
@@ -214,7 +259,7 @@ final readonly class AutoTypeBuilder
                 'allow_delete' => true,
                 'delete_empty' => true,
                 'by_reference' => false,
-                'prototype_name' => '__name'.$formLevel.'__',
+                'prototype_name' => '__name'.$formDepth.'__',
                 ...$baseChildOptions,
             ];
 
@@ -240,6 +285,10 @@ final readonly class AutoTypeBuilder
         // Embeddable object
         /** @var TypeInfo\ObjectType<mixed> */
         $innerType = $propTypeInfo instanceof TypeInfo\NullableType ? $propTypeInfo->getWrappedType() : $propTypeInfo;
+
+        if (Collection::class === $innerType->getClassName()) {
+            throw new \RuntimeException(\sprintf('Unprecise PhpDoc Collection detected for "%s:%s". Fix it. For example: "@param Collection<int, Obj> $%s"', $refProperty->class, $refProperty->name, $refProperty->name));
+        }
 
         return [
             'child_type' => AutoType::class,
@@ -279,18 +328,18 @@ final readonly class AutoTypeBuilder
     /**
      * @param FormInterface<mixed> $form
      */
-    private function getFormLevel(FormInterface $form): int
+    private function getFormDepth(FormInterface $form): int
     {
         if ($form->isRoot()) {
             return 0;
         }
 
-        $level = 0;
+        $depth = 0;
         while (null !== $formParent = $form->getParent()) {
             $form = $formParent;
-            ++$level;
+            ++$depth;
         }
 
-        return $level;
+        return $depth;
     }
 }

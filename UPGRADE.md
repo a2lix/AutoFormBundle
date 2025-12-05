@@ -5,8 +5,8 @@ The bundle is no longer tied to Doctrine and now uses Symfony's PropertyInfo com
 
 ## BC BREAK: Minimum Requirements
 
-- **PHP:** `8.2` or higher is required.
-- **Symfony:** `7.3` or higher is required.
+- **PHP:** `8.4` or higher is required.
+- **Symfony:** `7.4` or higher is required.
 
 ## BC BREAK: Composer Dependencies
 

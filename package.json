@@ -1,0 +1,9 @@
+{
+    "name": "@a2lix/auto-form-bundle",
+    "version": "1.0.0",
+    "symfony": {
+        "importmap": {
+            "@a2lix/symfony-collection": "^0.6"
+        }
+    }
+}

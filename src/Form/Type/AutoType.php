@@ -26,10 +26,13 @@ final class AutoType extends AbstractType
 {
     /**
      * @param list<string> $globalExcludedChildren
+     * @param list<string> $globalEmbeddedChildren
      */
     public function __construct(
         private readonly AutoTypeBuilder $autoTypeBuilder,
         private readonly array $globalExcludedChildren = [],
+        private readonly array $globalEmbeddedChildren = [],
+        private readonly bool $handleTranslationTypes = false,
     ) {}
 
     #[\Override]
@@ -44,18 +47,44 @@ final class AutoType extends AbstractType
     {
         $resolver->setDefaults([
             'children' => [],
-            'children_excluded' => $this->globalExcludedChildren,
-            'children_embedded' => [],
-            'children_groups' => null,
+            'children_excluded_' => $this->globalExcludedChildren,
+            'children_excluded' => null,
+            'children_embedded_' => $this->globalEmbeddedChildren,
+            'children_embedded' => null,
+            'children_groups' => ['Default'],
             'builder' => null,
+            'handle_translation_types' => $this->handleTranslationTypes,
+            'gedmo_only' => false,
         ]);
 
-        $resolver->setAllowedTypes('children_excluded', 'string[]|string');
-        $resolver->setAllowedTypes('children_embedded', 'string[]|string');
+        $resolver->setAllowedTypes('children_excluded', 'string[]|string|callable|null');
+        $resolver->setInfo('children_excluded', 'An array of properties, the * wildcard, or a callable (mixed $previousValue): mixed');
+        $resolver->setNormalizer('children_excluded', static function (Options $options, mixed $value): mixed {
+            if (\is_callable($value)) {
+                return $value($options['children_excluded_']);
+            }
+
+            return $value ?? $options['children_excluded_'];
+        });
+
+        $resolver->setAllowedTypes('children_embedded', 'string[]|string|callable|null');
+        $resolver->setInfo('children_embedded', 'An array of properties, the * wildcard, or a callable (mixed $previousValue): mixed');
+        $resolver->setNormalizer('children_embedded', static function (Options $options, mixed $value): mixed {
+            if (\is_callable($value)) {
+                return $value($options['children_embedded_']);
+            }
+
+            return $value ?? $options['children_embedded_'];
+        });
+
         $resolver->setAllowedTypes('children_groups', 'string[]|null');
         $resolver->setAllowedTypes('builder', 'callable|null');
-        $resolver->setInfo('builder', 'A callable that accepts two arguments (FormBuilderInterface $builder, string[] $classProperties). It should not return anything.');
+        $resolver->setInfo('builder', 'A callable (FormBuilderInterface $builder, string[] $classProperties): void');
 
+        // Translation options (translation_form_bundle required)
+        $resolver->setAllowedTypes('handle_translation_types', 'bool');
+        $resolver->setAllowedTypes('gedmo_only', 'bool');
+        // Others defaults FormType:class options
         $resolver->setNormalizer('data_class', static function (Options $options, ?string $value): string {
             if (null === $value) {
                 throw new \RuntimeException('Missing "data_class" option of "AutoType".');
@@ -63,7 +92,6 @@ final class AutoType extends AbstractType
 
             return $value;
         });
-
         $resolver->setDefault('validation_groups', static function (Options $options): ?array {
             /** @var list<string>|null */
             return $options['children_groups'];

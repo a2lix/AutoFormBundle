@@ -68,7 +68,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     private function getEntityManager(): EntityManagerInterface
     {
-        if (null !== $this->entityManager) {
+        if ($this->entityManager instanceof EntityManagerInterface) {
             return $this->entityManager;
         }
 
