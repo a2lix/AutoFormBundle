@@ -19,7 +19,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Component\Form\FormTypeGuesserChain;
@@ -61,7 +60,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
             ['id']
         );
 
-        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub = self::createStub(ManagerRegistry::class);
         $managerRegistryStub
             ->method('getManager')
             ->willReturn($this->getEntityManager())

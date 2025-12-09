@@ -33,7 +33,7 @@ use Symfony\Component\Form\FormInterface;
 #[CoversClass(AutoTypeBuilder::class)]
 #[CoversClass(AutoTypeCustom::class)]
 #[CoversClass(TypeInfoTypeGuesser::class)]
-#[AllowMockObjectsWithoutExpectations]  // https://github.com/symfony/symfony/issues/62669
+#[AllowMockObjectsWithoutExpectations] // https://github.com/symfony/symfony/issues/62669
 final class AutoTypeTest extends TypeTestCase
 {
     #[DataProviderExternal(DataProviderDto::class, 'provideScenarioCases')]
