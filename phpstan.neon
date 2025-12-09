@@ -5,7 +5,7 @@ parameters:
         - tests
     excludePaths:
         - src/A2lixAutoFormBundle.php
-        - tests/Fixtures/*
+        - tests/Fixtures
 
     # Stricter setup
     checkTooWideReturnTypesInProtectedAndPublicMethods: true

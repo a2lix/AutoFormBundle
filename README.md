@@ -9,6 +9,13 @@
 
 Stop writing boilerplate form code. This bundle provides a single, powerful `AutoType` form type that automatically generates a complete Symfony form from any PHP class.
 
+> [!NOTE]
+> If you need to manage form translations, please see the [A2lix TranslationFormBundle](https://github.com/a2lix/TranslationFormBundle), which is designed to work with this bundle.
+
+> [!TIP]
+> A complete demonstration is also available at [a2lix/demo](https://github.com/a2lix/Demo).
+
+
 ## Installation
 
 Use Composer to install the bundle:
@@ -29,7 +36,8 @@ class TaskController extends AbstractController
     public function new(Request $request): Response
     {
         $task = new Task(); // Any entity or DTO
-        $form = $this->createForm(AutoType::class, $task)
+        $form = $this
+            ->createForm(AutoType::class, $task)
             ->add('save', SubmitType::class)
             ->handleRequest($request)
         ;
@@ -67,7 +75,7 @@ class TaskController extends AbstractController
 
             // 2. Optional define which properties should be rendered as embedded forms.
             // Use '*' to embed all relational properties.
-            'children_embedded' => ['category', 'tags'],
+            'children_embedded' => static fn (mixed $current) => [...$current, 'category', 'tags'],
 
             // 3. Optional customize, override, or add fields.
             'children' => [
@@ -124,7 +132,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 class Product
 {
     #[AutoTypeCustom(excluded: true)]
-    public int $id;
+    public private(set) int $id;
 
     public ?string $name = null;
 
@@ -216,12 +224,6 @@ a2lix_auto_form:
     # Exclude 'id' and 'createdAt' properties from all AutoType forms by default
     children_excluded: [id, createdAt]
 ```
-
-## Translations
-
-If you need to manage form translations, please see the [A2lix TranslationFormBundle](https://github.com/a2lix/TranslationFormBundle), which is designed to work with this bundle.
-
-A complete demonstration is also available at [a2lix/demo](https://github.com/a2lix/Demo).
 
 ## License
 

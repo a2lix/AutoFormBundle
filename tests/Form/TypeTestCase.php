@@ -20,6 +20,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
+use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\PreloadedExtension;
@@ -60,15 +61,32 @@ abstract class TypeTestCase extends BaseTypeTestCase
             ['id']
         );
 
+        $managerRegistryStub = $this->createStub(ManagerRegistry::class);
+        $managerRegistryStub
+            ->method('getManager')
+            ->willReturn($this->getEntityManager())
+        ;
+        $managerRegistryStub
+            ->method('getManagers')
+            ->willReturn(['default' => $this->getEntityManager()])
+        ;
+
         return [
             ...parent::getExtensions(),
-            new PreloadedExtension([$autoType], [], $this->getFormTypeGuesserChain()),
+            new DoctrineOrmExtension($managerRegistryStub),
+            new PreloadedExtension(
+                [$autoType],
+                [],
+                new FormTypeGuesserChain([
+                    new TypeInfoTypeGuesser(TypeResolver::create()),
+                ]),
+            ),
         ];
     }
 
     private function getEntityManager(): EntityManagerInterface
     {
-        if ($this->entityManager instanceof EntityManagerInterface) {
+        if (null !== $this->entityManager) {
             return $this->entityManager;
         }
 
@@ -101,16 +119,5 @@ abstract class TypeTestCase extends BaseTypeTestCase
                 $reflectionExtractor,
             ]
         );
-    }
-
-    private function getFormTypeGuesserChain(): FormTypeGuesserChain
-    {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->method('getManagerForClass')->willReturn($this->getEntityManager());
-
-        return new FormTypeGuesserChain([
-            new DoctrineOrmTypeGuesser($managerRegistry),
-            new TypeInfoTypeGuesser(TypeResolver::create()),
-        ]);
     }
 }

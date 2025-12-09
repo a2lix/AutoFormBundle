@@ -15,6 +15,7 @@ use A2lix\AutoFormBundle\Form\Type\AutoType;
 use A2lix\AutoFormBundle\Tests\Fixtures\Entity\Media1;
 use A2lix\AutoFormBundle\Tests\Fixtures\Entity\Product1;
 use A2lix\AutoFormBundle\Tests\Fixtures\ProductStatus;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type as CoreType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -39,10 +40,10 @@ final class DataProviderEntity
                         'expected_type' => CoreType\TextType::class,
                     ],
                     'mediaMain' => [
-                        'expected_type' => CoreType\TextType::class,
+                        'expected_type' => EntityType::class,
                     ],
                     'mediaColl' => [
-                        'expected_type' => CoreType\TextType::class,
+                        'expected_type' => EntityType::class,
                     ],
                     'status' => [
                         'expected_type' => CoreType\EnumType::class,
@@ -166,7 +167,7 @@ final class DataProviderEntity
                         ],
                     ],
                     'mediaMain' => [
-                        'expected_type' => CoreType\TextType::class,
+                        'expected_type' => EntityType::class,
                     ],
                     'mediaColl' => [
                         'expected_type' => CoreType\CollectionType::class,
@@ -254,7 +255,7 @@ final class DataProviderEntity
             new TestScenario(
                 obj: new Product1(),
                 formOptions: [
-                    'children_excluded' => ['tags', 'mediaMain', 'mediaColl', 'status', 'statusList', 'validityStartAt', 'validityEndAt'],
+                    'children_excluded' => static fn (array $current) => [...$current, 'tags', 'mediaMain', 'mediaColl', 'status', 'statusList', 'validityStartAt', 'validityEndAt'],
                     'children' => [
                         'code' => [
                             'child_excluded' => true,

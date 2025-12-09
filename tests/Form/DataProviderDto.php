@@ -255,7 +255,7 @@ final class DataProviderDto
             new TestScenario(
                 obj: new Product1(),
                 formOptions: [
-                    'children_excluded' => ['tags', 'mediaMain', 'mediaColl', 'status', 'statusList', 'validityStartAt', 'validityEndAt'],
+                    'children_excluded' => static fn (mixed $current) => [...$current, 'tags', 'mediaMain', 'mediaColl', 'status', 'statusList', 'validityStartAt', 'validityEndAt'],
                     'children' => [
                         'code' => [
                             'child_excluded' => true,

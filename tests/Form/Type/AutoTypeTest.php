@@ -19,6 +19,7 @@ use A2lix\AutoFormBundle\Tests\Form\DataProviderDto;
 use A2lix\AutoFormBundle\Tests\Form\DataProviderEntity;
 use A2lix\AutoFormBundle\Tests\Form\TestScenario;
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Symfony\Component\Form\FormInterface;
@@ -32,6 +33,7 @@ use Symfony\Component\Form\FormInterface;
 #[CoversClass(AutoTypeBuilder::class)]
 #[CoversClass(AutoTypeCustom::class)]
 #[CoversClass(TypeInfoTypeGuesser::class)]
+#[AllowMockObjectsWithoutExpectations]  // https://github.com/symfony/symfony/issues/62669
 final class AutoTypeTest extends TypeTestCase
 {
     #[DataProviderExternal(DataProviderDto::class, 'provideScenarioCases')]
@@ -59,11 +61,11 @@ final class AutoTypeTest extends TypeTestCase
             $expectedChildOptions = $expectedForm[$childName];
             $childPath = $parentPath.'.'.$childName;
 
-            if (null !== $expectedType = $expectedChildOptions['expected_type'] ?? null) {
-                self::assertSame($child->getConfig()->getType()->getInnerType()::class, $expectedType, \sprintf('Type of "%s"', $childPath));
+            if (null !== $expectedType = ($expectedChildOptions['expected_type'] ?? null)) {
+                self::assertSame($expectedType, $child->getConfig()->getType()->getInnerType()::class, \sprintf('Type of "%s"', $childPath));
             }
 
-            if (null !== $expectedChildren = $expectedChildOptions['expected_children'] ?? null) {
+            if (null !== $expectedChildren = ($expectedChildOptions['expected_children'] ?? null)) {
                 // @phpstan-ignore argument.type
                 self::assertFormChildren($expectedChildren, $child->all(), $childPath);
             }
