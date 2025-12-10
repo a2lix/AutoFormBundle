@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -11,11 +9,10 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace A2lix\AutoFormBundle\Form\Manipulator;
+namespace A2lix\AutoFormBundle\Tests\Fixtures;
 
-use Symfony\Component\Form\FormInterface;
-
-interface FormManipulatorInterface
+enum ProductStatus: string
 {
-    public function getFieldsConfig(FormInterface $form): array;
+    case Available = 'available';
+    case Unavailable = 'unavailable';
 }

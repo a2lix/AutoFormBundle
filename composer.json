@@ -2,13 +2,13 @@
     "name": "a2lix/auto-form-bundle",
     "type": "symfony-bundle",
     "description": "Automate form building",
-    "keywords": ["symfony", "form", "field", "automate", "automation", "magic", "building"],
+    "keywords": ["symfony", "form", "field", "auto", "automate", "automation", "magic", "building"],
     "homepage": "https://github.com/a2lix/AutoFormBundle",
     "license": "MIT",
     "authors": [
         {
             "name": "David ALLIX",
-            "homepage": "http://a2lix.fr"
+            "homepage": "https://a2lix.fr"
         },
         {
             "name": "Contributors",
@@ -16,24 +16,30 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "doctrine/persistence": "^2.0|^3.0|^4.0",
-        "symfony/config": "^5.4.30|^6.3|^7.0",
-        "symfony/dependency-injection": "^5.4.30|^6.3|^7.0",
-        "symfony/doctrine-bridge": "^5.4.30|^6.3|^7.0",
-        "symfony/form": "^5.4.30|^6.3|^7.0",
-        "symfony/http-kernel": "^5.4.30|^6.3|^7.0"
+        "php": ">=8.4",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/form": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/property-info": "^7.4|^8.0",
+        "symfony/type-info": "^7.4|^8.0",
+        "phpdocumentor/reflection-docblock": "^5.6"
     },
     "require-dev": {
-        "doctrine/orm": "^2.15|^3.0",
-        "friendsofphp/php-cs-fixer": "^3.45",
-        "kubawerlos/php-cs-fixer-custom-fixers": "^3.18",
-        "phpstan/phpstan": "^1.10",
-        "rector/rector": "^0.18",
-        "symfony/cache": "^5.4.30|^6.3|^7.0",
-        "symfony/phpunit-bridge": "^5.4.30|^6.3|^7.0",
-        "symfony/validator": "^5.4.30|^6.3|^7.0",
-        "vimeo/psalm": "^5.18"
+        "doctrine/orm": "^3.5.8",
+        "friendsofphp/php-cs-fixer": "^3.91.3",
+        "kubawerlos/php-cs-fixer-custom-fixers": "^3.35.1",
+        "phpstan/extension-installer": "^1.4.3",
+        "phpstan/phpstan": "^2.1.33",
+        "phpstan/phpstan-phpunit": "^2.0.10",
+        "phpstan/phpstan-strict-rules": "^2.0.7",
+        "phpstan/phpstan-symfony": "^2.0.9",
+        "phpunit/phpunit": "^12.5.2",
+        "rector/rector": "^2.2.14",
+        "symfony/cache": "^7.4.1",
+        "symfony/doctrine-bridge": "^7.4.1",
+        "symfony/validator": "^7.4.2",
+        "symfony/var-dumper": "^7.4"
     },
     "suggest": {
         "a2lix/translation-form-bundle": "For translation form"
@@ -42,17 +48,18 @@
         "cs-fixer": [
             "php-cs-fixer fix --verbose"
         ],
-        "psalm": [
-            "psalm"
+        "phpstan": [
+            "phpstan analyse --memory-limit=2G"
         ],
         "phpunit": [
-            "SYMFONY_DEPRECATIONS_HELPER=max[self]=0 simple-phpunit"
+            "phpunit"
         ]
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "phpstan/extension-installer": true
         }
     },
     "autoload": {
@@ -63,7 +70,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.x-dev"
+            "dev-main": "1.x-dev"
         }
     }
 }
