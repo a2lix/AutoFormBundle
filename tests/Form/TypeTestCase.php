@@ -83,20 +83,6 @@ abstract class TypeTestCase extends BaseTypeTestCase
         ];
     }
 
-    private function getEntityManager(): EntityManagerInterface
-    {
-        if (null !== $this->entityManager) {
-            return $this->entityManager;
-        }
-
-        $configuration = ORMSetup::createAttributeMetadataConfig([__DIR__.'/../Fixtures/Entity'], true);
-        $configuration->enableNativeLazyObjects(true);
-
-        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $configuration);
-
-        return $this->entityManager = new EntityManager($connection, $configuration);
-    }
-
     private function getPropertyInfoExtractor(): PropertyInfoExtractor
     {
         $doctrineExtractor = new DoctrineExtractor($this->getEntityManager());
@@ -118,5 +104,19 @@ abstract class TypeTestCase extends BaseTypeTestCase
                 $reflectionExtractor,
             ]
         );
+    }
+
+    private function getEntityManager(): EntityManagerInterface
+    {
+        if (null !== $this->entityManager) {
+            return $this->entityManager;
+        }
+
+        $configuration = ORMSetup::createAttributeMetadataConfig([__DIR__.'/../Fixtures/Entity'], true);
+        $configuration->enableNativeLazyObjects(true);
+
+        $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $configuration);
+
+        return $this->entityManager = new EntityManager($connection, $configuration);
     }
 }
