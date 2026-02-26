@@ -13,7 +13,7 @@ namespace A2lix\AutoFormBundle\Tests\Form;
 
 /**
  * @phpstan-type ExpectedChildren = array<string, array{
- *   expected_type?: class-string,
+ *   expected_type?: class-string<\Symfony\Component\Form\FormTypeInterface<mixed>>,
  *   expected_children?: mixed,
  *   ...
  * }>

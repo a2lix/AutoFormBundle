@@ -45,7 +45,7 @@ class Product1
     #[ORM\ManyToOne(targetEntity: Media1::class)]
     public ?Media1 $mediaMain = null;
 
-    /** @var Collection<int, Media1> */
+    /** @var Collection<array-key, Media1> */
     #[ORM\OneToMany(targetEntity: Media1::class, mappedBy: 'product', cascade: ['all'], orphanRemoval: true)]
     public Collection $mediaColl;
 

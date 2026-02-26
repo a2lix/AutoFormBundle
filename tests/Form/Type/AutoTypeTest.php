@@ -22,7 +22,6 @@ use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Symfony\Component\Form\FormInterface;
 
 /**
  * @internal
@@ -49,8 +48,8 @@ final class AutoTypeTest extends TypeTestCase
     }
 
     /**
-     * @param ExpectedChildren                       $expectedForm
-     * @param array<array-key, FormInterface<mixed>> $formChildren
+     * @param ExpectedChildren                                               $expectedForm
+     * @param array<array-key, \Symfony\Component\Form\FormInterface<mixed>> $formChildren
      */
     private static function assertFormChildren(array $expectedForm, array $formChildren, string $parentPath = ''): void
     {

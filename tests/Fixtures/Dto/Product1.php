@@ -19,11 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type as CoreType;
 
 class Product1
 {
-    /**
-     * @param list<string>            $tags
-     * @param Collection<int, Media1> $mediaColl
-     * @param list<ProductStatus>     $statusList
-     */
     public function __construct(
         #[AutoTypeCustom(excluded: true)]
         public readonly ?string $id = null,
@@ -31,10 +26,13 @@ class Product1
         #[AutoTypeCustom(type: CoreType\TextareaType::class, name: 'desc', options: ['attr' => ['rows' => 2]])]
         private ?string $description = null,
         public readonly ?int $code = null,
+        /** @var list<string> */
         public readonly array $tags = [],
         public readonly ?Media1 $mediaMain = null,
+        /** @var Collection<array-key, Media1> */
         public ?Collection $mediaColl = null,
         public readonly ?ProductStatus $status = null,
+        /** @var list<ProductStatus> */
         public readonly ?array $statusList = null,
         #[AutoTypeCustom(groups: ['Default', 'validity'])]
         public readonly ?\DateTimeImmutable $validityStartAt = null,
