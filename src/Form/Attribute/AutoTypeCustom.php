@@ -20,9 +20,9 @@ use A2lix\AutoFormBundle\Form\Builder\AutoTypeBuilder;
 final readonly class AutoTypeCustom
 {
     /**
-     * @param array<string, mixed> $options
-     * @param class-string|null    $type
-     * @param list<string>|null    $groups
+     * @param array<string, mixed>                                                $options
+     * @param class-string<\Symfony\Component\Form\FormTypeInterface<mixed>>|null $type
+     * @param list<string>|null                                                   $groups
      */
     public function __construct(
         private array $options = [],

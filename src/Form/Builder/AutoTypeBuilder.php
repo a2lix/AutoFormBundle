@@ -23,7 +23,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * @phpstan-type ChildOptions array{
- *    child_type?: class-string,
+ *    child_type?: class-string<\Symfony\Component\Form\FormTypeInterface<mixed>>,
  *    child_name?: string,
  *    child_excluded?: bool,
  *    child_embedded?: bool,
@@ -287,7 +287,7 @@ final readonly class AutoTypeBuilder
         $innerType = $propTypeInfo instanceof TypeInfo\NullableType ? $propTypeInfo->getWrappedType() : $propTypeInfo;
 
         if (Collection::class === $innerType->getClassName()) {
-            throw new \RuntimeException(\sprintf('Unprecise PhpDoc Collection detected for "%s:%s". Fix it. For example: "@param Collection<int, Obj> $%s"', $refProperty->class, $refProperty->name, $refProperty->name));
+            throw new \RuntimeException(\sprintf('Unprecise PhpDoc Collection detected for "%s:%s". Fix it. For example: "@var Collection<array-key, Obj>"', $refProperty->class, $refProperty->name));
         }
 
         return [
