@@ -112,6 +112,6 @@ class DoctrineORMManipulator implements FormManipulatorInterface
             return;
         }
 
-        throw new \RuntimeException(sprintf("Field '%s' doesn't exist in %s", $formFieldName, $class));
+        throw new \RuntimeException(\sprintf("Field '%s' doesn't exist in %s", $formFieldName, $class));
     }
 }

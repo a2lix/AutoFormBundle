@@ -46,7 +46,7 @@ class DoctrineORMInfo
         $metadata = $this->classMetadataFactory->getMetadataFor($class);
 
         if (!$metadata->hasAssociation($fieldName)) {
-            throw new \RuntimeException(sprintf('Unable to find the association target class of "%s" in %s.', $fieldName, $class));
+            throw new \RuntimeException(\sprintf('Unable to find the association target class of "%s" in %s.', $fieldName, $class));
         }
 
         return $metadata->getAssociationTargetClass($fieldName);

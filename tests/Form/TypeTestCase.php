@@ -61,7 +61,8 @@ abstract class TypeTestCase extends BaseTypeTestCase
             return $this->doctrineORMManipulator;
         }
 
-        $config = ORMSetup::createAttributeMetadataConfiguration([__DIR__.'/../Fixtures/Entity'], true);
+        $config = ORMSetup::createAttributeMetadataConfig([__DIR__.'/../Fixtures/Entity'], true);
+        $config->enableNativeLazyObjects(true);
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
         $entityManager = new EntityManager($connection, $config);
         $doctrineORMInfo = new DoctrineORMInfo($entityManager->getMetadataFactory());

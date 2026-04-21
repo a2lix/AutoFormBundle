@@ -139,6 +139,7 @@ final class AutoFormTypeAdvancedTest extends TypeTestCase
         return $product;
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         $autoFormType = $this->getConfiguredAutoFormType();

@@ -18,7 +18,7 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->registerCustomFixers(new PhpCsFixerCustomFixers\Fixers())
     ->setRules([
-        '@PHP82Migration' => true,
+        '@PHP85Migration' => true,
         '@PhpCsFixer' => true,
         '@PhpCsFixer:risky' => true,
 

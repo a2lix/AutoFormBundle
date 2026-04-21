@@ -11,7 +11,7 @@ jobs:
         name: Analyze
         runs-on: ubuntu-latest
         container:
-            image: php:8.3-alpine
+            image: php:8.5-alpine
             options: >-
               --tmpfs /tmp:exec
               --tmpfs /var/tmp:exec
@@ -27,13 +27,13 @@ jobs:
             - uses: actions/cache@v3
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
-                key: ${{ runner.os }}-composer-8.3-highest-${{ hashFiles('**/composer.json') }}
+                key: ${{ runner.os }}-composer-8.5-highest-${{ hashFiles('**/composer.json') }}
                 restore-keys: |
-                  ${{ runner.os }}-composer-8.3-highest
+                  ${{ runner.os }}-composer-8.5-highest
             - name: Validate Composer
               run: composer validate
             - name: Install highest dependencies with Composer
-              run: composer update --no-progress --no-suggest --ansi
+              run: composer update --no-progress --ansi
             - name: Disable PHP memory limit
               run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
             - name: Run CS-Fixer
@@ -50,19 +50,10 @@ jobs:
         strategy:
             matrix:
                 php:
-                    - '8.1'
-                    - '8.2'
-                    - '8.3'
+                    - '8.5'
                 dependencies:
                     - 'lowest'
                     - 'highest'
-                include:
-                    - php: '8.1'
-                      phpunit-version: 10
-                    - php: '8.2'
-                      phpunit-version: 10
-                    - php: '8.3'
-                      phpunit-version: 10
             fail-fast: false
         steps:
             - name: Checkout
@@ -81,13 +72,11 @@ jobs:
                   ${{ runner.os }}-composer-${{ matrix.php }}-${{ matrix.dependencies }}
             - name: Install lowest dependencies with Composer
               if: matrix.dependencies == 'lowest'
-              run: composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+              run: composer update --no-progress --prefer-stable --prefer-lowest --ansi
             - name: Install highest dependencies with Composer
               if: matrix.dependencies == 'highest'
-              run: composer update --no-progress --no-suggest --ansi
+              run: composer update --no-progress --ansi
             - name: Run tests with PHPUnit
-              env:
-                SYMFONY_MAX_PHPUNIT_VERSION: ${{ matrix.phpunit-version }}
               run: vendor/bin/simple-phpunit --colors=always
 
     # coverage:

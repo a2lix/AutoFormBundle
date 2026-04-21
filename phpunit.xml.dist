@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<!-- https://docs.phpunit.de/en/11.5/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
          backupGlobals="false"
          colors="true"
          bootstrap="vendor/autoload.php"
 >
-  <coverage>
+  <source>
     <include>
       <directory>src/</directory>
     </include>
     <exclude>
       <directory>src/Resources</directory>
     </exclude>
-  </coverage>
+  </source>
 
   <php>
     <ini name="error_reporting" value="-1"/>
-    <server name="SYMFONY_MAX_PHPUNIT_VERSION" value="9.6" />
+    <server name="SYMFONY_PHPUNIT_VERSION" value="11.5"/>
   </php>
 
-  <listeners>
-    <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-  </listeners>
+  <extensions>
+    <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension"/>
+  </extensions>
 
   <testsuites>
     <testsuite name="Bundle Test Suite">

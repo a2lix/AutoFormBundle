@@ -17,6 +17,7 @@ use A2lix\AutoFormBundle\Form\Type\AutoFormType;
 use A2lix\AutoFormBundle\Tests\Fixtures\Entity\Media;
 use A2lix\AutoFormBundle\Tests\Fixtures\Entity\Product;
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
+use PHPUnit\Framework\Attributes\Depends;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\PreloadedExtension;
 
@@ -82,9 +83,7 @@ final class AutoFormTypeSimpleTest extends TypeTestCase
         return $product;
     }
 
-    /**
-     * @depends testCreationForm
-     */
+    #[Depends('testCreationForm')]
     public function testEditionForm(Product $product): void
     {
         $product->getMedias()[0]->setUrl('http://example.org/media1-edit');
@@ -121,6 +120,7 @@ final class AutoFormTypeSimpleTest extends TypeTestCase
         }
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         $autoFormType = $this->getConfiguredAutoFormType();
