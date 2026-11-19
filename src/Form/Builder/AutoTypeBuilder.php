@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -28,7 +28,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *    child_excluded?: bool,
  *    child_embedded?: bool,
  *    child_groups?: list<string>,
- *    ...
+ *    ...<string, mixed>
  * }
  * @phpstan-type ChildBuilderCallable callable(FormBuilderInterface<mixed> $builder, ?array<string, mixed> $propAttributeOptions): FormBuilderInterface<mixed>
  * @phpstan-type FormBuilderCallable callable(FormBuilderInterface<mixed> $builder, list<string> $classProperties): void

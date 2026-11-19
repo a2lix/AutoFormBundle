@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -72,7 +72,7 @@ final class AutoTypeTest extends TypeTestCase
             unset($expectedChildOptions['expected_type'], $expectedChildOptions['expected_children']);
             $actualOptions = $child->getConfig()->getOptions();
 
-            // @phpstan-ignore nullCoalesce.variable, staticMethod.alreadyNarrowedType
+            // @phpstan-ignore nullCoalesce.variable
             self::assertSame($expectedChildOptions, array_intersect_key($actualOptions, $expectedChildOptions ?? []), \sprintf('Options of "%s"', $childPath));
         }
     }
