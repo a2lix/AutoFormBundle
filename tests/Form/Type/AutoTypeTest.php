@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the AutoFormBundle package.
@@ -19,7 +19,6 @@ use A2lix\AutoFormBundle\Tests\Form\DataProviderDto;
 use A2lix\AutoFormBundle\Tests\Form\DataProviderEntity;
 use A2lix\AutoFormBundle\Tests\Form\TestScenario;
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 
@@ -32,7 +31,6 @@ use PHPUnit\Framework\Attributes\DataProviderExternal;
 #[CoversClass(AutoTypeBuilder::class)]
 #[CoversClass(AutoTypeCustom::class)]
 #[CoversClass(TypeInfoTypeGuesser::class)]
-#[AllowMockObjectsWithoutExpectations] // https://github.com/symfony/symfony/issues/62669
 final class AutoTypeTest extends TypeTestCase
 {
     #[DataProviderExternal(DataProviderDto::class, 'provideScenarioCases')]
@@ -72,7 +70,7 @@ final class AutoTypeTest extends TypeTestCase
             unset($expectedChildOptions['expected_type'], $expectedChildOptions['expected_children']);
             $actualOptions = $child->getConfig()->getOptions();
 
-            // @phpstan-ignore nullCoalesce.variable, staticMethod.alreadyNarrowedType
+            // @phpstan-ignore nullCoalesce.variable
             self::assertSame($expectedChildOptions, array_intersect_key($actualOptions, $expectedChildOptions ?? []), \sprintf('Options of "%s"', $childPath));
         }
     }
