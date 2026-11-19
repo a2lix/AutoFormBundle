@@ -19,6 +19,7 @@ use A2lix\AutoFormBundle\Tests\Form\DataProviderDto;
 use A2lix\AutoFormBundle\Tests\Form\DataProviderEntity;
 use A2lix\AutoFormBundle\Tests\Form\TestScenario;
 use A2lix\AutoFormBundle\Tests\Form\TypeTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 
@@ -31,6 +32,7 @@ use PHPUnit\Framework\Attributes\DataProviderExternal;
 #[CoversClass(AutoTypeBuilder::class)]
 #[CoversClass(AutoTypeCustom::class)]
 #[CoversClass(TypeInfoTypeGuesser::class)]
+#[AllowMockObjectsWithoutExpectations] // https://github.com/symfony/symfony/issues/62669
 final class AutoTypeTest extends TypeTestCase
 {
     #[DataProviderExternal(DataProviderDto::class, 'provideScenarioCases')]
